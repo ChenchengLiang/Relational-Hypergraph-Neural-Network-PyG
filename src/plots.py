@@ -44,8 +44,9 @@ def draw_label_pie_chart(num_label,learning_label,name=""):
 
 
 def draw_confusion_matrix(predicted_y,true_y,num_classes,name=""):
-    cm=confusion_matrix(true_y,predicted_y)
-    fig = px.imshow(cm,x=list(range(num_classes)),y=list(range(num_classes)), text_auto=True)
+    label_list=list(range(num_classes))
+    cm=confusion_matrix(true_y,predicted_y,labels=label_list)
+    fig = px.imshow(cm,x=label_list,y=label_list, text_auto=True)
     fig.update_layout(
         title='confusion matrix',
         xaxis_title='predicted_y',

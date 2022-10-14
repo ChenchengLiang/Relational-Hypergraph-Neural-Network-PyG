@@ -18,7 +18,7 @@ def main():
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
 
-
+    benchmarks = ["../data/experiment-"+str(i) for i in range(3,13)]
     #models=["GCN","hyper_GCN","full_connected"]
     models = ["hyper_GCN"]
     #tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
@@ -26,24 +26,25 @@ def main():
     graph_types=["hyperEdgeGraph","monoDirectionLayerGraph"]
     #graph_types = ["monoDirectionLayerGraph"]
     #graph_types = ["hyperEdgeGraph"]
-    num_gnn_layers=[4,8]
+    num_gnn_layers=[1,2,4,8]
     #num_gnn_layers = [2]
 
-    for model in models:
-        for task in tasks:
-            for graph_type in graph_types:
-                for num_gnn_layer in num_gnn_layers:
-                    run_one_experiment(model,task,graph_type,num_gnn_layer)
+    for graph_type in graph_types:
+        for bench in benchmarks:
+            for model in models:
+                for task in tasks:
+                    for num_gnn_layer in num_gnn_layers:
+                        run_one_experiment(model,task,graph_type,num_gnn_layer,bench)
 
-def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers):
-    mlflow.set_experiment("2022-10-14")
+def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
+    mlflow.set_experiment("2022-10-14-separate-data")
     task_num_class_dict={"argument_binary_classification":2,"template_binary_classification":2,"template_multi_classification":5}
 
     params = {}
-    params["benchmark"] = "../data/experiment-template-binary-classification"
+    params["benchmark"] = _benchmark
     params["learning_task"] = _task
     params["model"] = _model
-    params["epochs"] = 500
+    params["epochs"] = 200
     params["num_classes"] = task_num_class_dict[params["learning_task"]]
     params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
     params["embedding_size"] = 32
