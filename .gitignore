@@ -1,3 +1,5 @@
+*.iml
+*.xml
 /src/__pycache__
 /src/mlruns
 /venv
