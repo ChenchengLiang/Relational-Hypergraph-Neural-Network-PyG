@@ -18,7 +18,8 @@ def main():
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
 
-    benchmarks = ["../data/experiment-"+str(i) for i in range(3,13)]
+    #benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
+    benchmarks = ["../data/experiment-template-binary-classification"]
     #models=["GCN","hyper_GCN","full_connected"]
     models = ["hyper_GCN"]
     #tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
@@ -37,7 +38,7 @@ def main():
                         run_one_experiment(model,task,graph_type,num_gnn_layer,bench)
 
 def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
-    mlflow.set_experiment("2022-10-14-separate-data")
+    mlflow.set_experiment("2022-10-17-leakRelu-data")
     task_num_class_dict={"argument_binary_classification":2,"template_binary_classification":2,"template_multi_classification":5}
 
     params = {}
@@ -53,6 +54,7 @@ def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
     params["graph_type"] = _graph_type
     params["batch_size"] = 1
     params["self_loop"] = True
+    params["activation"]="leak_relu" #leak_relu
 
 
 
@@ -62,13 +64,16 @@ def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         if params["model"] == "GCN":
-            model = GNN_classification(params["num_classes"], vocabulary_size, embedding_size=params["embedding_size"]).to(
+            model = GNN_classification(params["num_classes"], vocabulary_size, embedding_size=params["embedding_size"],
+                                       num_gnn_layers=params["num_gnn_layers"],num_linear_layer=params["num_linear_layer"],
+                                       activation=params["activation"]).to(
                 device)
         elif params["model"]=="hyper_GCN":
             model = Hyper_classification(params["num_classes"],
                                          vocabulary_size=vocabulary_size,
                                          edge_arity_dict=edge_arity_dict, embedding_size=params["embedding_size"],
-                                         num_gnn_layers=params["num_gnn_layers"], num_linear_layer=params["num_linear_layer"]).to(device)
+                                         num_gnn_layers=params["num_gnn_layers"], num_linear_layer=params["num_linear_layer"],
+                                         activation=params["activation"]).to(device)
         else:
             model = Full_connected_model(params["num_classes"],vocabulary_size,embedding_size=params["embedding_size"]).to(device)
 

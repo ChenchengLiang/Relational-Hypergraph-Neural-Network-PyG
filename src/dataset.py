@@ -47,14 +47,13 @@ class HornGraphDataset(Dataset):
             node_indices = list(range(num_node))
 
             if self.graph_type == "hyperEdgeGraph":
-                graph_edge_list = ["argumentEdges","AST_1Edges", "AST_2Edges", "guardASTEdges", "binaryAdjacentList",
+                graph_edge_list = ["binaryAdjacentList","argumentEdges","AST_1Edges", "AST_2Edges", "guardASTEdges",
                                    "controlFlowHyperEdges", "dataFlowHyperEdges", "ternaryAdjacencyList"]
             else:
-                graph_edge_list = [
+                graph_edge_list = ["binaryAdjacentList",
                                 "predicateArgumentEdges", "predicateInstanceEdges", "argumentInstanceEdges",
                                    "controlHeadEdges","controlBodyEdges", "controlArgumentEdges", "subTermEdges", "guardEdges",
-                                   "dataEdges",
-                                   "binaryAdjacentList"]
+                                   "dataEdges"]
 
             # form learning label according to the task
             target_indices, target_label, graph_edge_list = self._construct_learning_label_and_edges(json_file_name,

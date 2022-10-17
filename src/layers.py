@@ -1,17 +1,24 @@
 import torch
-from torch.nn import Linear, Parameter,ModuleList,Sequential,ReLU,BatchNorm1d,LayerNorm
+from torch.nn import Linear, Parameter,ModuleList,Sequential,ReLU,BatchNorm1d,LayerNorm,LeakyReLU,Identity
 from torch_geometric.nn import MessagePassing
 from torch_geometric.utils import add_self_loops, degree
 from torch import Tensor
 import torch.nn.functional as F
+from torch_utils import get_activation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 class HyperConv(MessagePassing):
-    def __init__(self, in_channels, out_channels, edge_arity_dict):
+    def __init__(self, in_channels, out_channels, edge_arity_dict,activation="relu"):
         super().__init__()
         self.embedding_size=in_channels
         self.edge_arity_dict=edge_arity_dict
+        self.activation=activation
+        self.negative_slope: float = 0.2
 
-        self.linear_layers, self.linear_layers_ln= self._get_linear_layers()
+
+        self.linear_layers, self.linear_layers_ln,self.linear_layers_act= self._get_linear_layers()
+
+        self.final_update_func=get_activation(self.activation)
+
 
         self.reset_parameters()
 
@@ -44,7 +51,9 @@ class HyperConv(MessagePassing):
                 #normalization
                 message_per_position=self.linear_layers_ln[linear_layer_counter](message_per_position)
                 #message_per_position = F.dropout(message_per_position, p=0.8, training=self.training)
-                message_per_position = F.relu(message_per_position)
+                #message_per_position = F.relu(message_per_position)
+                message_per_position = self.linear_layers_act[linear_layer_counter](message_per_position)
+
 
                 #add messages to every target node position
                 target_node_index = edges[position, :] #[E]
@@ -52,7 +61,8 @@ class HyperConv(MessagePassing):
 
                 linear_layer_counter = linear_layer_counter + 1
 
-        aggregated_messages=F.relu(aggregated_messages) #[N,embedding_size]
+        #aggregated_messages=F.relu(aggregated_messages) #[N,embedding_size]
+        aggregated_messages = self.final_update_func(aggregated_messages)
 
         # Start propagating messages.
         #out = self.propagate(edge_index, x=x,message=aggregated_messages)
@@ -62,11 +72,14 @@ class HyperConv(MessagePassing):
     def _get_linear_layers(self):
         linear_layers=[]
         linear_layers_ln=[]
+        linear_layers_act=[]
         for k in self.edge_arity_dict:
             for _ in range(self.edge_arity_dict[k]):
                 linear_layers.append(Linear(self.embedding_size * self.edge_arity_dict[k], self.embedding_size))
                 linear_layers_ln.append(LayerNorm(self.embedding_size))
-        return ModuleList(linear_layers),ModuleList(linear_layers_ln)
+                linear_layers_act.append(get_activation(self.activation))
+        return ModuleList(linear_layers),ModuleList(linear_layers_ln),ModuleList(linear_layers_act)
+
 
     # def message(self, x_i,x_j,message):
     #     # x_j has shape [E, out_channels]
