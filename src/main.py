@@ -21,9 +21,9 @@ def main():
     #benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
     benchmarks = ["../data/experiment-template-binary-classification"]
     #models=["GCN","hyper_GCN","full_connected"]
-    models = ["hyper_GCN"]
+    models = ["hyper_GCN","GCN"]
     #tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
-    tasks = ["template_binary_classification"]
+    tasks = ["argument_binary_classification"]
     graph_types=["hyperEdgeGraph","monoDirectionLayerGraph"]
     #graph_types = ["monoDirectionLayerGraph"]
     #graph_types = ["hyperEdgeGraph"]
@@ -38,14 +38,14 @@ def main():
                         run_one_experiment(model,task,graph_type,num_gnn_layer,bench)
 
 def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
-    mlflow.set_experiment("2022-10-17-leakRelu-data")
+    mlflow.set_experiment("2022-10-17-argument-classification")
     task_num_class_dict={"argument_binary_classification":2,"template_binary_classification":2,"template_multi_classification":5}
 
     params = {}
     params["benchmark"] = _benchmark
     params["learning_task"] = _task
     params["model"] = _model
-    params["epochs"] = 200
+    params["epochs"] = 100
     params["num_classes"] = task_num_class_dict[params["learning_task"]]
     params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
     params["embedding_size"] = 32
@@ -54,7 +54,7 @@ def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
     params["graph_type"] = _graph_type
     params["batch_size"] = 1
     params["self_loop"] = True
-    params["activation"]="leak_relu" #leak_relu
+    params["activation"]="leak_relu" #leak_relu, tanh
 
 
 
@@ -143,5 +143,7 @@ def get_data(params,benchmark):
 
     return edge_arity_dict,train_loader,valid_loader,test_loader,vocabulary_size,class_weight,params
 
+
 if __name__ == '__main__':
     main()
+
