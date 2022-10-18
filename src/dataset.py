@@ -7,16 +7,16 @@ import os
 
 
 class HornGraphDataset(Dataset):
-    def __init__(self, root, learning_task,num_classes, graph_type, self_loop=False,transform=None, pre_transform=None, pre_filter=None):
+    def __init__(self, root, params,transform=None, pre_transform=None, pre_filter=None):
         """
                 root = Where the dataset should be stored. This folder is split
                 """
         self.root = root
-        self.num_classes = num_classes
+        self.num_classes = params["num_classes"]
         self.vocabulary = set()
-        self.graph_type = graph_type
-        self.learning_task=learning_task
-        self.self_loop=self_loop
+        self.graph_type = params["graph_type"]
+        self.learning_task=params["learning_task"]
+        self.self_loop=params["self_loop"]
         super().__init__(root, transform, pre_transform, pre_filter)
 
     @property

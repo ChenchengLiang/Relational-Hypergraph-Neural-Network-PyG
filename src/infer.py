@@ -14,7 +14,7 @@ def infer():
     best_model = torch.load(model_path)
     #mlflow.pytorch.load_model()
     params=mlflow.artifacts.load_dict(opj(artifact_uri,"params.json"))
-    ls_func = get_loss_function(params["task_type"], params["class_weight"]).to(device)
+    ls_func = get_loss_function(params).to(device)
     optimizer = torch.optim.Adam(best_model.parameters(), lr=0.01, weight_decay=5e-4)
 
     #Load test data
@@ -28,9 +28,7 @@ def infer():
     #predict
     mlflow.set_experiment("infer")
     with mlflow.start_run(description=""):
-        predicted_list, raw_predicted_list, file_name_list = predict(best_model, test_loader, optimizer, ls_func,
-                                                                     params["num_classes"],
-                                                                     task_type=params["task_type"])
+        predicted_list, raw_predicted_list, file_name_list = predict(best_model, test_loader, optimizer, params)
     #write back to graph
     write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list,params["task_type"], root=root)
 

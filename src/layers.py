@@ -50,9 +50,8 @@ class HyperConv(MessagePassing):
                 message_per_position = self.linear_layers[linear_layer_counter](concatednated_node_features) #[E, embedding_size]
                 #normalization
                 message_per_position=self.linear_layers_ln[linear_layer_counter](message_per_position)
-                #message_per_position = F.dropout(message_per_position, p=0.8, training=self.training)
-                #message_per_position = F.relu(message_per_position)
                 message_per_position = self.linear_layers_act[linear_layer_counter](message_per_position)
+                # message_per_position = F.dropout(message_per_position, p=0.8, training=self.training)
 
 
                 #add messages to every target node position
@@ -70,15 +69,15 @@ class HyperConv(MessagePassing):
         return out
 
     def _get_linear_layers(self):
-        linear_layers=[]
-        linear_layers_ln=[]
-        linear_layers_act=[]
+        linear_layers=ModuleList()
+        linear_layers_ln=ModuleList()
+        linear_layers_act=ModuleList()
         for k in self.edge_arity_dict:
             for _ in range(self.edge_arity_dict[k]):
-                linear_layers.append(Linear(self.embedding_size * self.edge_arity_dict[k], self.embedding_size))
+                linear_layers.append(Linear(self.embedding_size * self.edge_arity_dict[k], self.embedding_size,bias=False))
                 linear_layers_ln.append(LayerNorm(self.embedding_size))
                 linear_layers_act.append(get_activation(self.activation))
-        return ModuleList(linear_layers),ModuleList(linear_layers_ln),ModuleList(linear_layers_act)
+        return linear_layers,linear_layers_ln,linear_layers_act
 
 
     # def message(self, x_i,x_j,message):

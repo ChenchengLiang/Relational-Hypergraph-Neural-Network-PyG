@@ -6,6 +6,7 @@ import mlflow.pytorch
 from tqdm import tqdm
 import mlflow
 from torch_utils import get_accuracy
+from train_utils import get_loss_function
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -53,26 +54,27 @@ def run_one_epoch(model,data_loader,optimizer,ls_func,train=True,task_type="bina
             optimizer.step() # update parameters based on current gradients
     return running_loss/len(data_loader),predicted_list,raw_predicted_list,label_list,file_name_list
 
-def train(train_loader,valid_loader,model,ls_func,epochs=200,task_type="binary_classification"):
+def train(train_loader,valid_loader,model,params):
+    ls_func = get_loss_function(params).to(device)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"], weight_decay=5e-4)
     #optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
     train_loss_list=[]
     valid_loss_list=[]
     best_loss=10000000
     best_epoch=0
-    for epoch in tqdm(range(epochs),desc="Training progress"):
+    for epoch in tqdm(range(params["epochs"]),desc="Training progress"):
         #training
         model.train()
-        train_loss,predicted_list,raw_predicted_list,label_list,file_name_list=run_one_epoch(model,train_loader,optimizer,ls_func,train=True,task_type=task_type)
+        train_loss,predicted_list,raw_predicted_list,label_list,file_name_list=run_one_epoch(model,train_loader,optimizer,ls_func,train=True,task_type=params["task_type"])
         train_loss_list.append(train_loss)
         mlflow.log_metric("train_loss",train_loss,epoch)
 
 
         #validating
         model.eval()
-        valid_loss,predicted_list,raw_predicted_list,label_list,file_name_list=run_one_epoch(model,valid_loader,optimizer,ls_func,train=False,task_type=task_type)
+        valid_loss,predicted_list,raw_predicted_list,label_list,file_name_list=run_one_epoch(model,valid_loader,optimizer,ls_func,train=False,task_type=params["task_type"])
         valid_loss_list.append(valid_loss)
         mlflow.log_metric("valid_loss", valid_loss, epoch)
         valid_acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
@@ -89,7 +91,7 @@ def train(train_loader,valid_loader,model,ls_func,epochs=200,task_type="binary_c
             mlflow.log_metric("early stop epoch",epoch)
             return model, optimizer
 
-        if epoch % 50 == 0 or epoch == epochs-1:
+        if epoch % 50 == 0 or epoch == params["epochs"]-1:
             print("epoch:",epoch,"train_loss:",train_loss,"valid_loss:", valid_loss)
 
     print("best_epoch", best_epoch, "best_loss", best_loss)
