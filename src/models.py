@@ -7,10 +7,11 @@ from layers import HyperConv
 
 
 class GNN_classification(torch.nn.Module):
-    def __init__(self, label_size, vocabulary_size, embedding_size, num_gnn_layers, num_linear_layer, activation):
+    def __init__(self,  label_size, vocabulary_size, embedding_size, num_gnn_layers, num_linear_layer, activation,feature_size=1):
         super().__init__()
-        embedding_size = embedding_size
-
+        self.embedding_size = embedding_size
+        self.feature_size=feature_size
+        self.linear_in = Linear(feature_size, embedding_size)
         self.embedding = Embedding(vocabulary_size, embedding_size)
 
         # initialize conv layers
@@ -33,13 +34,17 @@ class GNN_classification(torch.nn.Module):
         self.linear_out = Linear(embedding_size, output_size)
 
     def forward(self, data):
-        x, edge_index, teamplate_node_mask, target_indices, edge_list = \
-            data.x, data.edge_index, data.teamplate_node_mask, data.target_indices, data.edge_list
-        x = torch.ravel(x)
+        x, edge_index, edge_list, target_indices = data.x, data.edge_index, data.edge_list,data.target_indices
+
 
         target_indices = torch.ravel(target_indices)
 
-        x = self.embedding(x)
+        if self.feature_size <=1:
+            x = torch.ravel(x)
+            x = self.embedding(x)
+        else:
+            x = self.linear_in(x)
+
 
         edges = edge_list[0]
 
@@ -67,25 +72,30 @@ class GNN_classification(torch.nn.Module):
 
 class Hyper_classification(torch.nn.Module):
     def __init__(self, label_size, vocabulary_size, edge_arity_dict, embedding_size, num_gnn_layers,
-                 num_linear_layer, activation):
+                 num_linear_layer, activation,feature_size=1,drop_out_probability=0):
         super().__init__()
-        embedding_size = embedding_size
-
+        self.feature_size=feature_size
+        self.embedding_size = embedding_size
+        self.linear_in = Linear(feature_size, embedding_size)
         self.embedding = Embedding(vocabulary_size, embedding_size)
         self.activation = activation
+        self.drop_out_probability=drop_out_probability
 
         # initialize conv layers
         hyper_conv_list = []
         conv_ln_list = []
         conv_act_list = []
+        conv_drop_list = []
         for i in range(num_gnn_layers):
             hyper_conv_list.append(
                 HyperConv(embedding_size, embedding_size, edge_arity_dict=edge_arity_dict, activation=self.activation))
             conv_ln_list.append(LayerNorm(embedding_size))
             conv_act_list.append(get_activation(self.activation))
+            conv_drop_list.append(Dropout(p=self.drop_out_probability))
         self.hyper_conv_list = ModuleList(hyper_conv_list)
         self.conv_ln_list = ModuleList(conv_ln_list)
         self.conv_act_list = ModuleList(conv_act_list)
+        self.conv_drop_list = ModuleList(conv_drop_list)
 
         # initialize linear layers
         self.linear_list, self.linear_ln_list, self.linear_act_list = initialize_linear_layers(
@@ -95,21 +105,26 @@ class Hyper_classification(torch.nn.Module):
         self.linear_out = Linear(embedding_size, output_size)
 
     def forward(self, data):
-        x, edge_index, teamplate_node_mask, target_indices, edge_list = \
-            data.x, data.edge_index, data.teamplate_node_mask, data.target_indices, data.edge_list
+        x, edge_index, target_indices, edge_list = \
+            data.x, data.edge_index, data.target_indices, data.edge_list
 
-        x = torch.ravel(x)
         target_indices = torch.ravel(target_indices)
 
-        # embedding layer
-        x = self.embedding(x)
+        if self.feature_size <=1:
+            x = torch.ravel(x)
+            x = self.embedding(x)
+        else:
+            x = self.linear_in(x)
 
+        #add option sotre output from each layer and concatenate in the end
         # GNN layers
-        for conv, ln, act in zip(self.hyper_conv_list, self.conv_ln_list, self.conv_act_list):
+        for conv, ln, act,drop in zip(self.hyper_conv_list, self.conv_ln_list, self.conv_act_list,self.conv_drop_list):
             x = conv(x, edge_index, edge_list)
             x = ln(x)
             # x = F.dropout(x, p=0.8, training=self.training)
             x = act(x)
+            if self.training==True:
+                x=drop(x)
 
         # gather template node
         # x = x[teamplate_node_mask]
@@ -165,3 +180,5 @@ class Full_connected_model(torch.nn.Module):
 
         x = self.linear_out(x)
         return x
+
+

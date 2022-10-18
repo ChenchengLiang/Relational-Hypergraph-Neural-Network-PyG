@@ -71,9 +71,9 @@ class HornGraphDataset(Dataset):
 
             # transform node features, edges, and labels to tensors
             node_features = self.tokenize_symbols(token_map, node_symbol_list, self.graph_type)
-            x_tensor = node_features #torch.tensor([[n] for n in node_features], dtype=torch.long)
-            target_indices_tensor = target_indices #torch.tensor(target_indices, dtype=torch.long)
-            y_tensor = target_label #torch.tensor(target_label)
+            x_tensor = torch.tensor([[n] for n in node_features], dtype=torch.long)
+            target_indices_tensor = torch.tensor(target_indices, dtype=torch.long)
+            y_tensor = torch.tensor(target_label)
 
             edge_list = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in edge_list]
 

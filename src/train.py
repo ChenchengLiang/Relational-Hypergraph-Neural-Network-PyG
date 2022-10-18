@@ -19,7 +19,8 @@ def run_one_epoch(model,data_loader,optimizer,ls_func,train=True,task_type="bina
     label_list=[]
     file_name_list=[]
     for batch in data_loader:
-    #for _, batch in enumerate(tqdm(data_loader)):
+        if type(batch) is list:
+            batch=batch[0]
         batch.to(device) # Use GPU
         pred = model(batch)
         if task_type == "binary_classification":
@@ -54,7 +55,7 @@ def run_one_epoch(model,data_loader,optimizer,ls_func,train=True,task_type="bina
 
 def train(train_loader,valid_loader,model,ls_func,epochs=200,task_type="binary_classification"):
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=5e-4)
     #optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
     train_loss_list=[]

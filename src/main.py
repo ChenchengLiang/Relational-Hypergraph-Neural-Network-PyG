@@ -58,6 +58,7 @@ def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark,data_
     params["self_loop"] = True
     params["activation"]="leak_relu" #leak_relu, tanh
     params["data_loader_shuffle"]=data_shuffle
+    params["drop_out_rate"]=0.2
 
 
 
@@ -69,14 +70,13 @@ def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark,data_
         if params["model"] == "GCN":
             model = GNN_classification(params["num_classes"], vocabulary_size, embedding_size=params["embedding_size"],
                                        num_gnn_layers=params["num_gnn_layers"],num_linear_layer=params["num_linear_layer"],
-                                       activation=params["activation"]).to(
-                device)
+                                       activation=params["activation"]).to(device)
         elif params["model"]=="hyper_GCN":
             model = Hyper_classification(params["num_classes"],
                                          vocabulary_size=vocabulary_size,
                                          edge_arity_dict=edge_arity_dict, embedding_size=params["embedding_size"],
                                          num_gnn_layers=params["num_gnn_layers"], num_linear_layer=params["num_linear_layer"],
-                                         activation=params["activation"]).to(device)
+                                         activation=params["activation"],drop_out_probability=params["drop_out_rate"]).to(device)
         else:
             model = Full_connected_model(params["num_classes"],vocabulary_size,embedding_size=params["embedding_size"]).to(device)
 
