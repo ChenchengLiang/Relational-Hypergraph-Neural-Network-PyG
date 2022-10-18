@@ -3,6 +3,7 @@ import numpy as np
 from utils import manual_flatten
 import mlflow
 from plots import draw_label_pie_chart, draw_confusion_matrix
+from torch_utils import get_accuracy
 
 
 def predict(trained_model, test_loader, optimizer, ls_func, num_classes, task_type="binary_classification"):
@@ -21,13 +22,14 @@ def predict(trained_model, test_loader, optimizer, ls_func, num_classes, task_ty
     draw_label_pie_chart(num_classes, predicted_list, "predicted-data")
 
     print("-" * 10)
-    flatten_predicted_list = np.array(manual_flatten(predicted_list)).ravel()
-    flatten_label_list = np.array(manual_flatten(label_list)).ravel()
+    acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
+    # flatten_predicted_list = np.array(manual_flatten(predicted_list)).ravel()
+    # flatten_label_list = np.array(manual_flatten(label_list)).ravel()
     draw_confusion_matrix(flatten_predicted_list, flatten_label_list, num_classes)
 
-    correct = (flatten_predicted_list == flatten_label_list).sum()
-    acc = int(correct) / len(flatten_label_list)
-    mlflow.log_metric("Accuracy", acc)
-    print(f'Accuracy: {acc:.4f}')
+    # correct = (flatten_predicted_list == flatten_label_list).sum()
+    # acc = int(correct) / len(flatten_label_list)
+    mlflow.log_metric("Predicted Accuracy", acc)
+    print(f'Predicted Accuracy: {acc:.4f}')
 
     return predicted_list, raw_predicted_list, file_name_list

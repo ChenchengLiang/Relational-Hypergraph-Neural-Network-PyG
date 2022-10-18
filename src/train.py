@@ -5,6 +5,7 @@ from plots import loss_plot
 import mlflow.pytorch
 from tqdm import tqdm
 import mlflow
+from torch_utils import get_accuracy
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -73,12 +74,19 @@ def train(train_loader,valid_loader,model,ls_func,epochs=200,task_type="binary_c
         valid_loss,predicted_list,raw_predicted_list,label_list,file_name_list=run_one_epoch(model,valid_loader,optimizer,ls_func,train=False,task_type=task_type)
         valid_loss_list.append(valid_loss)
         mlflow.log_metric("valid_loss", valid_loss, epoch)
+        valid_acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
+        mlflow.log_metric("valid accuracy", valid_acc, epoch)
 
         if valid_loss<best_loss:
             best_loss=valid_loss
             best_epoch=epoch
             torch.save(model, '../models/best_model.pth')
 
+        if valid_acc == 1:
+            torch.save(model, '../models/best_model.pth')
+            loss_plot(train_loss_list, valid_loss_list)
+            mlflow.log_metric("early stop epoch",epoch)
+            return model, optimizer
 
         if epoch % 50 == 0 or epoch == epochs-1:
             print("epoch:",epoch,"train_loss:",train_loss,"valid_loss:", valid_loss)

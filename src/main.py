@@ -23,29 +23,31 @@ def main():
     #models=["GCN","hyper_GCN","full_connected"]
     models = ["hyper_GCN","GCN"]
     #tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
-    tasks = ["argument_binary_classification"]
+    tasks = ["template_binary_classification"]
     graph_types=["hyperEdgeGraph","monoDirectionLayerGraph"]
     #graph_types = ["monoDirectionLayerGraph"]
     #graph_types = ["hyperEdgeGraph"]
-    num_gnn_layers=[1,2,4,8]
+    num_gnn_layers=[1,2,4]
     #num_gnn_layers = [2]
+    data_loader_shuffle=[False]
 
     for graph_type in graph_types:
         for bench in benchmarks:
             for model in models:
                 for task in tasks:
                     for num_gnn_layer in num_gnn_layers:
-                        run_one_experiment(model,task,graph_type,num_gnn_layer,bench)
+                        for data_shuffle in data_loader_shuffle:
+                            run_one_experiment(model,task,graph_type,num_gnn_layer,bench,data_shuffle)
 
-def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
-    mlflow.set_experiment("2022-10-17-argument-classification")
+def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark,data_shuffle):
+    mlflow.set_experiment("2022-10-17-batch-size-more")
     task_num_class_dict={"argument_binary_classification":2,"template_binary_classification":2,"template_multi_classification":5}
 
     params = {}
     params["benchmark"] = _benchmark
     params["learning_task"] = _task
     params["model"] = _model
-    params["epochs"] = 100
+    params["epochs"] = 200
     params["num_classes"] = task_num_class_dict[params["learning_task"]]
     params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
     params["embedding_size"] = 32
@@ -55,11 +57,12 @@ def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
     params["batch_size"] = 1
     params["self_loop"] = True
     params["activation"]="leak_relu" #leak_relu, tanh
+    params["data_loader_shuffle"]=data_shuffle
 
 
 
     with mlflow.start_run(description=""):
-        edge_arity_dict,train_loader,valid_loader,test_loader,vocabulary_size,class_weight,params=get_data(params, params["benchmark"])
+        edge_arity_dict,train_loader,valid_loader,test_loader,vocabulary_size,class_weight,params=get_data(params)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -99,18 +102,18 @@ def run_one_experiment(_model,_task,_graph_type,_num_gnn_layers,_benchmark):
 
 
 
-def get_data(params,benchmark):
-    root = opj(benchmark, "train_data")
+def get_data(params):
+    root = opj(params["benchmark"], "train_data")
     remove_processed_file(root=root)
     train_data = HornGraphDataset(root=root, learning_task=params["learning_task"], num_classes=params["num_classes"],
                                   graph_type=params["graph_type"],self_loop=params["self_loop"])
 
-    root = opj(benchmark, "valid_data")
+    root = opj(params["benchmark"], "valid_data")
     remove_processed_file(root=root)
     valid_data = HornGraphDataset(root=root, learning_task=params["learning_task"], num_classes=params["num_classes"],
                                   graph_type=params["graph_type"],self_loop=params["self_loop"])
 
-    root = opj(benchmark, "test_data")
+    root = opj(params["benchmark"], "test_data")
     remove_processed_file(root=root)
     test_data = HornGraphDataset(root=root, learning_task=params["learning_task"], num_classes=params["num_classes"],
                                  graph_type=params["graph_type"],self_loop=params["self_loop"])
@@ -122,12 +125,12 @@ def get_data(params,benchmark):
     # valid_data = train_data
     # test_data = train_data
     print("train-valid-test:", len(train_data), len(valid_data), len(test_data))
-    print("train_data[0]", train_data[0])
+    #print("train_data[0]", train_data[0])
     # print("train_data[0].y", train_data[0].y)
 
-    train_loader = DataLoader(train_data, batch_size=params["batch_size"], shuffle=True)
-    valid_loader = DataLoader(valid_data, batch_size=params["batch_size"], shuffle=True)
-    test_loader = DataLoader(test_data, batch_size=params["batch_size"], shuffle=True)
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
+    valid_loader = torch.utils.data.DataLoader(valid_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
+    test_loader = torch.utils.data.DataLoader(test_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
 
     edge_arity_dict = train_data[0].edge_arity_dict
 

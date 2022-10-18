@@ -20,7 +20,7 @@ class GNN_classification(torch.nn.Module):
         for i in range(num_gnn_layers):
             conv_list.append(GCNConv(embedding_size, embedding_size))
             conv_ln_list.append(LayerNorm(embedding_size))
-            conv_act_list.append(activation)
+            conv_act_list.append(get_activation(activation))
         self.conv_list = ModuleList(conv_list)
         self.conv_ln_list = ModuleList(conv_ln_list)
         self.conv_act_list = ModuleList(conv_act_list)

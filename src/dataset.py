@@ -71,17 +71,17 @@ class HornGraphDataset(Dataset):
 
             # transform node features, edges, and labels to tensors
             node_features = self.tokenize_symbols(token_map, node_symbol_list, self.graph_type)
-            node_features_tensor = torch.tensor([[n] for n in node_features], dtype=torch.long)
-            target_indices = torch.tensor(target_indices, dtype=torch.long)
-            y_tensor = torch.tensor(target_label)
+            x_tensor = node_features #torch.tensor([[n] for n in node_features], dtype=torch.long)
+            target_indices_tensor = target_indices #torch.tensor(target_indices, dtype=torch.long)
+            y_tensor = target_label #torch.tensor(target_label)
 
             edge_list = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in edge_list]
 
-            data = Data(x=node_features_tensor,
+            data = Data(x=x_tensor,
                         edge_index=torch.tensor([[0, 0]]).t().contiguous(),
                         y=y_tensor,
                         teamplate_node_mask=teamplate_node_mask,
-                        target_indices=target_indices,
+                        target_indices=target_indices_tensor,
                         edge_list=edge_list,
                         edge_arity_dict=edge_arity_dict,
                         file_name=file_name
@@ -96,6 +96,7 @@ class HornGraphDataset(Dataset):
     def get(self, idx):
         data = torch.load(os.path.join(self.processed_dir, f'data_{idx}.pt'))
         return data
+
 
     def _construct_learning_label_and_edges(self,json_file_name,graph_edge_list,node_indices):
         if self.learning_task == "template_multi_classification":

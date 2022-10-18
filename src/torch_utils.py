@@ -1,5 +1,14 @@
 from torch.nn import ReLU, LeakyReLU, Identity, Linear, LayerNorm, ModuleList, Tanh
+import numpy as np
+from utils import manual_flatten
+import torch
+def get_accuracy(predicted_list,label_list):
+    flatten_predicted_list = np.array(manual_flatten(predicted_list)).ravel()
+    flatten_label_list = np.array(manual_flatten(label_list)).ravel()
 
+    correct = (flatten_predicted_list == flatten_label_list).sum()
+    acc = int(correct) / len(flatten_label_list)
+    return acc,flatten_predicted_list,flatten_label_list
 
 def get_activation(activation):
     if activation == "relu":
@@ -21,3 +30,4 @@ def initialize_linear_layers(num_linear_layer, embedding_size, activation):
         linear_ln_list.append(LayerNorm(embedding_size))
         linear_act_list.append(get_activation(activation))
     return ModuleList(linear_list), ModuleList(linear_ln_list), ModuleList(linear_act_list)
+
