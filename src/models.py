@@ -73,7 +73,7 @@ class GNN_classification(torch.nn.Module):
         return x
 
 
-class Hyper_classification(torch.nn.Module):
+class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classification
     def __init__(self, label_size, vocabulary_size, edge_arity_dict, embedding_size, num_gnn_layers,
                  num_linear_layer, activation,feature_size=1,drop_out_probability=0):
         super().__init__()

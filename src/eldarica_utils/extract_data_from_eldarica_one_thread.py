@@ -1,4 +1,3 @@
-from ..utils import get_file_list
 import sys
 import os
 import time
@@ -150,5 +149,13 @@ def make_dirct(d):
         os.mkdir(d)
     except:
         print(str(d), "folder existed")
+
+
+def get_file_list(folder,file_type,compress_type=".zip"):
+    file_list = []
+    for f in glob.glob(folder +"/" + "*"+file_type+compress_type):
+        if "normalized" not in f and "simplified" not in f:
+            file_list.append(f)
+    return file_list
 if __name__ == '__main__':
     main()

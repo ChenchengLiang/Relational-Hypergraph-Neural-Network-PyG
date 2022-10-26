@@ -7,6 +7,7 @@
 *.sh
 /tutorial
 /benchmarks
+/eldarica-graph-generation
 /models
 /figures
 /data

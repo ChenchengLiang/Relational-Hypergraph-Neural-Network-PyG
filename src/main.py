@@ -20,13 +20,15 @@ def main():
     torch.cuda.manual_seed_all(42)
 
     # benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
-    benchmarks = ["../data/experiment-template-binary-classification"]
+    #benchmarks = ["../data/experiment-template-binary-classification"]
+    benchmarks = ["../data/single-example"]
     # models=["GCN","hyper_GCN","full_connected"]
     models = [ "hyper_GCN","GNN"]
+    gnns=[SAGEConv,FiLMConv,GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
     tasks = ["template_binary_classification"]
     graph_types = ["hyperEdgeGraph", "monoDirectionLayerGraph"]
-    # graph_types = ["monoDirectionLayerGraph"]
+    #graph_types = ["monoDirectionLayerGraph"]
     # graph_types = ["hyperEdgeGraph"]
     num_gnn_layers = [2]
     # num_gnn_layers = [2]
@@ -38,11 +40,15 @@ def main():
                 for task in tasks:
                     for num_gnn_layer in num_gnn_layers:
                         for data_shuffle in data_loader_shuffle:
-                            run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle)
+                            if model == "GNN":
+                                for _gnn in gnns:
+                                    run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn)
+                            else:
+                                run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle, SAGEConv)
 
 
-def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle):
-    mlflow.set_experiment("2022-10-18-learning-rate")
+def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn):
+    mlflow.set_experiment("2022-10-26-graph-unit-test")
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
@@ -63,7 +69,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = 0
     params["learning_rate"] = 0.001
-    params["gnn"] = SAGEConv
+    params["gnn"] = _gnn
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params)
@@ -97,6 +103,10 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, "model")
         predicted_list, raw_predicted_list, file_name_list = predict(best_model, test_loader, optimizer, params)
+
+        params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".") + 1:-2]
+        mlflow.log_params(params)
+        mlflow.log_dict(params, "params.json")
 
     write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, params["task_type"],
                                        root=opj(params["benchmark"], "test_data"))
@@ -138,8 +148,7 @@ def get_data(params):
     class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values]
     params["class_weight"] = class_weight
     params["edge_arity_dict"] = edge_arity_dict
-    mlflow.log_params(params)
-    mlflow.log_dict(params, "params.json")
+
 
     return edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params
 

@@ -46,14 +46,15 @@ class HornGraphDataset(Dataset):
             num_node=len(node_symbol_list)
             node_indices = list(range(num_node))
 
+            #ASTEdge
             if self.graph_type == "hyperEdgeGraph":
-                graph_edge_list = ["binaryAdjacentList","argumentEdges","AST_1Edges", "AST_2Edges", "guardASTEdges",
-                                   "controlFlowHyperEdges", "dataFlowHyperEdges", "ternaryAdjacencyList"]
+                graph_edge_list = ["binaryEdge","relationSymbolArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge",
+                                   "controlFlowHyperEdge", "dataFlowHyperEdge", "ternaryHyperEdge"]
             else:
-                graph_edge_list = ["binaryAdjacentList",
-                                "predicateArgumentEdges", "predicateInstanceEdges", "argumentInstanceEdges",
-                                   "controlHeadEdges","controlBodyEdges", "controlArgumentEdges", "subTermEdges", "guardEdges",
-                                   "dataEdges"]
+                graph_edge_list = ["binaryEdge",
+                                     "relationSymbolArgumentEdge","relationSymbolInstanceEdge", "argumentInstanceEdge",
+                                   "clauseHeadEdge","clauseBodyEdge", "clauseArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge",
+                                   "dataEdge"]
 
             # form learning label according to the task
             target_indices, target_label, graph_edge_list = self._construct_learning_label_and_edges(json_file_name,
@@ -99,15 +100,11 @@ class HornGraphDataset(Dataset):
 
 
     def _construct_learning_label_and_edges(self,json_file_name,graph_edge_list,node_indices):
-        if self.learning_task == "template_multi_classification":
-            target_indices = read_one_filed(json_file_name, "templateIndices")
-            target_label = read_one_filed(json_file_name, "templateRelevanceLabel")
-            graph_edge_list = graph_edge_list + ["templateEdges"]
-        elif self.learning_task == "template_binary_classification":
-            target_indices = read_one_filed(json_file_name, "templateIndices")
-            target_label = read_one_filed(json_file_name, "templateRelevanceLabel")
-            graph_edge_list = graph_edge_list + ["templateEdges"]
-            graph_edge_list = graph_edge_list + ["templateASTEdges"]
+        if self.learning_task in ["template_binary_classification","template_multi_classification"]:
+            target_indices = read_one_filed(json_file_name, "labelIndices")
+            target_label = read_one_filed(json_file_name, "labelList")
+            graph_edge_list = graph_edge_list + ["templateEdge"]
+            graph_edge_list = graph_edge_list + ["templateASTEdge"]
         elif self.learning_task == "argument_binary_classification":
             target_indices = node_indices
             argument_indices = read_one_filed(json_file_name, "argumentIndices")
