@@ -7,11 +7,22 @@ from train import train
 import mlflow
 from predict import predict
 import numpy as np
-def hyper_GNN_on_standard_dataset():
+from torch_geometric.nn import GCNConv,SAGEConv,FiLMConv
+
+
+def control_exmperiment():
+    model="GNN"
+    if model == "GNN":
+        for gnn in [GCNConv,SAGEConv,FiLMConv]:
+            hyper_GNN_on_standard_dataset(model,gnn)
+    else:
+        hyper_GNN_on_standard_dataset(model, "")
+
+def hyper_GNN_on_standard_dataset(_model,_gnn=""):
     np.random.seed(42)
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
-    mlflow.set_experiment("2022-10-18-standard-dataset")
+    mlflow.set_experiment("2022-10-24-standard-dataset")
     params={}
     params["embedding_size"]=32
     params["num_gnn_layers"]=2
@@ -19,8 +30,11 @@ def hyper_GNN_on_standard_dataset():
     params["activation"]="leak_relu"
     params["epochs"]=1000
     params["drop_out_rate"]=0
-    params["benchmark"]="Random"
+    params["benchmark"]="Cora"
+    params["learning_rate"] = 0.001
     params["class_weight"]=[]
+    params["model"] = _model
+    params["gnn"] = "" if params["model"] == "hyper_GNN" else _gnn
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if params["benchmark"]=="Cora":
         dataset = Planetoid(root='/tmp/'+params["benchmark"], name=params["benchmark"])
@@ -46,14 +60,17 @@ def hyper_GNN_on_standard_dataset():
     test_loader=train_loader
 
     with mlflow.start_run(description=""):
-        model = GNN_classification(params["num_classes"], vocabulary_size=1, embedding_size=params["embedding_size"],
-                                   num_gnn_layers=params["num_gnn_layers"], num_linear_layer=params["num_linear_layer"],
-                                   activation=params["activation"],feature_size=params["feature_size"]).to(device)
+        if params["model"] == "hyper_GNN":
+            edge_arity_dict = {"edge_type_0": 2}
+            model = Hyper_classification(params["num_classes"], edge_arity_dict=edge_arity_dict,vocabulary_size=1, embedding_size=params["embedding_size"],
+                                       num_gnn_layers=params["num_gnn_layers"], num_linear_layer=params["num_linear_layer"],
+                                       activation=params["activation"], feature_size=params["feature_size"],drop_out_probability=params["drop_out_rate"]).to(device)
+        else:
+            model = GNN_classification(params["num_classes"], vocabulary_size=1, embedding_size=params["embedding_size"],gnn=params["gnn"],
+                                       num_gnn_layers=params["num_gnn_layers"], num_linear_layer=params["num_linear_layer"],
+                                       activation=params["activation"],feature_size=params["feature_size"]).to(device)
 
-        edge_arity_dict={"edge_type_0":2}
-        # model = Hyper_classification(params["num_classes"], edge_arity_dict=edge_arity_dict,vocabulary_size=1, embedding_size=params["embedding_size"],
-        #                            num_gnn_layers=params["num_gnn_layers"], num_linear_layer=params["num_linear_layer"],
-        #                            activation=params["activation"], feature_size=params["feature_size"],drop_out_probability=params["drop_out_rate"]).to(device)
+
 
 
         trained_model, optimizer = train(train_loader, valid_loader, model, params)
@@ -63,6 +80,8 @@ def hyper_GNN_on_standard_dataset():
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, "model")
         predicted_list, raw_predicted_list, file_name_list = predict(best_model, test_loader, optimizer, params)
+        params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".")+1:-2]
+        mlflow.log_params(params)
 
 def collate_fn(data):
     for d in data:
@@ -72,4 +91,4 @@ def collate_fn(data):
     return data
 
 if __name__ == '__main__':
-    hyper_GNN_on_standard_dataset()
+    control_exmperiment()

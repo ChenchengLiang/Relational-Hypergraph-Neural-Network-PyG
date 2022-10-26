@@ -11,6 +11,7 @@ from train_utils import get_loss_function
 from predict import predict
 import mlflow
 from plots import draw_label_pie_chart
+from torch_geometric.nn import GCNConv,SAGEConv,FiLMConv
 
 
 def main():
@@ -21,7 +22,7 @@ def main():
     # benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
     benchmarks = ["../data/experiment-template-binary-classification"]
     # models=["GCN","hyper_GCN","full_connected"]
-    models = ["hyper_GCN", "GCN"]
+    models = [ "hyper_GCN","GNN"]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
     tasks = ["template_binary_classification"]
     graph_types = ["hyperEdgeGraph", "monoDirectionLayerGraph"]
@@ -49,7 +50,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["benchmark"] = _benchmark
     params["learning_task"] = _task
     params["model"] = _model
-    params["epochs"] = 1000
+    params["epochs"] = 500
     params["num_classes"] = task_num_class_dict[params["learning_task"]]
     params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
     params["embedding_size"] = 32
@@ -62,14 +63,15 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = 0
     params["learning_rate"] = 0.001
+    params["gnn"] = SAGEConv
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        if params["model"] == "GCN":
-            model = GNN_classification(params["num_classes"], vocabulary_size, embedding_size=params["embedding_size"],
+        if params["model"] == "GNN":
+            model = GNN_classification(params["num_classes"], vocabulary_size, embedding_size=params["embedding_size"],gnn=params["gnn"],
                                        num_gnn_layers=params["num_gnn_layers"],
                                        num_linear_layer=params["num_linear_layer"],
                                        activation=params["activation"]).to(device)

@@ -1,13 +1,14 @@
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv,SAGEConv
+from torch_geometric.nn import GCNConv,SAGEConv,FiLMConv
 from torch.nn import Linear, BatchNorm1d, Embedding, ModuleList, LayerNorm, Dropout, ReLU, LeakyReLU, Identity
 from torch_utils import get_activation, initialize_linear_layers
 from layers import HyperConv
 
 
 class GNN_classification(torch.nn.Module):
-    def __init__(self,  label_size, vocabulary_size, embedding_size, num_gnn_layers, num_linear_layer, activation,feature_size=1,drop_out_probability=0):
+    def __init__(self,  label_size, vocabulary_size, embedding_size, num_gnn_layers, num_linear_layer,
+                 activation,gnn=GCNConv,feature_size=1,drop_out_probability=0):
         super().__init__()
         self.embedding_size = embedding_size
         self.drop_out_probability = drop_out_probability
@@ -21,7 +22,7 @@ class GNN_classification(torch.nn.Module):
         self.conv_act_list = ModuleList()
         self.conv_drop_list = ModuleList()
         for i in range(num_gnn_layers):
-            self.conv_list.append(SAGEConv(embedding_size, embedding_size))
+            self.conv_list.append(gnn(embedding_size, embedding_size))
             self.conv_ln_list.append(LayerNorm(embedding_size))
             self.conv_act_list.append(get_activation(activation))
             self.conv_drop_list.append(Dropout(self.drop_out_probability))
@@ -122,6 +123,8 @@ class Hyper_classification(torch.nn.Module):
             x = act(x)
             if self.training==True:
                 x=drop(x)
+
+        #todo concatenate layers option
 
         # gather template node
         # x = x[teamplate_node_mask]
