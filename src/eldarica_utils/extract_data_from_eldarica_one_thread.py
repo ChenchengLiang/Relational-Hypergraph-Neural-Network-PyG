@@ -1,4 +1,4 @@
-from src.utils import get_file_list
+from ..utils import get_file_list
 import sys
 import os
 import time

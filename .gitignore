@@ -6,6 +6,7 @@
 /venv
 *.sh
 /tutorial
+/benchmarks
 /models
 /figures
 /data
