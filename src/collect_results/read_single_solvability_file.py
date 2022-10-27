@@ -1,7 +1,7 @@
 from utils import read_solvability_JSON
 
 def main():
-    print_filled_fields("cegar","off")
+    print_filled_fields("predicateGeneratorTime","")
 
 
 def print_filled_fields(key_word_1="",key_word_2=""):
@@ -13,6 +13,7 @@ def print_filled_fields(key_word_1="",key_word_2=""):
             if j[field][0]!="10800000" and key_word_1 in field and key_word_2 in field:
                 collected_fields.append([field,j[field]])
                 #print(field,j[field])
+    print("collected_fields",len(collected_fields))
     for f in sorted(collected_fields):
         print(f[0],f[1])
 
