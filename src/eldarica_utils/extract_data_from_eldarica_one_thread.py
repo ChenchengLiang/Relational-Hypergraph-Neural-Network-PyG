@@ -13,54 +13,54 @@ def main():
     eldarica_timeout = 60 * 60 * 3
     existed_abstract_options = ["empty", "term", "oct", "relEqs", "relIneqs"]
     predicted_abstract_options = ["predictedCG", "predictedCDHG"]
-    other_abstract_options = ["mined", "unlabeled", "random"]
+    other_abstract_options = [ "unlabeled", "random","mined"]
     cost_type = ["same", "shape", "logit"]
     split_clause_option = ["1"]  # ["0","1"]
     exploration_rate=[0.5]
     data_fold = ["train_data", "valid_data", "test_data"]
     file_type = "smt2"
 
-    # get getSolvability # 15 hours
-    for a in existed_abstract_options:
-        for s in split_clause_option:
-            parameters_pipeline.append(
-                " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout))
+    # # get getSolvability # 15 hours
+    # for a in existed_abstract_options:
+    #     for s in split_clause_option:
+    #         parameters_pipeline.append(
+    #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout))
+    #
+    # # get labeled templates # 3 hours
+    # parameters_pipeline.append(" -mineTemplates ")
+    #
+    # # construct graphs # 6 hours
+    # parameters_pipeline.append(" -getHornGraph:CDHG ")
+    # parameters_pipeline.append(" -getHornGraph:CG ")
 
-    # get labeled templates # 3 hours
-    parameters_pipeline.append(" -mineTemplates ")
+    # # description: check solvability for sinlge template set
+    # for s in split_clause_option:
+    #     for ao in predicted_abstract_options + other_abstract_options:  # existed_abstract_options
+    #         parameters_pipeline.append(
+    #             " -getSolvability " + " -fixRandomSeed " + " -abstract:" + ao + " -splitClauses:" + s + " -t:" + str(
+    #                 eldarica_timeout))
 
-    # construct graphs # 6 hours
-    parameters_pipeline.append(" -getHornGraph:CDHG ")
-    parameters_pipeline.append(" -getHornGraph:CG ")
+    # # description: check solvability for predicted template set with different cost
+    # # unlabeled and random template set can use shape cost, but not important
+    # for ao in predicted_abstract_options:
+    #     for s in split_clause_option:
+    #         for c in ["shape","logit"]:
+    #             parameters_pipeline.append(
+    #                 " -getSolvability " + " -fixRandomSeed " + " -abstract:" + ao + " -readCostType:" + c + " -splitClauses:" + s + " -t:" + str(
+    #                     eldarica_timeout))
 
-    # description: check solvability for sinlge template set
-    for ao in predicted_abstract_options + other_abstract_options:  # existed_abstract_options
-        for s in split_clause_option:
-            parameters_pipeline.append(
-                " -getSolvability " + " -fixRandomSeed " + " -abstract:" + ao + " -splitClauses:" + s + " -t:" + str(
-                    eldarica_timeout))
-
-    # description: check solvability for predicted template set with different cost
-    # unlabeled and random template set can use shape cost, but not important
-    for ao in predicted_abstract_options:
-        for s in split_clause_option:
-            for c in ["shape","logit"]:
-                parameters_pipeline.append(
-                    " -getSolvability " + " -fixRandomSeed " + " -abstract:" + ao + " -readCostType:" + c + " -splitClauses:" + s + " -t:" + str(
-                        eldarica_timeout))
-
-    # description: check solvability for combined predicates with two template set, union
-    for ao in ["term", "oct", "relEqs", "relIneqs"]:
-        for s in split_clause_option:
-            for g in ["CDHG","CG"]:
-                for c in cost_type:
-                    parameters_pipeline.append(" -getSolvability " + " -fixRandomSeed " + " -combineTemplateStrategy:union " +" -hornGraphType:"+g+
-                                               " -abstract:" + ao + " -readCostType:" + c + " -splitClauses:" + s + " -t:" + str(eldarica_timeout))
+    # # description: check solvability for combined predicates with two template set, union
+    # for ao in ["term", "oct", "relEqs", "relIneqs"]:
+    #     for s in split_clause_option:
+    #         for g in ["CDHG","CG"]:
+    #             for c in cost_type:
+    #                 parameters_pipeline.append(" -getSolvability " + " -fixRandomSeed " + " -combineTemplateStrategy:union " +" -hornGraphType:"+g+
+    #                                            " -abstract:" + ao + " -readCostType:" + c + " -splitClauses:" + s + " -t:" + str(eldarica_timeout))
 
     # description: check solvability for combined predicates with two template set, random
     for ao in ["term", "oct", "relEqs", "relIneqs"]:
         for s in split_clause_option:
-            for g in ["CDHG","CG"]:
+            for g in ["CG","CDHG"]:
                 for c in cost_type:
                     for e in exploration_rate:
                         parameters_pipeline.append(" -getSolvability " + " -fixRandomSeed " + " -combineTemplateStrategy:random " +" -hornGraphType:"+g+
