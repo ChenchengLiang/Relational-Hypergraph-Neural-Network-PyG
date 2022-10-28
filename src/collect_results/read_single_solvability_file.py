@@ -1,7 +1,7 @@
 from utils import read_solvability_JSON
 
 def main():
-    print_filled_fields("predicateGeneratorTime","")
+    print_filled_fields("","PredictedCG")
 
 
 def print_filled_fields(key_word_1="",key_word_2=""):
