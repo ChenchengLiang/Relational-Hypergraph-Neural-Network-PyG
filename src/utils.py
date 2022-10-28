@@ -37,9 +37,9 @@ def add_JSON_field(json_file="",new_field=[],new_field_content=[]):
     with open(json_file, 'w') as f:
         json.dump(json_obj, f, sort_keys=False,separators=(",",":"))
 
-def get_file_list(folder,file_type,compress_type=".zip"):
+def get_file_list(folder,file_type,compress_type="zip"):
     file_list = []
-    for f in glob.glob(folder +"/" + "*"+file_type+compress_type):
+    for f in glob.glob(folder +"/" + "*"+file_type+"."+compress_type):
         if "normalized" not in f and "simplified" not in f:
             file_list.append(f)
     return file_list
@@ -93,5 +93,7 @@ def manual_flatten(target_list):
 def make_dirct(d):
     try:
         os.mkdir(d)
+        return d
     except:
         print(str(d), "folder existed")
+        return d
