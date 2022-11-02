@@ -2,10 +2,12 @@ import os.path
 from src.utils import get_file_list
 from utils import read_files, get_sumary_folder, read_json_file, read_graph_generation_log
 import pandas as pd
+from statistics import mean
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/small_real_dataset/train_data"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/test"
+    #folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/ready_for_training"
     summary_folder = get_sumary_folder(folder)
     file_list = get_file_list(folder, "smt2")
     graph_type = {"hyperEdgeGraph": "CDHG", "monoDirectionLayerGraph": "CG"}
@@ -35,18 +37,29 @@ def main():
             for field in node_field_list + binary_edge_name_list + ternary_edge_name_list:
                 data_dict[graph_type[g]][field + "Number"].append(graph_dict[field + "Number"][0])
 
-    print(data_dict["CDHG"])
-    print(data_dict["CG"])
+    # print(data_dict["CDHG"])
+    # print(data_dict["CG"])
+
+    summary_dict={}
+    for measurement in [mean, max, min]:
+        measurement_str=measurement.__name__
+        print(measurement_str)
+        measurement_dict={"graph_type":["CDHG","CG"]}
+        measurement_dict.update({"average_"+x+"_number":[] for x in node_field_list + binary_edge_name_list + ternary_edge_name_list})
+        for field in node_field_list + binary_edge_name_list + ternary_edge_name_list:
+            measurement_dict["average_"+field+"_number"].append(measurement(data_dict["CDHG"][field+"Number"]))
+            measurement_dict["average_" + field + "_number"].append(measurement(data_dict["CG"][field + "Number"]))
+        summary_dict.update({measurement_str:measurement_dict})
+
     with pd.ExcelWriter(summary_folder + "/graph_statistics.xlsx") as writer:
         data = pd.DataFrame(pd.DataFrame(data_dict["CDHG"]))
         data.to_excel(writer, sheet_name="CDHG")
         data = pd.DataFrame(pd.DataFrame(data_dict["CG"]))
         data.to_excel(writer, sheet_name="CG")
+        for k in summary_dict:
+            data = pd.DataFrame(pd.DataFrame(summary_dict[k]))
+            data.to_excel(writer, sheet_name=k)
 
-    # todo graph that has most of nodes
-    # average node
-    # most of edges
-    # average edges
 
 
 if __name__ == '__main__':

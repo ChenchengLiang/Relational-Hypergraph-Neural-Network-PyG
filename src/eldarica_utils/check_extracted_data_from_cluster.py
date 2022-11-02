@@ -4,16 +4,17 @@ from src.utils import get_file_list ,make_dirct
 import glob
 import gzip
 def main():
+    # for constructed graphs
+    separate_corner_cases_from_cluster(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/train_data",
+                                    file_numebr=10,target_message="training")
+    # #for mined templates
+    # separate_corner_cases_from_cluster(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-labeled-divided-2454/train_data",
+    #                              file_numebr=6,target_message="graph_construction")
 
-    #constructed_graphs_from_cluster()
-    mined_tempaltes_from_cluster()
+    # folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/train_data"
+    # check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-non-lin_524.smt2")
 
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/uppmax-mined-results/train_data"
-    #check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_0004.smt2")
-
-def constructed_graphs_from_cluster():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-for-graph-construction-divided-2210/train_data"
-
+def separate_corner_cases_from_cluster(folder,file_numebr,target_message):
     zip_file_list = get_file_list(folder, "smt2")
     print("ziped_smt2_file_list", len(zip_file_list))
 
@@ -24,26 +25,10 @@ def constructed_graphs_from_cluster():
 
     file_dict = {f: glob.glob(f[:-len(".zip")] + "*") for f in get_file_list(zip_file_folder, "smt2")}
 
-    separate_template_mining_timeout(folder, file_dict, file_number=10,target_message="training")
-
-def mined_tempaltes_from_cluster():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-labeled-divided-2454/train_data"
-
-    zip_file_list = get_file_list(folder, "smt2")
-    print("ziped_smt2_file_list", len(zip_file_list))
-
-    unziped_file_list = glob.glob(folder + "/" + "*.smt2")
-    print("unziped_file_list", len(unziped_file_list))
-
-    zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder)
-
-    file_dict = {f: glob.glob(f[:-len(".zip")] + "*") for f in get_file_list(zip_file_folder, "smt2")}
-
-    separate_template_mining_timeout(folder, file_dict,file_number=6)
+    separate_timeout_case(folder, file_dict, file_number=file_numebr,target_message=target_message)
 
 
-
-def separate_template_mining_timeout(folder,file_dict,file_number,target_message="graph_construction_folder"):
+def separate_timeout_case(folder,file_dict,file_number,target_message="graph_construction_folder"):
     ready_for_graph_construction_folder = make_dirct(os.path.dirname(folder) + "/ready_for_"+target_message)
     template_mining_timeout_folder = make_dirct(os.path.dirname(folder) + "/cluster_timeout_folder")
     ready_for_graph_construction_number = 0
@@ -63,7 +48,7 @@ def separate_template_mining_timeout(folder,file_dict,file_number,target_message
                     copy(ff, template_mining_timeout_folder)
             except:
                 print("file existed")
-    print("ready_for_"+target_message+"a_number", ready_for_graph_construction_number)
+    print("ready_for_"+target_message+"_number", ready_for_graph_construction_number)
     print("cluster_timeout_number", template_mining_timeout_number)
 
 def separate_zip_and_unzip_files(folder):
