@@ -21,16 +21,15 @@ def main():
 
     # benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
     #benchmarks = ["../data/experiment-template-binary-classification"]
-    benchmarks = ["../data/single-example"]
-    # models=["GCN","hyper_GCN","full_connected"]
-    #models = [ "hyper_GCN","GNN"]
-    models = [ "GNN"]
+    benchmarks = ["../data/linear_dataset_small"]
+    models = [ "hyper_GCN","GNN"]
+    #models = [ "GNN"]
     gnns=[SAGEConv,FiLMConv,GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
     tasks = ["template_binary_classification"]
-    #graph_types = ["hyperEdgeGraph", "monoDirectionLayerGraph"]
+    graph_types = ["hyperEdgeGraph", "monoDirectionLayerGraph"]
     #graph_types = ["monoDirectionLayerGraph"]
-    graph_types = ["hyperEdgeGraph"]
+    #graph_types = ["hyperEdgeGraph"]
     num_gnn_layers = [2]
     # num_gnn_layers = [2]
     data_loader_shuffle = [False]
@@ -49,7 +48,7 @@ def main():
 
 
 def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn):
-    mlflow.set_experiment("2022-10-30-"+os.path.basename(_benchmark))
+    mlflow.set_experiment("2022-10-31-"+os.path.basename(_benchmark))
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
@@ -65,7 +64,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["num_linear_layer"] = 2
     params["graph_type"] = _graph_type
     params["batch_size"] = 1
-    params["self_loop"] = True
+    params["self_loop"] = False
     params["activation"] = "leak_relu"  # leak_relu, tanh
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = 0
@@ -76,6 +75,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        #device = torch.device('cpu')
 
         if params["model"] == "GNN":
             model = GNN_classification(params["num_classes"], vocabulary_size, embedding_size=params["embedding_size"],gnn=params["gnn"],
@@ -128,12 +128,13 @@ def get_data(params):
 
     dataset = train_data + valid_data + test_data
     vocabulary_size = len(train_data.vocabulary) + len(valid_data.vocabulary) + len(test_data.vocabulary)
+    print("vocabulary_size",vocabulary_size)
 
     # train_data = dataset
     # valid_data = train_data
     # test_data = train_data
     print("train-valid-test:", len(train_data), len(valid_data), len(test_data))
-    # print("train_data[0]", train_data[0])
+    print("train_data[0]", train_data[0])
     # print("train_data[0].y", train_data[0].y)
 
     train_loader = DataLoader(train_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])

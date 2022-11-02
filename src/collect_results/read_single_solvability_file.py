@@ -1,4 +1,4 @@
-from utils import read_solvability_JSON
+from utils import read_files,read_json_file
 
 def main():
     print_filled_fields("","PredictedCG")
@@ -6,7 +6,7 @@ def main():
 
 def print_filled_fields(key_word_1="",key_word_2=""):
     file_list = ["/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/test/train_data/chc-LIA-non-lin_005.smt2.zip"]
-    json_obj_list = read_solvability_JSON(file_list)
+    json_obj_list = read_files(file_list,file_type="solvability.JSON",read_function=read_json_file)
     collected_fields=[]
     for j in json_obj_list:
         for field in j:

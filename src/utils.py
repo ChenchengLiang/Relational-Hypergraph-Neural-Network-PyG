@@ -39,16 +39,17 @@ def add_JSON_field(json_file="",new_field=[],new_field_content=[]):
 
 def get_file_list(folder,file_type,compress_type="zip"):
     file_list = []
-    for f in glob.glob(folder +"/" + "*"+file_type+"."+compress_type):
+    file_names = folder +"/" + "*"+file_type+compress_type if compress_type=="" else folder +"/" + "*"+file_type+"."+compress_type
+    for f in glob.glob(file_names):
         if "normalized" not in f and "simplified" not in f:
             file_list.append(f)
     return file_list
 
 
 def remove_processed_file(root=""):
-    for f in get_file_list(os.path.join(root,"processed"),file_type=".pt",compress_type=""):
+    for f in get_file_list(os.path.join(root,"processed"),file_type="pt",compress_type=""):
         os.remove(f)
-    for f in get_file_list(os.path.join(root,"predicted"),file_type=".JSON",compress_type=".zip"):
+    for f in get_file_list(os.path.join(root,"predicted"),file_type="JSON",compress_type="zip"):
         os.remove(f)
 
 def file_compress(inp_file_names, out_zip_file):
@@ -78,11 +79,6 @@ def unzip_file(zip_file):
         print("zip file "+zip_file+" not existed")
 
 
-def make_dirct(d):
-    try:
-        os.mkdir(d)
-    except:
-        print(str(d),"folder existed")
 
 def manual_flatten(target_list):
     temp = []

@@ -1,6 +1,6 @@
 import os.path
 import json
-from utils import read_solvability_JSON
+from utils import read_files, get_sumary_folder,read_json_file
 from src.utils import get_file_list, make_dirct
 import pandas as pd
 from statistics import mean
@@ -25,11 +25,6 @@ def main():
     for x in solvability_summary_by_abstract_option:
         print(x, solvability_summary_by_abstract_option[x])
 
-
-def get_sumary_folder(folder):
-    summary_folder = os.path.dirname(folder) + "/" + os.path.basename(folder) + "_summary"
-    make_dirct(summary_folder)
-    return summary_folder
 
 
 def write_solvability_summary_to_file(folder, solvability_summary, key_word=""):
@@ -72,7 +67,7 @@ def write_solvability_summary_to_file(folder, solvability_summary, key_word=""):
 
 def get_solvability_summary_by_abstract_option(abstract_option_list, folder):
     file_list = get_file_list(folder, "smt2")
-    solvability_object_list = read_solvability_JSON(file_list)
+    solvability_object_list = read_files(file_list,file_type="solvability.JSON",read_function=read_json_file)
 
     measurement_list = ["solvingTime", "cegarIterationNumber", "predicateGeneratorTime", "satisfiability"]
     # change getSolvability and CEGAR in Eldarica to collect generatedPredicateNumber and averagePredicateSize

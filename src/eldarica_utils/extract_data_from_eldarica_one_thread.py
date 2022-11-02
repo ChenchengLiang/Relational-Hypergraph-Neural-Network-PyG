@@ -26,7 +26,7 @@ def main():
     #         parameters_pipeline.append(
     #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout))
     #
-    # # get labeled templates # 3 hours
+    # get labeled templates # 3 hours
     # parameters_pipeline.append(" -mineTemplates ")
 
     # construct graphs # 6 hours

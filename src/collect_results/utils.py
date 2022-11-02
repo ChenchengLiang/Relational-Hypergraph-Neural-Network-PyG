@@ -1,25 +1,40 @@
-from src.utils import unzip_file
+from src.utils import unzip_file,make_dirct
 import os
 import json
 
+def read_json_file(f,json_obj):
+    loaded_graph = json.load(f)
+    for field in loaded_graph:
+        # print(bcolors.GRENN + str(field) + str(loaded_graph[field]) + bcolors.RESET)
+        json_obj[str(field)] = loaded_graph[field]
+    return json_obj
 
-def read_solvability_JSON(file_list):
+def read_files(file_list,file_type="solvability.JSON",read_function=read_json_file):
     json_obj_list = []
     for file in file_list:
         file_name = file[:-len(".zip")]
-        json_file = file_name + ".solvability.JSON"
+        json_file = file_name + "."+file_type
         unzip_file(json_file+".zip")
         if os.path.exists(json_file):
             json_obj = {}
             json_obj["file_name"] = json_file
             with open(json_file) as f:
-                loaded_graph = json.load(f)
-                for field in loaded_graph:
-                    # print(bcolors.GRENN + str(field) + str(loaded_graph[field]) + bcolors.RESET)
-                    json_obj[str(field)] = loaded_graph[field]
+                read_function(f,json_obj)
             json_obj_list.append(json_obj)
-
         #delete unziped file
         if os.path.exists(json_file+".zip"):
             os.remove(json_file)
     return json_obj_list
+
+
+def read_graph_generation_log(f,json_obj):
+    for l in f.readlines():
+        for g in ["CDHG","CG"]:
+            if g in l:
+                json_obj.update({g+"_time_consumption": int(l[l.find(":")+1:l.find("milliseconds")])})
+    return json_obj
+
+def get_sumary_folder(folder):
+    summary_folder = os.path.dirname(folder) + "/" + os.path.basename(folder) + "_summary"
+    make_dirct(summary_folder)
+    return summary_folder

@@ -4,8 +4,12 @@ from src.utils import get_file_list ,make_dirct
 import glob
 import gzip
 def main():
-    constructed_graphs_from_cluster()
-    #mined_tempaltes_from_cluster()
+
+    #constructed_graphs_from_cluster()
+    mined_tempaltes_from_cluster()
+
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/uppmax-mined-results/train_data"
+    #check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_0004.smt2")
 
 def constructed_graphs_from_cluster():
     folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-for-graph-construction-divided-2210/train_data"
@@ -23,7 +27,7 @@ def constructed_graphs_from_cluster():
     separate_template_mining_timeout(folder, file_dict, file_number=10,target_message="training")
 
 def mined_tempaltes_from_cluster():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-solvable-divided-2932/train_data"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-labeled-divided-2454/train_data"
 
     zip_file_list = get_file_list(folder, "smt2")
     print("ziped_smt2_file_list", len(zip_file_list))

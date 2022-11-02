@@ -55,6 +55,7 @@ class HornGraphDataset(Dataset):
                                    "clauseHeadEdge","clauseBodyEdge", "clauseArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge",
                                    "dataEdge","quantifierEdge","binaryEdge"]
 
+
             # form learning label according to the task
             target_indices, target_label, graph_edge_list = self._construct_learning_label_and_edges(json_file_name,
                                                                                                      graph_edge_list,
@@ -160,8 +161,8 @@ class HornGraphDataset(Dataset):
         for word in sorted(vocabulary_set):
             token_map[word] = token_id
             token_id = token_id + 1
-        # print("vocabulary_set",vocabulary_set)
-        # print("token_map",token_map)
+        # print("vocabulary_set",len(vocabulary_set),vocabulary_set)
+        # print("token_map",len(token_map),token_map)
         return vocabulary_set, token_map
 
     def convert_constant_to_category(self, constant_string):
@@ -178,12 +179,14 @@ class HornGraphDataset(Dataset):
                                 "predicateArgument": "unknown_predicate_argument", "template": "unknown_template",
                                 "symbolicConstant": "unknown_symbolic_constant"}
         else:
-            unknown_node_map = {"predicateArgument": "unknown_predicate_argument", "template": "unknown_template",
-                                "symbolicConstant": "unknown_symbolic_constant",
-                                "predicateName": "unknown_predicateName",
+            unknown_node_map = {"relationSymbolArgument": "unknown_relationSymbolArgument",
+                                "constant": "unknown_Constant",
+                                "relationSymbol": "unknown_relationSymbol",
                                 "clause": "unknown_clause",
                                 "clauseHead": "unknown_clauseHead", "clauseBody": "unknown_clauseBody",
-                                "clauseArgument": "unknown_clauseArgument"}
+                                "clauseArgument": "unknown_clauseArgument",
+                                "template_Eqs": "unknown_templateEqs","template_Ineqs": "unknown_templateIneqs",
+                                "template_Bool": "unknown_templateBool"}
 
         converted_node_symbols = [self.convert_constant_to_category(word) for word in node_symbols]
         # node tokenization
