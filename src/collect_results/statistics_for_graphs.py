@@ -6,7 +6,7 @@ from statistics import mean
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/ready_for_training"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/ready_for_training"
     #folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/ready_for_training"
     summary_folder = get_sumary_folder(folder)
     file_list = get_file_list(folder, "smt2")
