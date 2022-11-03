@@ -10,7 +10,6 @@ def read_json_file(f,json_obj):
     return json_obj
 
 def read_files(file_list,file_type="solvability.JSON",read_function=read_json_file):
-    json_obj_list = []
     for file in file_list:
         file_name = file[:-len(".zip")]
         json_file = file_name + "."+file_type
@@ -24,8 +23,6 @@ def read_files(file_list,file_type="solvability.JSON",read_function=read_json_fi
             if os.path.exists(json_file + ".zip"):
                 os.remove(json_file)
             yield json_obj
-            #json_obj_list.append(json_obj)
-    #return iter(json_obj_list)
 
 
 def read_graph_generation_log(f,json_obj):
