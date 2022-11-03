@@ -7,16 +7,16 @@ from src.collect_results.utils import read_files, read_json_file
 
 
 def main():
-    # # for constructed graphs
-    # separate_corner_cases_from_cluster_graph_construction(
-    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data",
-    #     file_numebr=10, target_message="not-timeout-cases")
+    # for constructed graphs
+    separate_corner_cases_from_cluster_graph_construction(
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/train_data",
+        file_numebr=10, target_message="not-timeout-cases")
     # #for mined templates
     # separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-labeled-divided-2454/train_data",
     #                              file_numebr=6,target_message="ready_for_check_other_issues")
 
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data"
-    check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_0636.smt2 ")
+    # folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data"
+    # check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_0636.smt2 ")
 
 
 def separate_corner_cases_from_cluster_mineTemplates(folder, file_numebr, target_message):

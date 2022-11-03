@@ -12,7 +12,7 @@ from predict import predict
 import mlflow
 from plots import draw_label_pie_chart
 from torch_geometric.nn import GCNConv,SAGEConv,FiLMConv
-
+from datetime import datetime
 
 def main():
     np.random.seed(42)
@@ -21,7 +21,7 @@ def main():
 
     # benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
     #benchmarks = ["../data/experiment-template-binary-classification"]
-    benchmarks = ["../data/linear_dataset_small"]
+    benchmarks = ["../data/linear_dataset"]
     models = [ "hyper_GCN","GNN"]
     #models = [ "GNN"]
     gnns=[SAGEConv,FiLMConv,GCNConv]
@@ -48,7 +48,8 @@ def main():
 
 
 def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn):
-    mlflow.set_experiment("2022-10-31-"+os.path.basename(_benchmark))
+    today=datetime.today().strftime('%Y-%m-%d')
+    mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
