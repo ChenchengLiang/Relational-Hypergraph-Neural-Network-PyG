@@ -6,7 +6,7 @@ from statistics import mean
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/test"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/ready_for_training"
     #folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/ready_for_training"
     summary_folder = get_sumary_folder(folder)
     file_list = get_file_list(folder, "smt2")
@@ -43,7 +43,6 @@ def main():
     summary_dict={}
     for measurement in [mean, max, min]:
         measurement_str=measurement.__name__
-        print(measurement_str)
         measurement_dict={"graph_type":["CDHG","CG"]}
         measurement_dict.update({"average_"+x+"_number":[] for x in node_field_list + binary_edge_name_list + ternary_edge_name_list})
         for field in node_field_list + binary_edge_name_list + ternary_edge_name_list:

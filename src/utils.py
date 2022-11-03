@@ -38,12 +38,11 @@ def add_JSON_field(json_file="",new_field=[],new_field_content=[]):
         json.dump(json_obj, f, sort_keys=False,separators=(",",":"))
 
 def get_file_list(folder,file_type,compress_type="zip"):
-    file_list = []
     file_names = folder +"/" + "*"+file_type+compress_type if compress_type=="" else folder +"/" + "*"+file_type+"."+compress_type
     for f in glob.glob(file_names):
-        if "normalized" not in f and "simplified" not in f:
-            file_list.append(f)
-    return file_list
+        base_name = os.path.basename(f)
+        if "normalized" not in base_name and "simplified" not in base_name:
+            yield f
 
 
 def remove_processed_file(root=""):
