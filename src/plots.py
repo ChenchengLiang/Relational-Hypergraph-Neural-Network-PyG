@@ -39,7 +39,7 @@ def draw_label_pie_chart(num_label, learning_label, name=""):
     flat_list = [item for sublist in learning_label for item in sublist]
     values = [flat_list.count(i) for i in label_name_list]
     pull = [0.2 if v / sum(values) < 0.01 else 0 for v in values]  # if percentage < 0.01, pull it out from the pie
-    fig = go.Figure(data=[go.Pie(labels=label_name_list, values=values, pull=pull)])
+    fig = go.Figure(title=name+str(len(learning_label)),data=[go.Pie(labels=label_name_list, values=values, pull=pull)])
 
     save_file_name = "../figures/" + name + "-distribution.html"
     fig.write_html(save_file_name)

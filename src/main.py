@@ -134,7 +134,8 @@ def get_data(params):
     # train_data = dataset
     # valid_data = train_data
     # test_data = train_data
-    print("train-valid-test:", len(train_data), len(valid_data), len(test_data))
+    train_valid_test_number=[len(train_data), len(valid_data), len(test_data)]
+    print("train-valid-test:", train_valid_test_number)
     print("train_data[0]", train_data[0])
     # print("train_data[0].y", train_data[0].y)
 
@@ -151,6 +152,7 @@ def get_data(params):
     class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values]
     params["class_weight"] = class_weight
     params["edge_arity_dict"] = edge_arity_dict
+    params["train_valid_test"] = train_valid_test_number
 
 
     return edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params
