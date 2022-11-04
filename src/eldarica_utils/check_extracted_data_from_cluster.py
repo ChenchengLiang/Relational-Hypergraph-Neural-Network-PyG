@@ -9,7 +9,7 @@ from src.collect_results.utils import read_files, read_json_file
 def main():
     # for constructed graphs
     separate_corner_cases_from_cluster_graph_construction(
-        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/train_data",
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data",
         file_numebr=10, target_message="not-timeout-cases")
     # #for mined templates
     # separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-labeled-divided-2454/train_data",
@@ -29,8 +29,8 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
     zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder)
     separated_folder = separate_cluster_timeout_case(zip_file_folder, file_number=file_numebr,
                                                      target_message=target_message)
-    separated_folder = separate_cases_by_graph_field(separated_folder, "non-trivial-clauses","no_simplified_clauses_folder",separate_no_simplified_clauses)
-    separated_folder = separate_cases_by_graph_field(separated_folder, "ready_for_training","no_template_folder",separate_no_template_cases)
+    separated_folder,exception_folder = separate_cases_by_graph_field(separated_folder, "non-trivial-clauses","no_simplified_clauses_folder",separate_no_simplified_clauses)
+    separated_folder,exception_folder = separate_cases_by_graph_field(separated_folder, "ready_for_training","no_template_folder",separate_no_template_cases)
 
 def separate_no_simplified_clauses(g,file_name,target_folder,exception_folder):
     if g["nodeNumber"][0] <= 7:
@@ -39,7 +39,7 @@ def separate_no_simplified_clauses(g,file_name,target_folder,exception_folder):
         copy_relative_files(file_name, target_folder)
 
 def separate_no_template_cases(g,file_name,target_folder,exception_folder):
-    if g["templateEdgeNumber"][0] == 1:
+    if g["labelNumber"][0] == 0:
         copy_relative_files(file_name, exception_folder)
     else:
         copy_relative_files(file_name, target_folder)
@@ -56,7 +56,10 @@ def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_n
     except:
         print("file existed")
 
-    return target_folder
+    print(os.path.basename(target_folder), len(get_file_list(target_folder)))
+    print(os.path.basename(exception_folder), len(get_file_list(exception_folder)))
+
+    return target_folder,exception_folder
 
 
 def separate_cluster_timeout_case(folder, file_number, target_message="graph_construction_folder"):
