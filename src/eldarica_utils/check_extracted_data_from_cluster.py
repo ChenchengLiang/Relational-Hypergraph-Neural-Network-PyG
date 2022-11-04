@@ -8,15 +8,15 @@ from src.collect_results.utils import read_files, read_json_file
 
 def main():
     # for constructed graphs
-    separate_corner_cases_from_cluster_graph_construction(
-        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data",
-        file_numebr=10, target_message="not-timeout-cases")
+    # separate_corner_cases_from_cluster_graph_construction(
+    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data",
+    #     file_numebr=10, target_message="not-timeout-cases")
     # #for mined templates
     # separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-labeled-divided-2454/train_data",
     #                              file_numebr=6,target_message="ready_for_check_other_issues")
 
-    # folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data"
-    # check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_0636.smt2 ")
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/uppmax-mined-results/train_data"
+    check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_0194.smt2")
 
 
 def separate_corner_cases_from_cluster_mineTemplates(folder, file_numebr, target_message):
@@ -29,37 +29,54 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
     zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder)
     separated_folder = separate_cluster_timeout_case(zip_file_folder, file_number=file_numebr,
                                                      target_message=target_message)
-    separated_folder,exception_folder = separate_cases_by_graph_field(separated_folder, "non-trivial-clauses","no_simplified_clauses_folder",separate_no_simplified_clauses)
-    separated_folder,exception_folder = separate_cases_by_graph_field(separated_folder, "ready_for_training","no_template_folder",separate_no_template_cases)
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "1-has-simplified-clauses",
+                                                                       "1-no_simplified_clauses",
+                                                                       separate_no_simplified_clauses)
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "2-has_template",
+                                                                       "2-no_template", separate_no_template_cases)
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-ready_for_training",
+                                                                       "3-no_labeled_template",
+                                                                       separate_no_labeled_template_cases)
 
-def separate_no_simplified_clauses(g,file_name,target_folder,exception_folder):
+
+
+def separate_no_simplified_clauses(g, file_name, target_folder, exception_folder):
     if g["nodeNumber"][0] <= 7:
         copy_relative_files(file_name, exception_folder)
     else:
         copy_relative_files(file_name, target_folder)
 
-def separate_no_template_cases(g,file_name,target_folder,exception_folder):
+
+def separate_no_template_cases(g, file_name, target_folder, exception_folder):
     if g["labelNumber"][0] == 0:
         copy_relative_files(file_name, exception_folder)
     else:
         copy_relative_files(file_name, target_folder)
 
-def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_name,separate_function):
+
+def separate_no_labeled_template_cases(g, file_name, target_folder, exception_folder):
+    if sum(g["labelList"]) == 0:
+        copy_relative_files(file_name, exception_folder)
+    else:
+        copy_relative_files(file_name, target_folder)
+
+
+def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_name, separate_function):
     target_folder = make_dirct(os.path.dirname(folder) + "/" + target_folder_name)
-    exception_folder = make_dirct(os.path.dirname(folder) + "/"+exception_folder_name)
+    exception_folder = make_dirct(os.path.dirname(folder) + "/" + exception_folder_name)
     graph_dict_list = read_files(get_file_list(folder, "smt2"), file_type="hyperEdgeGraph.JSON",
                                  read_function=read_json_file)
     try:
         for g in graph_dict_list:
             file_name = g["file_name"][:g["file_name"].find(".hyperEdgeGraph.JSON")]
-            separate_function(g,file_name,target_folder,exception_folder)
+            separate_function(g, file_name, target_folder, exception_folder)
     except:
         print("file existed")
 
-    print(os.path.basename(target_folder), len(get_file_list(target_folder)))
-    print(os.path.basename(exception_folder), len(get_file_list(exception_folder)))
+    print(os.path.basename(target_folder), len(get_file_list(target_folder,file_type="smt2")))
+    print(os.path.basename(exception_folder), len(get_file_list(exception_folder,file_type="smt2")))
 
-    return target_folder,exception_folder
+    return target_folder, exception_folder
 
 
 def separate_cluster_timeout_case(folder, file_number, target_message="graph_construction_folder"):
