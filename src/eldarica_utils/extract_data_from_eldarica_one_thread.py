@@ -30,8 +30,8 @@ def main():
     parameters_pipeline.append(" -mineTemplates ")
 
     # construct graphs # 6 hours
-    parameters_pipeline.append(" -getHornGraph:CDHG ")
-    parameters_pipeline.append(" -getHornGraph:CG ")
+    # parameters_pipeline.append(" -getHornGraph:CDHG ")
+    # parameters_pipeline.append(" -getHornGraph:CG ")
 
     # # description: check solvability for sinlge template set
     # for s in split_clause_option:

@@ -72,7 +72,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["learning_rate"] = 0.001
     params["gnn"] = _gnn
 
-    with mlflow.start_run(description=""):
+    with mlflow.start_run(description="",run_name=datetime.now()):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
