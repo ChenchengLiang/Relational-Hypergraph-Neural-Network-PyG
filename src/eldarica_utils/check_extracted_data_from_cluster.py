@@ -7,16 +7,22 @@ from src.collect_results.utils import read_files, read_json_file
 
 
 def main():
-    # for constructed graphs
-    # separate_corner_cases_from_cluster_graph_construction(
-    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data",
-    #     file_numebr=10, target_message="not-timeout-cases")
-    # #for mined templates
-    # separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-labeled-divided-2454/train_data",
-    #                              file_numebr=6,target_message="ready_for_check_other_issues")
 
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/uppmax-mined-results/train_data"
-    check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_0194.smt2")
+    #for solvabiloty
+    # separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-solvability/train_data",
+    #                              file_numebr=2,target_message="ready_for_template_mining")
+    #for mined templates
+    separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-mined-template/train_data",
+                                 file_numebr=6,target_message="ready_for_graph_construction")
+
+    # # for constructed graphs
+    # separate_corner_cases_from_cluster_graph_construction(
+    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/train_data",
+    #     file_numebr=10, target_message="not-timeout-cases")
+
+
+    # folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-solvability/train_data"
+    # check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_0917.smt2")
 
 
 def separate_corner_cases_from_cluster_mineTemplates(folder, file_numebr, target_message):

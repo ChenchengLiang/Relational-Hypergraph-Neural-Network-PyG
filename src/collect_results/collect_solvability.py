@@ -8,7 +8,7 @@ from src.plots import plot_cactus
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/test/train_data"
+    folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/linear_dataset/train_data"
     # get abstract_option_list
     abstract_option_list = get_abstract_option_list()
 
@@ -55,7 +55,8 @@ def write_solvability_summary_to_file(folder, solvability_summary, key_word=""):
         safe_number = sum(solvability_summary[f]["satisfiability_list"])
         safe_number_list.append(safe_number)
         unsafe_number_list.append(len(solvability_summary[f]["satisfiability_list"]) - safe_number)
-        average_solving_time_list.append(mean(solvability_summary[f]["solvingTime_list"]))
+        _solving_time_list= [0] if len(solvability_summary[f]["solvingTime_list"])==0 else solvability_summary[f]["solvingTime_list"]
+        average_solving_time_list.append(mean(_solving_time_list))
 
     df = pd.DataFrame(
         dict(Options=option_list, Solvable_number=solvable_number_list,

@@ -20,18 +20,18 @@ def main():
     data_fold = ["train_data", "valid_data", "test_data"]
     file_type = "smt2"
 
-    # # get getSolvability # 15 hours
+    # get getSolvability # 15 hours
     # for a in manual_abstract_options:
     #     for s in split_clause_option:
     #         parameters_pipeline.append(
-    #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout))
-    #
+    #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) + " -log ")
+
     # get labeled templates # 3 hours
-    parameters_pipeline.append(" -mineTemplates ")
+    #parameters_pipeline.append(" -mineTemplates -log ")
 
     # construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG ")
-    # parameters_pipeline.append(" -getHornGraph:CG ")
+    parameters_pipeline.append(" -getHornGraph:CDHG -log ")
+    parameters_pipeline.append(" -getHornGraph:CG -log ")
 
     # # description: check solvability for sinlge template set
     # for s in split_clause_option:

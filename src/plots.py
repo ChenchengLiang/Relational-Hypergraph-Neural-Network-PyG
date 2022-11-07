@@ -39,8 +39,8 @@ def draw_label_pie_chart(num_label, learning_label, name=""):
     flat_list = [item for sublist in learning_label for item in sublist]
     values = [flat_list.count(i) for i in label_name_list]
     pull = [0.2 if v / sum(values) < 0.01 else 0 for v in values]  # if percentage < 0.01, pull it out from the pie
-    fig = go.Figure(title=name+str(len(learning_label)),data=[go.Pie(labels=label_name_list, values=values, pull=pull)])
-
+    fig = go.Figure(data=[go.Pie(labels=label_name_list, values=values, pull=pull)])
+    fig.update_layout(title=name+"-"+str(len(learning_label)))
     save_file_name = "../figures/" + name + "-distribution.html"
     fig.write_html(save_file_name)
     mlflow.log_artifact(save_file_name)
@@ -62,9 +62,9 @@ def draw_confusion_matrix(predicted_y, true_y, num_classes, name=""):
 
 def plot_cactus(summary_folder, solvability_summary):
     max_time = np.max(np.max(np.array([item["solvingTime_list"] for item in solvability_summary.values()]))) / 1000
-    # print("max_time s",max_time)
+    print("max_time s",max_time)
     cactus = {}
-    time_limit = int(max_time) + 1
+    time_limit = int(max_time) + 2
     for option in solvability_summary:
         cactus[option] = [0]
         solved_index = 0
@@ -79,7 +79,7 @@ def plot_cactus(summary_folder, solvability_summary):
 
     # key_words=["Term","Octagon","RelationalEqs","RelationalIneqs"]
     # for k in key_words:
-    #     draw_one_cactus(summary_folder,cactus,k)
+    #     draw_one_cactus_plotly(summary_folder,cactus,k)
 
     # draw_one_cactus(summary_folder, cactus, "")
     draw_one_cactus_plotly(summary_folder, cactus, key_word="", scale="linear")
