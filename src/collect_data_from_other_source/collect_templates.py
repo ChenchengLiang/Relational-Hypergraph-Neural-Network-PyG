@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("../..")
 from src.utils import get_file_list, unzip_file, compress_file, make_dirct
 from src.collect_results.utils import copy_relative_files
@@ -9,7 +10,7 @@ import subprocess
 
 def main():
     folder = sys.argv[1]
-    collect_predicate_from_other_solvers(folder,solver_location=sys.argv[2])
+    collect_predicate_from_other_solvers(folder, solver_location=sys.argv[2], shell_timeout=60 * 5)
     separate_solvable_cases(folder)
 
 
@@ -22,10 +23,10 @@ def separate_solvable_cases(folder):
         with open(file_name + ".predicates", "r") as f:
             content = f.read()
             if len(content) != 0:
-                #transform to initial predicate
+                # transform to initial predicate
                 copy_relative_files(file_name, solvable_folder)
-                tpl_file_content=content.replace("define-fun","initial-predicates").replace(") Bool",")")
-                with open(solvable_folder+"/"+os.path.basename(file_name) + ".tpl","w") as template_file:
+                tpl_file_content = content.replace("define-fun", "initial-predicates").replace(") Bool", ")")
+                with open(solvable_folder + "/" + os.path.basename(file_name) + ".tpl", "w") as template_file:
                     template_file.write(tpl_file_content)
 
             else:
@@ -36,13 +37,15 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
     solver_parameter_list = " -smt2 -v:1 "
     shell_folder = make_dirct(os.path.join(os.path.dirname(unsolvable_folder), "shell_folder"))
     file_list = get_file_list(unsolvable_folder, "smt2")
+    counter=0
     for f in file_list:
         unzip_file(f)
         os.remove(f)
         f = f[:-len(".zip")]
 
         file_name = os.path.basename(f)
-        # print("file_name", file_name)
+        counter+=1
+        print(str(counter)+"/"+str(len(file_list))+" file_name", file_name)
 
         filter_key_words_list = ["transform", "expand", "spacer", "Propagating", "Entering", "create_child", "sat"]
         str_filter = ""
@@ -53,7 +56,8 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
         timeout_command = "timeout " + str(shell_timeout)
         with open(shell_file_name, "w") as ff:
             ff.write("#!/bin/sh\n")
-            ff.write(timeout_command + " " + solver_location + " " + f + " " + solver_parameter_list + log_parameters + "\n")
+            ff.write(
+                timeout_command + " " + solver_location + " " + f + " " + solver_parameter_list + log_parameters + "\n")
 
         run_one_shell(shell_file_name, log_file=unsolvable_folder + "/" + file_name + ".log")
 
