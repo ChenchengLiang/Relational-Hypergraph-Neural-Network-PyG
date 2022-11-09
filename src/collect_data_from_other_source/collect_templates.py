@@ -3,11 +3,12 @@ from src.collect_results.utils import copy_relative_files
 import os
 import time
 import subprocess
-
+import sys
 
 def main():
+    sys.path.append('..')
     folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/z3-solutions/test"
-    collect_predicate_from_other_solvers(folder)
+    collect_predicate_from_other_solvers(folder,solver_location="/home/cheli243/Downloads/z3-binary/build/z3")
     separate_solvable_cases(folder)
 
 
@@ -30,7 +31,7 @@ def separate_solvable_cases(folder):
                 copy_relative_files(file_name, unsolvable_folder)
 
 
-def collect_predicate_from_other_solvers(unsolvable_folder, solver="z3", shell_timeout=20):
+def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3", shell_timeout=20):
     solver_parameter_list = " -smt2 -v:1 "
     shell_folder = make_dirct(os.path.join(os.path.dirname(unsolvable_folder), "shell_folder"))
     file_list = get_file_list(unsolvable_folder, "smt2")
@@ -51,7 +52,7 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver="z3", shell_t
         timeout_command = "timeout " + str(shell_timeout)
         with open(shell_file_name, "w") as ff:
             ff.write("#!/bin/sh\n")
-            ff.write(timeout_command + " " + solver + " " + f + " " + solver_parameter_list + log_parameters + "\n")
+            ff.write(timeout_command + " " + solver_location + " " + f + " " + solver_parameter_list + log_parameters + "\n")
 
         run_one_shell(shell_file_name, log_file=unsolvable_folder + "/" + file_name + ".log")
 

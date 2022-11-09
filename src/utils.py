@@ -45,7 +45,13 @@ def get_file_list(folder,file_type,compress_type="zip"):
         if "normalized" not in base_name and "simplified" not in base_name:
             file_list.append(f)
     return file_list
-
+def convert_constant_to_category(constant_string):
+    converted_string = constant_string
+    if constant_string.isdigit() and int(constant_string) > 1:
+        converted_string = "positive_constant"
+    elif converted_string[1:].isdigit() and int(constant_string) < -1:
+        converted_string = "negative_constant"
+    return converted_string
 
 def remove_processed_file(root=""):
     for f in get_file_list(os.path.join(root,"processed"),file_type="pt",compress_type=""):

@@ -2,18 +2,18 @@ import torch
 import torch_geometric
 import numpy as np
 from torch_geometric.data import Dataset, Data
-from utils import get_file_list, unzip_file, read_one_filed
+from utils import get_file_list, unzip_file, read_one_filed,convert_constant_to_category
 import os
 
 
 class HornGraphDataset(Dataset):
-    def __init__(self, root, params,transform=None, pre_transform=None, pre_filter=None):
+    def __init__(self, root, params,token_map,transform=None, pre_transform=None, pre_filter=None):
         """
                 root = Where the dataset should be stored. This folder is split
                 """
         self.root = root
         self.num_classes = params["num_classes"]
-        self.vocabulary = set()
+        self.token_map=token_map
         self.graph_type = params["graph_type"]
         self.learning_task=params["learning_task"]
         self.self_loop=params["self_loop"]
@@ -35,7 +35,7 @@ class HornGraphDataset(Dataset):
         pass
 
     def process(self):
-        self.vocabulary, token_map = self.build_vocabulary()
+
 
         file_list = self.raw_file_names
         for index, file_name in enumerate(file_list):
@@ -75,7 +75,7 @@ class HornGraphDataset(Dataset):
             teamplate_node_mask = [True if i in target_indices else False for i in node_indices]
 
             # transform node features, edges, and labels to tensors
-            node_features = self.tokenize_symbols(token_map, node_symbol_list, self.graph_type)
+            node_features = self.tokenize_symbols(self.token_map, node_symbol_list, self.graph_type)
             x_tensor = torch.tensor([[n] for n in node_features], dtype=torch.long)
             target_indices_tensor = torch.tensor(target_indices, dtype=torch.long)
             y_tensor = torch.tensor(target_label)
@@ -89,7 +89,7 @@ class HornGraphDataset(Dataset):
                         target_indices=target_indices_tensor,
                         edge_list=edge_list,
                         edge_arity_dict=edge_arity_dict,
-                        file_name=file_name
+                        file_name=file_name,
                         )
             torch.save(data,
                        os.path.join(self.processed_dir,
@@ -143,39 +143,6 @@ class HornGraphDataset(Dataset):
 
         return edge_list, edge_arity_dict
 
-    def build_vocabulary(self):
-        vocabulary_set = set(
-            ["dummy", "unknown_node", "unknown_predicate", "unknown_symbolic_constant", "unknown_predicate_argument",
-             "unknown_operator", "unknown_constant", "unknown_guard", "unknown_template", "unknown_predicateName",
-             "unknown_clause", "unknown_clauseHead", "unknown_clauseBody", "unknown_clauseArgument"])
-
-        for file_name in self.raw_file_names:
-            unzip_file(file_name)
-            json_file_name = file_name[:-len(".zip")]
-            node_symbol_list = read_one_filed(json_file_name, "nodeSymbolList")
-            vocabulary_set.update(node_symbol_list)
-            if os.path.exists(json_file_name):
-                os.remove(json_file_name)
-
-        token_map = {}
-        token_id = 0
-        # todo: pad vocabulary_set
-
-        vocabulary_set = set([self.convert_constant_to_category(w) for w in vocabulary_set])
-        for word in sorted(vocabulary_set):
-            token_map[word] = token_id
-            token_id = token_id + 1
-        # print("vocabulary_set",len(vocabulary_set),vocabulary_set)
-        # print("token_map",len(token_map),token_map)
-        return vocabulary_set, token_map
-
-    def convert_constant_to_category(self, constant_string):
-        converted_string = constant_string
-        if constant_string.isdigit() and int(constant_string) > 1:
-            converted_string = "positive_constant"
-        elif converted_string[1:].isdigit() and int(constant_string) < -1:
-            converted_string = "negative_constant"
-        return converted_string
 
     def tokenize_symbols(self, token_map, node_symbols, graph_type):
         if graph_type == "hyperEdgeGraph":
@@ -192,7 +159,7 @@ class HornGraphDataset(Dataset):
                                 "template_Eqs": "unknown_templateEqs","template_Ineqs": "unknown_templateIneqs",
                                 "template_Bool": "unknown_templateBool"}
 
-        converted_node_symbols = [self.convert_constant_to_category(word) for word in node_symbols]
+        converted_node_symbols = [convert_constant_to_category(word) for word in node_symbols]
         # node tokenization
         full_operator_list = ["+", "-", "*", "/", ">", ">0", ">=", ">=0", "=", "=0", "<", "<0", "<=", "<=0", "==",
                               "==0", "===", "!", "+++", "++", "**", "***",

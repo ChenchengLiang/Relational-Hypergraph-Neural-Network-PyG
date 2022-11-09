@@ -1,18 +1,18 @@
 import os
+from datetime import datetime
 from os.path import join as opj
-from dataset import HornGraphDataset
-from torch_geometric.loader import DataLoader
-from models import Hyper_classification, Full_connected_model, GNN_classification
-from train import train
+
+import mlflow
 import numpy as np
 import torch
-from utils import remove_processed_file, write_predicted_label_to_JSON_file
-from train_utils import get_loss_function
+from torch_geometric.nn import GCNConv, SAGEConv, FiLMConv
+
+from models import Hyper_classification, Full_connected_model, GNN_classification
 from predict import predict
-import mlflow
-from plots import draw_label_pie_chart
-from torch_geometric.nn import GCNConv,SAGEConv,FiLMConv
-from datetime import datetime
+from read_data import get_data
+from train import train
+from utils import write_predicted_label_to_JSON_file
+
 
 def main():
     np.random.seed(42)
@@ -48,7 +48,7 @@ def main():
 
 def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn):
     today=datetime.today().strftime('%Y-%m-%d')
-    mlflow.set_experiment(today+"--"+os.path.basename(_benchmark))
+    mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
@@ -73,7 +73,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["use_intermediate_gnn_results"]=True
 
     with mlflow.start_run(description=""):
-        edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params)
+        edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,reload_data=True)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #device = torch.device('cpu')
@@ -114,49 +114,6 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, params["task_type"],
                                        root=opj(params["benchmark"], "test_data"))
 
-
-def get_data(params):
-    root = opj(params["benchmark"], "train_data")
-    remove_processed_file(root=root)
-    train_data = HornGraphDataset(params=params, root=root)
-
-    root = opj(params["benchmark"], "valid_data")
-    remove_processed_file(root=root)
-    valid_data = HornGraphDataset(params=params, root=root)
-
-    root = opj(params["benchmark"], "test_data")
-    remove_processed_file(root=root)
-    test_data = HornGraphDataset(params=params, root=root)
-
-    dataset = train_data + valid_data + test_data
-    vocabulary_size = len(train_data.vocabulary) + len(valid_data.vocabulary) + len(test_data.vocabulary)
-    print("vocabulary_size",vocabulary_size)
-
-    # train_data = dataset
-    # valid_data = train_data
-    # test_data = train_data
-    train_valid_test_number=[len(train_data), len(valid_data), len(test_data)]
-    print("train-valid-test:", train_valid_test_number)
-    print("train_data[0]", train_data[0])
-    # print("train_data[0].y", train_data[0].y)
-
-    train_loader = DataLoader(train_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
-    valid_loader = DataLoader(valid_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
-    test_loader = DataLoader(test_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
-
-    edge_arity_dict = train_data[0].edge_arity_dict
-
-    dataset_distribution_values = draw_label_pie_chart(params["num_classes"], [t.y for t in dataset], "all-data")
-    draw_label_pie_chart(params["num_classes"], [t.y for t in train_data], "train-data")
-    draw_label_pie_chart(params["num_classes"], [t.y for t in valid_data], "valid-data")
-    draw_label_pie_chart(params["num_classes"], [t.y for t in test_data], "test-data")
-    class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values]
-    params["class_weight"] = class_weight
-    params["edge_arity_dict"] = edge_arity_dict
-    params["train_valid_test"] = train_valid_test_number
-
-
-    return edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params
 
 
 if __name__ == '__main__':
