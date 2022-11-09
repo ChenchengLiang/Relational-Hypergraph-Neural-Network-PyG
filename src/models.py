@@ -75,8 +75,9 @@ class GNN_classification(torch.nn.Module):
 
 class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classification
     def __init__(self, label_size, vocabulary_size, edge_arity_dict, embedding_size, num_gnn_layers,
-                 num_linear_layer, activation,feature_size=1,drop_out_probability=0):
+                 num_linear_layer, activation,feature_size=1,drop_out_probability=0,use_intermediate_gnn_results=False):
         super().__init__()
+        self.use_intermediate_gnn_results=use_intermediate_gnn_results
         self.feature_size=feature_size
         self.embedding_size = embedding_size
         self.linear_in = Linear(feature_size, embedding_size)
@@ -95,6 +96,9 @@ class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classif
             self.conv_ln_list.append(LayerNorm(embedding_size))
             self.conv_act_list.append(get_activation(self.activation))
             self.conv_drop_list.append(Dropout(p=self.drop_out_probability))
+
+        # transform concatenated intermediate layer to linear layer size
+        self.linear_transformation_for_intermediate_results = Linear(embedding_size * num_gnn_layers, embedding_size)
 
         # initialize linear layers
         self.linear_list, self.linear_ln_list, self.linear_act_list = initialize_linear_layers(
@@ -116,6 +120,7 @@ class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classif
             x = self.linear_in(x)
 
         #add option sotre output from each layer and concatenate in the end
+        intermediate_layer_results=[]
         # GNN layers
         for conv, ln, act,drop in zip(self.hyper_conv_list, self.conv_ln_list, self.conv_act_list,self.conv_drop_list):
             x = conv(x, edge_index, edge_list)
@@ -123,12 +128,15 @@ class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classif
             x = act(x)
             if self.training==True:
                 x=drop(x)
+            intermediate_layer_results.append(x)
 
-        #todo concatenate layers option
-
-        # gather template node
-        # x = x[teamplate_node_mask]
-        x = torch.index_select(x, dim=0, index=target_indices)
+        if self.use_intermediate_gnn_results==True:
+            x=torch.concat(intermediate_layer_results,dim=1)
+            x = torch.index_select(x, dim=0, index=target_indices)
+            x=self.linear_transformation_for_intermediate_results(x)
+        else:
+            # gather template node
+            x = torch.index_select(x, dim=0, index=target_indices)
 
         # linear layers
         for lin, ln, act in zip(self.linear_list, self.linear_ln_list, self.linear_act_list):

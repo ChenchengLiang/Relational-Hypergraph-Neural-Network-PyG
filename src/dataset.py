@@ -48,12 +48,12 @@ class HornGraphDataset(Dataset):
 
             #ASTEdge
             if self.graph_type == "hyperEdgeGraph":
-                graph_edge_list = ["relationSymbolArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge","quantifierEdge","binaryEdge",
+                graph_edge_list = ["binaryEdge", "relationSymbolArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge","quantifierEdge",
                                    "controlFlowHyperEdge", "dataFlowHyperEdge", "ternaryHyperEdge"]
             else:
-                graph_edge_list = ["relationSymbolArgumentEdge","relationSymbolInstanceEdge", "argumentInstanceEdge",
+                graph_edge_list = ["binaryEdge", "relationSymbolArgumentEdge","relationSymbolInstanceEdge", "argumentInstanceEdge",
                                    "clauseHeadEdge","clauseBodyEdge", "clauseArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge",
-                                   "dataEdge","quantifierEdge","binaryEdge"]
+                                   "dataEdge","quantifierEdge"]
 
 
             # form learning label according to the task

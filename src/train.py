@@ -29,7 +29,6 @@ def run_one_epoch(model,data_loader,optimizer,ls_func,train=True,task_type="bina
             raw_predicted_list.append(sigmoid_pred.cpu().detach().numpy())
             predicted_list.append(np.rint(sigmoid_pred.cpu().detach().numpy()))
             loss = ls_func(torch.squeeze(sigmoid_pred), batch.y.float())
-            #todo: implement class_weight
         elif task_type == "multi_classification":
             softmax_value=torch.softmax(pred,dim=1).cpu().detach().numpy()
             raw_predicted_list.append(softmax_value)

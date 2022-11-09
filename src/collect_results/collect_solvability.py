@@ -8,7 +8,7 @@ from src.plots import plot_cactus
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/linear_dataset/train_data"
+    folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/non-linear-dataset/train_data"
     # get abstract_option_list
     abstract_option_list = get_abstract_option_list()
 

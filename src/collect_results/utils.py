@@ -1,7 +1,8 @@
 from src.utils import unzip_file,make_dirct
 import os
 import json
-
+import glob
+from shutil import copy
 def read_json_file(f,json_obj):
     loaded_graph = json.load(f)
     for field in loaded_graph:
@@ -36,3 +37,7 @@ def get_sumary_folder(folder):
     summary_folder = os.path.dirname(folder) + "/" + os.path.basename(folder) + "_summary"
     make_dirct(summary_folder)
     return summary_folder
+
+def copy_relative_files(file_name, folder):
+    for f in glob.glob(file_name + "*"):
+        copy(f, folder)

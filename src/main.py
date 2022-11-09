@@ -22,8 +22,8 @@ def main():
     # benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
     #benchmarks = ["../data/experiment-template-binary-classification"]
     benchmarks = ["../data/linear_dataset_small"]
-    models = [ "hyper_GCN","GNN"]
-    #models = [ "GNN"]
+    #models = [ "hyper_GCN","GNN"]
+    models = [ "hyper_GCN"]
     gnns=[SAGEConv,FiLMConv,GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
     tasks = ["template_binary_classification"]
@@ -57,7 +57,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["benchmark"] = _benchmark
     params["learning_task"] = _task
     params["model"] = _model
-    params["epochs"] = 500
+    params["epochs"] = 200
     params["num_classes"] = task_num_class_dict[params["learning_task"]]
     params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
     params["embedding_size"] = 32
@@ -71,6 +71,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["drop_out_rate"] = 0
     params["learning_rate"] = 0.001
     params["gnn"] = _gnn
+    params["use_intermediate_gnn_results"]=True
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params)
@@ -90,7 +91,8 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
                                          num_gnn_layers=params["num_gnn_layers"],
                                          num_linear_layer=params["num_linear_layer"],
                                          activation=params["activation"],
-                                         drop_out_probability=params["drop_out_rate"]).to(device)
+                                         drop_out_probability=params["drop_out_rate"],
+                                         use_intermediate_gnn_results=params["use_intermediate_gnn_results"]).to(device)
         else:
             model = Full_connected_model(params["num_classes"], vocabulary_size,
                                          embedding_size=params["embedding_size"]).to(device)

@@ -21,7 +21,7 @@ def write_predicted_label_to_JSON_file(predicted_list,raw_predicted_list,file_na
         base_name = os.path.basename(file_name)
         new_name=os.path.join(predicted_dir,base_name)
         os.rename(file_name,new_name)
-        file_compress([new_name], os.path.join(new_name) + ".zip")
+        compress_file([new_name], os.path.join(new_name) + ".zip")
         if os.path.exists(new_name):
             os.remove(new_name)
 
@@ -53,7 +53,7 @@ def remove_processed_file(root=""):
     for f in get_file_list(os.path.join(root,"predicted"),file_type="JSON",compress_type="zip"):
         os.remove(f)
 
-def file_compress(inp_file_names, out_zip_file):
+def compress_file(inp_file_names, out_zip_file):
     import zipfile
     compression = zipfile.ZIP_DEFLATED
     zf = zipfile.ZipFile(out_zip_file, mode="w")
@@ -78,7 +78,6 @@ def unzip_file(zip_file):
             zip_ref.extractall(os.path.dirname(zip_file))
     else:
         print("zip file "+zip_file+" not existed")
-
 
 
 def manual_flatten(target_list):
