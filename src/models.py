@@ -97,8 +97,8 @@ class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classif
             self.conv_act_list.append(get_activation(self.activation))
             self.conv_drop_list.append(Dropout(p=self.drop_out_probability))
 
-        # transform concatenated intermediate layer to linear layer size
-        self.linear_transformation_for_intermediate_results = Linear(embedding_size * num_gnn_layers, embedding_size)
+        # transform concatenated intermediate layer to linear layer size, +1 means include embeddeding layer
+        self.linear_transformation_for_intermediate_results = Linear(embedding_size * (num_gnn_layers+1), embedding_size)
 
         # initialize linear layers
         self.linear_list, self.linear_ln_list, self.linear_act_list = initialize_linear_layers(
@@ -120,7 +120,7 @@ class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classif
             x = self.linear_in(x)
 
         #add option sotre output from each layer and concatenate in the end
-        intermediate_layer_results=[]
+        intermediate_layer_results=[x]
         # GNN layers
         for conv, ln, act,drop in zip(self.hyper_conv_list, self.conv_ln_list, self.conv_act_list,self.conv_drop_list):
             x = conv(x, edge_index, edge_list)

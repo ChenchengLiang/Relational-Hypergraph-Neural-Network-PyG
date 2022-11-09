@@ -21,7 +21,7 @@ def main():
 
     # benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
     #benchmarks = ["../data/experiment-template-binary-classification"]
-    benchmarks = ["../data/linear_dataset_small"]
+    benchmarks = ["../data/linear_dataset"]
     #models = [ "hyper_GCN","GNN"]
     models = [ "hyper_GCN"]
     gnns=[SAGEConv,FiLMConv,GCNConv]
@@ -31,7 +31,6 @@ def main():
     #graph_types = ["monoDirectionLayerGraph"]
     #graph_types = ["hyperEdgeGraph"]
     num_gnn_layers = [2]
-    # num_gnn_layers = [2]
     data_loader_shuffle = [False]
 
     for graph_type in graph_types:
@@ -49,7 +48,7 @@ def main():
 
 def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn):
     today=datetime.today().strftime('%Y-%m-%d')
-    mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
+    mlflow.set_experiment(today+"--"+os.path.basename(_benchmark))
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
