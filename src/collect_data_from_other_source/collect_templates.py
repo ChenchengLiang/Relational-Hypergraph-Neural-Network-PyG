@@ -1,14 +1,15 @@
+import sys
+sys.path.append("../..")
 from src.utils import get_file_list, unzip_file, compress_file, make_dirct
 from src.collect_results.utils import copy_relative_files
 import os
 import time
 import subprocess
-import sys
+
 
 def main():
-    sys.path.append('..')
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/z3-solutions/test"
-    collect_predicate_from_other_solvers(folder,solver_location="/home/cheli243/Downloads/z3-binary/build/z3")
+    folder = sys.argv[1]
+    collect_predicate_from_other_solvers(folder,solver_location=sys.argv[2])
     separate_solvable_cases(folder)
 
 

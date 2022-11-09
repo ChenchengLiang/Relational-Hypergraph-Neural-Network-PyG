@@ -1,4 +1,6 @@
 import sys
+sys.path.append("../..")
+from src.utils import make_dirct,compress_file,unzip_file,get_file_list
 import os
 import time
 import subprocess
@@ -124,29 +126,6 @@ def call_Eldarica_one_time(run_shell_command, file_name, eldarica_parameter_list
     print("extracting " + file_name + " finished", "use time: ", used_time)
     return used_time
 
-
-def compress_file(inp_file_names, out_zip_file):
-    import zipfile
-    compression = zipfile.ZIP_DEFLATED
-    zf = zipfile.ZipFile(out_zip_file, mode="w")
-    try:
-        for file_to_write in inp_file_names:
-            zf.write(file_to_write, os.path.basename(out_zip_file)[:-len(".zip")], compress_type=compression)
-    except FileNotFoundError as e:
-        print(str(e))
-    finally:
-        zf.close()
-
-
-def unzip_file(zip_file):
-    if os.path.exists(zip_file):
-        import zipfile
-        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-            zip_ref.extractall(os.path.dirname(zip_file))
-    else:
-        print("zip file " + zip_file + " not existed")
-
-
 def change_eldarica_parameters(file, params):
     if "mineTemplates" in params:
         params = params + get_eldarica_option_by_shortest_solving_Time(file)
@@ -182,19 +161,6 @@ def get_eldarica_option_by_shortest_solving_Time(file):
         return abstracOptionDict[maxKeyValue[0]]
 
 
-def make_dirct(d):
-    try:
-        os.mkdir(d)
-    except:
-        print(str(d), "folder existed")
-
-
-def get_file_list(folder, file_type, compress_type=".zip"):
-    file_list = []
-    for f in glob.glob(folder + "/" + "*" + file_type + compress_type):
-        if "normalized" not in f and "simplified" not in f:
-            file_list.append(f)
-    return file_list
 
 
 if __name__ == '__main__':
