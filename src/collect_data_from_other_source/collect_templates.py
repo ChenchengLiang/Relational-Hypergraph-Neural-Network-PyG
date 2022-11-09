@@ -6,6 +6,7 @@ from src.collect_results.utils import copy_relative_files
 import os
 import time
 import subprocess
+from tqdm import tqdm
 
 
 def main():
@@ -37,16 +38,18 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
     solver_parameter_list = " -smt2 -v:1 "
     shell_folder = make_dirct(os.path.join(os.path.dirname(unsolvable_folder), "shell_folder"))
     file_list = get_file_list(unsolvable_folder, "smt2")
-    counter=0
-    for f in file_list:
+    for f in tqdm(file_list, desc="progress"):
+        # for f in file_list:
+        # unzip file
         unzip_file(f)
         os.remove(f)
         f = f[:-len(".zip")]
 
+        # print info
         file_name = os.path.basename(f)
-        counter+=1
-        print(str(counter)+"/"+str(len(file_list))+" file_name", file_name)
+        print("file_name", file_name)
 
+        # set shell parameters
         filter_key_words_list = ["transform", "expand", "spacer", "Propagating", "Entering", "create_child", "sat"]
         str_filter = ""
         for kw in filter_key_words_list:
@@ -54,13 +57,16 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
         log_parameters = " 2>&1 | " + str_filter + " tee " + unsolvable_folder + "/" + file_name + ".predicates"
         shell_file_name = shell_folder + "/" + "run-ulimit" + "-" + file_name + ".sh"
         timeout_command = "timeout " + str(shell_timeout)
+        # write shell file
         with open(shell_file_name, "w") as ff:
             ff.write("#!/bin/sh\n")
             ff.write(
                 timeout_command + " " + solver_location + " " + f + " " + solver_parameter_list + log_parameters + "\n")
 
+        # run shell
         run_one_shell(shell_file_name, log_file=unsolvable_folder + "/" + file_name + ".log")
 
+        # remove shell file and zip file again
         os.remove(shell_file_name)
         compress_file([f], f + ".zip")
         os.remove(f)
