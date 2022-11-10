@@ -86,7 +86,7 @@ def run_eldarica_with_shell(file, shell_timeout, eldarica_parameter_list, shell_
     file = file[:-len(".zip")]
 
     # unzip file
-    for f in glob.glob(file + "*"):
+    for f in glob.glob(file + "*.zip"):
         unzip_file(f)
         os.remove(f)
 
@@ -111,8 +111,9 @@ def run_eldarica_with_shell(file, shell_timeout, eldarica_parameter_list, shell_
     if os.path.exists(file):
         file_list = glob.glob(file + "*")
         for f in file_list:
-            compress_file([f], f + ".zip")
-            os.remove(f)
+            if "out.gz" not in f:
+                compress_file([f], f + ".zip")
+                os.remove(f)
 
 
 def call_Eldarica_one_time(run_shell_command, file_name, eldarica_parameter_list):

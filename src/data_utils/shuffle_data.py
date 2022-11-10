@@ -5,9 +5,10 @@ import random
 import os
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test/3-ready_for_training"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/4-ready-for-training"
     file_list = get_file_list(folder, "smt2")
     file_list_number=len(file_list)
+    random.seed(42)
     for i in range(5):
         random.shuffle(file_list)
 
