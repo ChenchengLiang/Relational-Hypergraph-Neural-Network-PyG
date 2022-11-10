@@ -1,8 +1,6 @@
 import torch
-import torch_geometric
-import numpy as np
 from torch_geometric.data import Dataset, Data
-from utils import get_file_list, unzip_file, read_one_filed,convert_constant_to_category
+from src.utils import get_file_list, unzip_file, read_one_filed,convert_constant_to_category
 import os
 
 

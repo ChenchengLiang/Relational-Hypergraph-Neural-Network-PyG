@@ -4,29 +4,31 @@ from src.utils import get_file_list, make_dirct
 import glob
 import gzip
 from src.collect_results.utils import read_files, read_json_file, copy_relative_files
+from tqdm import tqdm
 
 
 def main():
+    # for solvabiloty
+    separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test",
+                                 file_numebr=3,target_message="ready_for_template_mining",source="check-solvability")
+    # for mined templates
+    # separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test",
+    #                              file_numebr=7,target_message="ready_for_graph_construction",source="mine-tempaltes")
 
-    #for solvabiloty
-    # separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-solvability/train_data",
-    #                              file_numebr=2,target_message="ready_for_template_mining")
-    #for mined templates
-    # separate_corner_cases_from_cluster_mineTemplates(folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-mined-template/train_data",
-    #                              file_numebr=6,target_message="ready_for_graph_construction")
+    # for unsolvable unlabeled templates
+    # separate_corner_cases_from_cluster_mineTemplates(
+    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test",
+    #     file_numebr=4, target_message="ready_for_graph_construction",source="generate-unlabeled-tempaltes")
 
     # for constructed graphs
-    separate_corner_cases_from_cluster_graph_construction(
-        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/train_data",
-        file_numebr=10, target_message="not-timeout-cases")
+    # separate_corner_cases_from_cluster_graph_construction(
+    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/train_data",
+    #     file_numebr=10, target_message="not-timeout-cases")
 
 
-    # folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/train_data"
-    # check_cluster_log_files(os.path.dirname(folder) + "/log", "out", "gz", "chc-LIA-Lin_2516.smt2")
 
-
-def separate_corner_cases_from_cluster_mineTemplates(folder, file_numebr, target_message):
-    zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder)
+def separate_corner_cases_from_cluster_mineTemplates(folder, file_numebr, target_message, source=""):
+    zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder, source)
     separated_folder = separate_cluster_timeout_case(zip_file_folder, file_number=file_numebr,
                                                      target_message=target_message)
 
@@ -43,7 +45,6 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-ready_for_training",
                                                                        "3-no_labeled_template",
                                                                        separate_no_labeled_template_cases)
-
 
 
 def separate_no_simplified_clauses(g, file_name, target_folder, exception_folder):
@@ -79,8 +80,8 @@ def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_n
     except:
         print("file existed")
 
-    print(os.path.basename(target_folder), len(get_file_list(target_folder,file_type="smt2")))
-    print(os.path.basename(exception_folder), len(get_file_list(exception_folder,file_type="smt2")))
+    print(os.path.basename(target_folder), len(get_file_list(target_folder, file_type="smt2")))
+    print(os.path.basename(exception_folder), len(get_file_list(exception_folder, file_type="smt2")))
 
     return target_folder, exception_folder
 
@@ -108,18 +109,19 @@ def separate_cluster_timeout_case(folder, file_number, target_message="graph_con
     return separated_folder
 
 
-def separate_zip_and_unzip_files(folder):
-    zip_file_list = get_file_list(folder, "smt2")
+def separate_zip_and_unzip_files(folder, source=""):
+    train_data_folder = os.path.join(folder, "train_data")
+    zip_file_list = get_file_list(train_data_folder, "smt2")
     print("ziped_smt2_file_list", len(zip_file_list))
 
-    unziped_file_list = glob.glob(folder + "/" + "*.smt2")
+    unziped_file_list = glob.glob(train_data_folder + "/" + "*.smt2")
     print("unziped_file_list", len(unziped_file_list))
 
-    zip_file_folder = make_dirct(os.path.dirname(folder) + "/" + "zip_files")
-    unzip_file_folder = make_dirct(os.path.dirname(folder) + "/" + "unzip_files")
+    zip_file_folder = make_dirct(os.path.dirname(train_data_folder) + "/" + "zip_files")
+    unzip_file_folder = make_dirct(os.path.dirname(train_data_folder) + "/" + "unzip_files")
 
     try:
-        for f in glob.glob(folder + "/*"):
+        for f in glob.glob(train_data_folder + "/*"):
             if "zip" in f:
                 copy(f, zip_file_folder)
             else:
@@ -131,25 +133,30 @@ def separate_zip_and_unzip_files(folder):
     print("files in zip file folder", len(zip_file_list))
     print("files in unzip file folder", len(unzip_file_list))
 
-    # for f in unzip_file_list:
-    #     check_cluster_log_files(os.path.dirname(folder)+"/log","out","gz",f)
+    collect_cluster_log(folder, zip_file_folder, unzip_file_folder, source)
     return zip_file_folder, unzip_file_folder
 
 
-def check_cluster_log_files(folder, file_type, compress_type, smt2_file):
-    # print relation between .out and .smt2 files
-    smt2_file = os.path.basename(smt2_file)
-    file_list = get_file_list(folder, file_type, compress_type)
-    for file in file_list:
+def collect_cluster_log(folder, zip_file_folder, unzip_file_folder, source=""):
+    cluster_log_list = get_file_list(os.path.join(folder, "log"), "out", "gz")
+    zipped_smt2_file_list = get_file_list(zip_file_folder, "smt2")
+    unzipped_smt2_file_list = get_file_list(unzip_file_folder, "smt2", "")
+    for smt2_file in tqdm(zipped_smt2_file_list, desc="zipped_smt2_file_list"):
+        smt2_file_name = os.path.basename(smt2_file[:-len(".zip")])
+        scan_cluster_logs(cluster_log_list, smt2_file_name, zip_file_folder, source)
+    for smt2_file in tqdm(unzipped_smt2_file_list, desc="unzipped_smt2_file_list"):
+        smt2_file_name = os.path.basename(smt2_file)
+        scan_cluster_logs(cluster_log_list, smt2_file_name, unzip_file_folder, source)
+
+
+def scan_cluster_logs(cluster_log_list, smt2_file_name, target_folder, source=""):
+    for file in cluster_log_list:
         with gzip.open(file, 'rb') as f:
             file_content = f.read()
             file_content = file_content.decode("utf-8")
-            if smt2_file in file_content:
-                print("file", smt2_file)
-                print("out file", file)
-                print(file_content)
-
-
+            if smt2_file_name in file_content:
+                suffix = "" if len(source) == 0 else "." + source
+                copy(file, target_folder + "/" + smt2_file_name + suffix + ".out.gz")
 
 
 

@@ -1,7 +1,7 @@
 import sys
 sys.path.append("/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG")
 from src.utils import get_file_list, make_dirct
-from utils import copy_relative_files
+from src.collect_results.utils import copy_relative_files
 from os.path import join as opj
 import shutil
 

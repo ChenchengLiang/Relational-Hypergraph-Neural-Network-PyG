@@ -4,7 +4,7 @@ from predict import predict
 from os.path import join as opj
 from train_utils import get_loss_function
 from utils import remove_processed_file,write_predicted_label_to_JSON_file
-from dataset import HornGraphDataset
+from src.data_utils.dataset import HornGraphDataset
 from torch_geometric.loader import DataLoader
 def infer():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

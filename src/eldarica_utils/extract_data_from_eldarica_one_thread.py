@@ -32,11 +32,11 @@ def main():
     #parameters_pipeline.append(" -mineTemplates -log ")
 
     # for unsolvable set get unlabeled templates # 3 hours
-    parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
+    # parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
 
     # construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -log ")
-    # parameters_pipeline.append(" -getHornGraph:CG -log ")
+    parameters_pipeline.append(" -getHornGraph:CDHG -log ")
+    parameters_pipeline.append(" -getHornGraph:CG -log ")
 
     # # description: check solvability for sinlge template set
     # for s in split_clause_option:

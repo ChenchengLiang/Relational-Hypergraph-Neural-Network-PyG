@@ -9,7 +9,7 @@ from torch_geometric.nn import GCNConv, SAGEConv, FiLMConv
 
 from models import Hyper_classification, Full_connected_model, GNN_classification
 from predict import predict
-from read_data import get_data
+from src.data_utils.read_data import get_data
 from train import train
 from utils import write_predicted_label_to_JSON_file
 
