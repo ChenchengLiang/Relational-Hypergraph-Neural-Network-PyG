@@ -6,8 +6,12 @@ from statistics import mean
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/3-no_labeled_template"
-    #folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/ready_for_training"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs/4-ready-for-training"
+    get_statistics(folder)
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/4-ready-for-training"
+    get_statistics(folder)
+
+def get_statistics(folder):
     summary_folder = get_sumary_folder(folder)
     file_list = get_file_list(folder, "smt2")
     graph_type = {"hyperEdgeGraph": "CDHG", "monoDirectionLayerGraph": "CG"}
@@ -40,15 +44,18 @@ def main():
     # print(data_dict["CDHG"])
     # print(data_dict["CG"])
 
-    summary_dict={}
+    summary_dict = {}
     for measurement in [mean, max, min]:
-        measurement_str=measurement.__name__
-        measurement_dict={"graph_type":["CDHG","CG"]}
-        measurement_dict.update({measurement_str+"_"+x+"_number":[] for x in node_field_list + binary_edge_name_list + ternary_edge_name_list})
+        measurement_str = measurement.__name__
+        measurement_dict = {"graph_type": ["CDHG", "CG"]}
+        measurement_dict.update({measurement_str + "_" + x + "_number": [] for x in
+                                 node_field_list + binary_edge_name_list + ternary_edge_name_list})
         for field in node_field_list + binary_edge_name_list + ternary_edge_name_list:
-            measurement_dict[measurement_str+"_"+field+"_number"].append(measurement(data_dict["CDHG"][field+"Number"]))
-            measurement_dict[measurement_str+"_" + field + "_number"].append(measurement(data_dict["CG"][field + "Number"]))
-        summary_dict.update({measurement_str:measurement_dict})
+            measurement_dict[measurement_str + "_" + field + "_number"].append(
+                measurement(data_dict["CDHG"][field + "Number"]))
+            measurement_dict[measurement_str + "_" + field + "_number"].append(
+                measurement(data_dict["CG"][field + "Number"]))
+        summary_dict.update({measurement_str: measurement_dict})
 
     with pd.ExcelWriter(summary_folder + "/graph_statistics.xlsx") as writer:
         data = pd.DataFrame(pd.DataFrame(data_dict["CDHG"]))
@@ -58,8 +65,6 @@ def main():
         for k in summary_dict:
             data = pd.DataFrame(pd.DataFrame(summary_dict[k]))
             data.to_excel(writer, sheet_name=k)
-
-
 
 if __name__ == '__main__':
     main()

@@ -1,4 +1,5 @@
 import os.path
+import shutil
 from shutil import copy
 from src.utils import get_file_list, make_dirct
 import glob
@@ -16,14 +17,20 @@ def main():
     #                              file_numebr=7,target_message="ready_for_graph_construction",source="mine-tempaltes")
 
     # for unsolvable unlabeled templates
-    # separate_corner_cases_from_cluster_mineTemplates(
-    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test",
-    #     file_numebr=4, target_message="ready_for_graph_construction",source="generate-unlabeled-tempaltes")
+    separate_corner_cases_from_cluster_mineTemplates(
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-unsolvable-unlabeled-tempaltes",
+        file_numebr=4, target_message="ready_for_graph_construction",source="generate-unlabeled-tempaltes")
+    separate_corner_cases_from_cluster_mineTemplates(
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-unsolvable-unlabeled-tempaltes",
+        file_numebr=4, target_message="ready_for_graph_construction", source="generate-unlabeled-tempaltes")
 
     # for constructed graphs
     separate_corner_cases_from_cluster_graph_construction(
-        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test",
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs",
         file_numebr=11, target_message="not-timeout-cases",source="construct-graphs")
+    separate_corner_cases_from_cluster_graph_construction(
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs",
+        file_numebr=11, target_message="not-timeout-cases", source="construct-graphs")
 
 
 
@@ -84,6 +91,7 @@ def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_n
 
     print(os.path.basename(target_folder), len(get_file_list(target_folder, file_type="smt2")))
     print(os.path.basename(exception_folder), len(get_file_list(exception_folder, file_type="smt2")))
+    shutil.rmtree(folder)
 
     return target_folder, exception_folder
 
@@ -108,6 +116,8 @@ def separate_cluster_timeout_case(folder, file_number, target_message="graph_con
         print("file existed")
     print(target_message + "_number", ready_for_graph_construction_number)
     print("cluster_timeout_number", cluster_timeout_number)
+    shutil.rmtree(folder)
+
     return separated_folder
 
 
@@ -143,10 +153,10 @@ def collect_cluster_log(folder, zip_file_folder, unzip_file_folder, source=""):
     cluster_log_list = get_file_list(os.path.join(folder, "log"), "out", "gz")
     zipped_smt2_file_list = get_file_list(zip_file_folder, "smt2")
     unzipped_smt2_file_list = get_file_list(unzip_file_folder, "smt2", "")
-    for smt2_file in tqdm(zipped_smt2_file_list, desc="zipped_smt2_file_list"):
+    for smt2_file in tqdm(zipped_smt2_file_list, desc="collect log for zipped_smt2_file_list"):
         smt2_file_name = os.path.basename(smt2_file[:-len(".zip")])
         scan_cluster_logs(cluster_log_list, smt2_file_name, zip_file_folder, source)
-    for smt2_file in tqdm(unzipped_smt2_file_list, desc="unzipped_smt2_file_list"):
+    for smt2_file in tqdm(unzipped_smt2_file_list, desc="collect log for unzipped_smt2_file_list"):
         smt2_file_name = os.path.basename(smt2_file)
         scan_cluster_logs(cluster_log_list, smt2_file_name, unzip_file_folder, source)
 
