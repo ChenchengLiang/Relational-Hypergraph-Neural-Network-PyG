@@ -1,7 +1,7 @@
 from os.path import join as opj
 from src.data_utils.dataset import HornGraphDataset
-from utils import remove_processed_file, unzip_file, read_one_filed, get_file_list, convert_constant_to_category
-from plots import draw_label_pie_chart
+from src.utils import remove_processed_file, unzip_file, read_one_filed, get_file_list, convert_constant_to_category
+from src.plots import draw_label_pie_chart
 from torch_geometric.loader import DataLoader
 import os
 
