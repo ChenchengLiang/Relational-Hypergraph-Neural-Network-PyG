@@ -98,7 +98,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
             model = Full_connected_model(params["num_classes"], vocabulary_size,
                                          embedding_size=params["embedding_size"]).to(device)
 
-        trained_model, optimizer = train(train_loader, valid_loader, model, params)
+        trained_model = train(train_loader, valid_loader, model, params)
 
         # print("-" * 10 + "trained_model" + "-" * 10)
         # predict(trained_model, test_loader, optimizer, ls_func,params["num_classes"], task_type=params["task_type"])

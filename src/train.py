@@ -88,12 +88,12 @@ def train(train_loader,valid_loader,model,params):
             torch.save(model, '../models/best_model.pth')
             loss_plot(train_loss_list, valid_loss_list)
             mlflow.log_metric("early stop epoch",epoch)
-            return model, optimizer
+            return model
 
         if epoch % 50 == 0 or epoch == params["epochs"]-1:
             print("epoch:",epoch,"train_loss:",train_loss,"valid_loss:", valid_loss)
 
     print("best_epoch", best_epoch, "best_loss", best_loss)
     loss_plot(train_loss_list,valid_loss_list)
-    return model,optimizer
+    return model
 
