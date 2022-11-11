@@ -23,7 +23,7 @@ def main():
     #benchmarks = ["../data/experiment-template-binary-classification"]
     benchmarks = ["../data/linear_dataset_shuffled"]
     #models = [ "hyper_GCN","GNN"]
-    models = [ "hyper_GCN"]
+    models = ["hyper_GCN"]
     gnns=[SAGEConv,FiLMConv,GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
     tasks = ["template_binary_classification"]

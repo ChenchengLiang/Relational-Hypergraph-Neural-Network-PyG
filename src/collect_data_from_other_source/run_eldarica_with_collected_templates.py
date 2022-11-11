@@ -6,10 +6,11 @@ import os
 from utils import run_one_shell
 def main():
     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/z3-non-linear-unsolvable/test"
-    shell_timeout= 60 * 1
+    solver_location = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/eldarica-graph-generation/eld"
+
+    shell_timeout= 60 * 5
     shell_folder = make_dirct(os.path.join(os.path.dirname(folder), "shell_folder"))
     timeout_command = "timeout " + str(shell_timeout)
-    solver_location = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/eldarica-graph-generation/eld"
     solvable_folder=make_dirct(folder+"-solvable")
     unsolvable_folder = make_dirct(folder + "-unsolvable")
     template_empty_folder = make_dirct(folder + "-no-template")

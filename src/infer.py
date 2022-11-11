@@ -1,8 +1,6 @@
 import mlflow
 import torch
 from predict import predict
-from os.path import join as opj
-from train_utils import get_loss_function
 from utils import remove_processed_file,write_predicted_label_to_JSON_file
 from src.data_utils.dataset import HornGraphDataset
 from torch_geometric.loader import DataLoader
@@ -14,7 +12,8 @@ def main():
                         "./mlruns/1/764e9c18cfdd4700b7a573cd3bbe54f4/artifacts",
                     opj(data_path,"linear-unsolvable-predict-CG"):
                     "./mlruns/1/528002b450324df6b16e61909c09f4ed/artifacts"}
-    infer()
+    for k in benchmark_dict:
+        infer(k,benchmark_dict[k])
 
 def infer(benchmark,artifact_uri):
 
