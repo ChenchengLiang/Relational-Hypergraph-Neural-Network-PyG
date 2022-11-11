@@ -37,6 +37,11 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
     shell_folder = make_dirct(os.path.join(os.path.dirname(unsolvable_folder), "shell_folder"))
     file_list = get_file_list(unsolvable_folder, "smt2")
     timeout_command = "timeout " + str(shell_timeout)
+    filter_key_words_list = ["transform", "expand", "spacer", "Propagating", "Entering", "create_child", "sat",
+                             "is-reachable", "Deleting closed node"]
+    str_filter = ""
+    for kw in filter_key_words_list:
+        str_filter = str_filter + " grep -v \"" + kw + "\" | "
     for f in tqdm(file_list, desc="progress"):
         # for f in file_list:
         # unzip file
@@ -45,16 +50,12 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
         f = f[:-len(".zip")]
 
         # print info
-        file_name = os.path.basename(f)
-        print("file_name", file_name)
+        base_file_name = os.path.basename(f)
+        print("base_file_name", base_file_name)
 
         # set shell parameters
-        filter_key_words_list = ["transform", "expand", "spacer", "Propagating", "Entering", "create_child", "sat"]
-        str_filter = ""
-        for kw in filter_key_words_list:
-            str_filter = str_filter + " grep -v \"" + kw + "\" | "
-        log_parameters = " 2>&1 | " + str_filter + " tee " + unsolvable_folder + "/" + file_name + ".predicates"
-        shell_file_name = shell_folder + "/" + "run-ulimit" + "-" + file_name + ".sh"
+        log_parameters = " 2>&1 | " + str_filter + " tee " + unsolvable_folder + "/" + base_file_name + ".predicates"
+        shell_file_name = shell_folder + "/" + "run-ulimit" + "-" + base_file_name + ".sh"
 
         # write shell file
         with open(shell_file_name, "w") as ff:
@@ -63,7 +64,7 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
                 timeout_command + " " + solver_location + " " + f + " " + solver_parameter_list + log_parameters + "\n")
 
         # run shell
-        log_file=unsolvable_folder + "/" + file_name + ".log"
+        log_file=unsolvable_folder + "/" + base_file_name + ".log"
         run_one_shell(shell_file_name, log_file=log_file)
 
         # remove shell file and zip file again

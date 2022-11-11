@@ -32,21 +32,23 @@ def main():
     #graph_types = ["hyperEdgeGraph"]
     num_gnn_layers = [2]
     data_loader_shuffle = [False]
+    use_intermediate_gnn_results=[True,False]
 
     for graph_type in graph_types:
         for bench in benchmarks:
             for model in models:
                 for task in tasks:
                     for num_gnn_layer in num_gnn_layers:
-                        for data_shuffle in data_loader_shuffle:
-                            if model == "GNN":
-                                for _gnn in gnns:
-                                    run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn)
-                            else:
-                                run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle, SAGEConv)
+                        for _use_intermediate_gnn_results in use_intermediate_gnn_results:
+                            for data_shuffle in data_loader_shuffle:
+                                if model == "GNN":
+                                    for _gnn in gnns:
+                                        run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn,_use_intermediate_gnn_results)
+                                else:
+                                    run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle, SAGEConv,_use_intermediate_gnn_results)
 
 
-def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn):
+def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results):
     today=datetime.today().strftime('%Y-%m-%d')
     mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
@@ -56,7 +58,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["benchmark"] = _benchmark
     params["learning_task"] = _task
     params["model"] = _model
-    params["epochs"] = 10
+    params["epochs"] = 200
     params["num_classes"] = task_num_class_dict[params["learning_task"]]
     params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
     params["embedding_size"] = 32
@@ -70,7 +72,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["drop_out_rate"] = 0
     params["learning_rate"] = 0.001
     params["gnn"] = _gnn
-    params["use_intermediate_gnn_results"]=True
+    params["use_intermediate_gnn_results"]=_use_intermediate_gnn_results
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,reload_data=True)

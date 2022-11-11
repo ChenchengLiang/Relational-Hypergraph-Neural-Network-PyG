@@ -10,7 +10,7 @@ from data_utils.read_data import build_vocabulary
 def infer():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    artifact_uri = "./mlruns/1/764e9c18cfdd4700b7a573cd3bbe54f4/artifacts"
+    artifact_uri = "./mlruns/1/528002b450324df6b16e61909c09f4ed/artifacts"
     model_path = opj(artifact_uri,"model/data/model.pth")
     best_model = torch.load(model_path)
     #mlflow.pytorch.load_model()

@@ -9,3 +9,4 @@ def run_one_shell(shell_file_name, log_file):
     used_time = end - start
     with open(log_file, "w") as l:
         l.write("used_time:" + str(used_time))
+    return used_time
