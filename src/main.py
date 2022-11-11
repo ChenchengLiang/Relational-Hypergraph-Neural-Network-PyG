@@ -107,7 +107,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
         model_path = "../models/best_model.pth"
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, "model")
-        predicted_list, raw_predicted_list, file_name_list = predict(best_model, test_loader, optimizer, params)
+        predicted_list, raw_predicted_list, file_name_list = predict(best_model, test_loader, params)
 
         params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".") + 1:-2]
         mlflow.log_params(params)
