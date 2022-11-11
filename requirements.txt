@@ -1,0 +1,10 @@
+mlflow==1.29.0
+numpy==1.23.3
+torch==1.12.1
+seaborn==0.12.0
+matplotlib==3.6.0
+plotly==5.10.0
+scikit-learn==1.1.2
+tqdm==4.64.1
+pandas==1.5.0
+setuptools==60.2.0

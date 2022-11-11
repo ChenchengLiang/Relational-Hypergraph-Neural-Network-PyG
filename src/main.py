@@ -11,7 +11,7 @@ from models import Hyper_classification, Full_connected_model, GNN_classificatio
 from predict import predict
 from src.data_utils.read_data import get_data
 from train import train
-from utils import write_predicted_label_to_JSON_file
+from utils import write_predicted_label_to_JSON_file,send_email
 
 
 def main():
@@ -46,7 +46,7 @@ def main():
                                         run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn,_use_intermediate_gnn_results)
                                 else:
                                     run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle, SAGEConv,_use_intermediate_gnn_results)
-
+    send_email("train finished")
 
 def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results):
     today=datetime.today().strftime('%Y-%m-%d')
