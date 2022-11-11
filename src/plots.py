@@ -28,7 +28,7 @@ def loss_plot(train_loss_floats, valid_loss_floats):
         xaxis_title='epocs',
         yaxis_title='loss')
     plot_name = "loss"
-    save_file_name = "../figures/" + plot_name + ".html"
+    save_file_name = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/figures/" + plot_name + ".html"
     # fig.update_yaxes(type="linear")
     fig.write_html(save_file_name)
     mlflow.log_artifact(save_file_name)
@@ -41,7 +41,7 @@ def draw_label_pie_chart(num_label, learning_label, name=""):
     pull = [0.2 if v / sum(values) < 0.01 else 0 for v in values]  # if percentage < 0.01, pull it out from the pie
     fig = go.Figure(data=[go.Pie(labels=label_name_list, values=values, pull=pull)])
     fig.update_layout(title=name+"-"+str(len(learning_label)))
-    save_file_name = "../figures/" + name + "-distribution.html"
+    save_file_name = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/figures/" + name + "-distribution.html"
     fig.write_html(save_file_name)
     mlflow.log_artifact(save_file_name)
     return values
@@ -55,7 +55,7 @@ def draw_confusion_matrix(predicted_y, true_y, num_classes, name=""):
         title='confusion matrix',
         xaxis_title='predicted_y',
         yaxis_title='true_y')
-    save_file_name = "../figures/" + name + "-confusion-matrix.html"
+    save_file_name = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/figures/" + name + "-confusion-matrix.html"
     fig.write_html(save_file_name)
     mlflow.log_artifact(save_file_name)
 

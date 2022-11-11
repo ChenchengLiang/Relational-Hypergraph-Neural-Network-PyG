@@ -4,10 +4,8 @@ sys.path.append("../..")
 from src.utils import get_file_list, unzip_file, compress_file, make_dirct
 from src.collect_results.utils import copy_relative_files
 import os
-import time
-import subprocess
 from tqdm import tqdm
-
+from utils import run_one_shell
 
 def main():
     folder = sys.argv[1]
@@ -38,6 +36,7 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
     solver_parameter_list = " -smt2 -v:1 "
     shell_folder = make_dirct(os.path.join(os.path.dirname(unsolvable_folder), "shell_folder"))
     file_list = get_file_list(unsolvable_folder, "smt2")
+    timeout_command = "timeout " + str(shell_timeout)
     for f in tqdm(file_list, desc="progress"):
         # for f in file_list:
         # unzip file
@@ -56,7 +55,7 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
             str_filter = str_filter + " grep -v \"" + kw + "\" | "
         log_parameters = " 2>&1 | " + str_filter + " tee " + unsolvable_folder + "/" + file_name + ".predicates"
         shell_file_name = shell_folder + "/" + "run-ulimit" + "-" + file_name + ".sh"
-        timeout_command = "timeout " + str(shell_timeout)
+
         # write shell file
         with open(shell_file_name, "w") as ff:
             ff.write("#!/bin/sh\n")
@@ -64,7 +63,8 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
                 timeout_command + " " + solver_location + " " + f + " " + solver_parameter_list + log_parameters + "\n")
 
         # run shell
-        run_one_shell(shell_file_name, log_file=unsolvable_folder + "/" + file_name + ".log")
+        log_file=unsolvable_folder + "/" + file_name + ".log"
+        run_one_shell(shell_file_name, log_file=log_file)
 
         # remove shell file and zip file again
         os.remove(shell_file_name)
@@ -72,15 +72,6 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
         os.remove(f)
 
 
-def run_one_shell(shell_file_name, log_file):
-    run_shell_command = ["sh", shell_file_name]
-    start = time.time()
-    eld = subprocess.Popen(run_shell_command, stdout=subprocess.DEVNULL, shell=False)
-    eld.wait()
-    end = time.time()
-    used_time = end - start
-    with open(log_file, "w") as l:
-        l.write("used_time:" + str(used_time))
 
 
 if __name__ == '__main__':

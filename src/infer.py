@@ -6,23 +6,23 @@ from train_utils import get_loss_function
 from utils import remove_processed_file,write_predicted_label_to_JSON_file
 from src.data_utils.dataset import HornGraphDataset
 from torch_geometric.loader import DataLoader
+from data_utils.read_data import build_vocabulary
 def infer():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    artifact_uri = "./mlruns/4/d4114f79216542c9a1e3f166044c1023/artifacts"
+    artifact_uri = "./mlruns/1/764e9c18cfdd4700b7a573cd3bbe54f4/artifacts"
     model_path = opj(artifact_uri,"model/data/model.pth")
     best_model = torch.load(model_path)
     #mlflow.pytorch.load_model()
     params=mlflow.artifacts.load_dict(opj(artifact_uri,"params.json"))
-    ls_func = get_loss_function(params).to(device)
     optimizer = torch.optim.Adam(best_model.parameters(), lr=0.01, weight_decay=5e-4)
 
     #Load test data
+    vocabulary, token_map = build_vocabulary(params)
     benchmark="../data/infer"
     root = opj(benchmark, "test_data")
     remove_processed_file(root=root)
-    test_data = HornGraphDataset(root=root, learning_task=params["learning_task"], num_classes=params["num_classes"],
-                                 graph_type=params["graph_type"],self_loop=params["self_loop"])
+    test_data = HornGraphDataset(params=params, root=root, token_map=token_map)
     test_loader = DataLoader(test_data, batch_size=params["batch_size"], shuffle=True)
 
     #predict
