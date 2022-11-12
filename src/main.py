@@ -21,7 +21,7 @@ def main():
 
     # benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
     #benchmarks = ["../data/experiment-template-binary-classification"]
-    benchmarks = ["../data/linear_dataset_shuffled"]
+    benchmarks = ["../data/non-linear-dataset-shuffled"]
     #models = [ "hyper_GCN","GNN"]
     models = ["hyper_GCN"]
     gnns=[SAGEConv,FiLMConv,GCNConv]
