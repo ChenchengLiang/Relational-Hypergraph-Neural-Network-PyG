@@ -6,8 +6,8 @@ import os
 from tqdm import tqdm
 from utils import run_one_shell
 def main():
-    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/z3-non-linear-unsolvable/train_data-solved"
-    solver_location = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/eldarica-graph-generation/eld"
+    folder=sys.argv[1]#"/home/cheli243/PycharmProjects/HintsLearning/benchmarks/z3-non-linear-unsolvable/train_data-solved"
+    solver_location =sys.argv[2] #"/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/eldarica-graph-generation/eld"
 
     shell_timeout= 60 * 5
     shell_folder = make_dirct(os.path.join(os.path.dirname(folder), "shell_folder"))
@@ -24,7 +24,7 @@ def main():
             if len(t.read())==0:
                 copy_relative_files(file_name,template_empty_folder)
     #separate solvable and usolvable
-    for zip_file_name in get_file_list(folder, "smt2"):
+    for zip_file_name in tqdm(get_file_list(folder, "smt2"),desc="separate solvable and usolvable pregress"):
         file_name = zip_file_name[:-len(".zip")]
         template_name=file_name+".tpl"
         base_file_name=os.path.basename(file_name)

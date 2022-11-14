@@ -110,6 +110,8 @@ def make_dirct(d):
         print(str(d), "folder existed")
         return d
 
+def count_generator(iter):
+    return sum(1 for _ in iter)
 
 def send_email(subject="python finished"):
     print("send email to chencheng.liang@it.uu.se")

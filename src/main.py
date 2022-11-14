@@ -11,7 +11,6 @@ from predict import predict
 from src.data_utils.read_data import get_data
 from train import train
 from utils import write_predicted_label_to_JSON_file,send_email
-from torchsummary import summary
 from torch_geometric.profile import get_model_size,count_parameters,get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
 

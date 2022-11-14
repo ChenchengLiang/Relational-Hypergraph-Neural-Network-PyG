@@ -23,7 +23,7 @@ def predict(trained_model, test_loader, params):
     # print("predicted_list[0]:", predicted_list[0])
     # print("label_list[0]:", label_list[0])
     mlflow.log_metric("test_loss", test_loss)
-    draw_label_pie_chart(params["num_classes"], predicted_list, "predicted-data")
+    draw_label_pie_chart(params["num_classes"], lambda : (t for t in predicted_list), "predicted-data")
 
     print("-" * 10)
     acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)

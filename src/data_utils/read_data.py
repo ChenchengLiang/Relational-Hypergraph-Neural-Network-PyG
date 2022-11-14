@@ -39,14 +39,17 @@ def get_data(params, reload_data=True):
     train_loader = DataLoader(train_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
     valid_loader = DataLoader(valid_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
     test_loader = DataLoader(test_data, batch_size=params["batch_size"], shuffle=params["data_loader_shuffle"])
-    print("debug after loader")
+
     edge_arity_dict = train_data[0].edge_arity_dict
 
-    dataset_distribution_values = draw_label_pie_chart(params["num_classes"], [t.y for t in dataset], "all-data")
-    draw_label_pie_chart(params["num_classes"], [t.y for t in train_data], "train-data")
-    draw_label_pie_chart(params["num_classes"], [t.y for t in valid_data], "valid-data")
-    draw_label_pie_chart(params["num_classes"], [t.y for t in test_data], "test-data")
+    dataset_distribution_values = draw_label_pie_chart(params["num_classes"], lambda : (t.y for t in dataset), "all-data")
+
+
+    draw_label_pie_chart(params["num_classes"], lambda : (t.y for t in train_data), "train-data")
+    draw_label_pie_chart(params["num_classes"], lambda : (t.y for t in valid_data), "valid-data")
+    draw_label_pie_chart(params["num_classes"], lambda : (t.y for t in test_data), "test-data")
     class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values]
+    print("class_weight",class_weight)
     params["class_weight"] = class_weight
     params["edge_arity_dict"] = edge_arity_dict
     params["train_valid_test"] = train_valid_test_number

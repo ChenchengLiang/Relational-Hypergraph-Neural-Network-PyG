@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from sklearn.metrics import confusion_matrix
 import plotly.express as px
 import numpy as np
-
+from utils import count_generator
 plt.style.use("ggplot")
 
 
@@ -34,13 +34,13 @@ def loss_plot(train_loss_floats, valid_loss_floats):
     mlflow.log_artifact(save_file_name)
 
 
-def draw_label_pie_chart(num_label, learning_label, name=""):
+def draw_label_pie_chart(num_label, learning_label_generator, name=""):
     label_name_list = list(range(num_label))
-    flat_list = [item for sublist in learning_label for item in sublist]
+    flat_list = [item for sublist in learning_label_generator() for item in sublist]
     values = [flat_list.count(i) for i in label_name_list]
     pull = [0.2 if v / sum(values) < 0.01 else 0 for v in values]  # if percentage < 0.01, pull it out from the pie
     fig = go.Figure(data=[go.Pie(labels=label_name_list, values=values, pull=pull)])
-    fig.update_layout(title=name+"-"+str(len(learning_label)))
+    fig.update_layout(title=name+"-"+str(count_generator(learning_label_generator())))
     save_file_name = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/figures/" + name + "-distribution.html"
     fig.write_html(save_file_name)
     mlflow.log_artifact(save_file_name)
