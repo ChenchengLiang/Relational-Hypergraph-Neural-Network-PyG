@@ -113,6 +113,14 @@ def make_dirct(d):
 def count_generator(iter):
     return sum(1 for _ in iter)
 
+# calculate file size in KB, MB, GB
+def convert_bytes(size):
+    """ Convert bytes to KB, or MB or GB"""
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if size < 1024.0:
+            return "%3.1f %s" % (size, x)
+        size /= 1024.0
+
 def send_email(subject="python finished"):
     print("send email to chencheng.liang@it.uu.se")
     shell_command = " echo \"Subject:" + subject + " \" | sendmail -F \"chencheng\" chencheng.liang@it.uu.se "

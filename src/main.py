@@ -19,8 +19,8 @@ def main():
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
 
-    # benchmarks = ["../data/experiment-"+str(i) for i in range(13)]
-    #benchmarks = ["../data/experiment-template-binary-classification"]
+    # benchmarks = ["../data/linear_dataset_small-overfitting-test-"+str(i) for i in range(6)]
+    #benchmarks = ["../data/linear_dataset_small-overfitting-test"]
     benchmarks = ["../data/non-linear-dataset-shuffled"]
     #models = [ "hyper_GCN","GNN"]
     models = ["hyper_GCN"]

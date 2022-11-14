@@ -1,8 +1,9 @@
-from src.utils import unzip_file,make_dirct
+from src.utils import unzip_file,make_dirct,convert_bytes
 import os
 import json
 import glob
 from shutil import copy
+from tqdm import tqdm
 def read_json_file(f,json_obj):
     loaded_graph = json.load(f)
     for field in loaded_graph:
@@ -11,13 +12,14 @@ def read_json_file(f,json_obj):
     return json_obj
 
 def read_files(file_list,file_type="solvability.JSON",read_function=read_json_file):
-    for file in file_list:
+    for file in tqdm(file_list,desc="read " + file_type):
         file_name = file[:-len(".zip")]
         json_file = file_name + "."+file_type
         unzip_file(json_file+".zip")
         if os.path.exists(json_file):
             json_obj = {}
             json_obj["file_name"] = json_file
+            json_obj["file_size"] = convert_bytes(os.path.getsize(json_file))
             with open(json_file) as f:
                 read_function(f,json_obj)
                 # delete unziped file
