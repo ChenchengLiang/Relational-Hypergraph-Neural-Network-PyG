@@ -21,7 +21,7 @@ def separate_solvable_cases(folder):
         file_name = file[:-len(".zip")]
         with open(file_name + ".predicates", "r") as f:
             content = f.read()
-            if len(content) != 0:
+            if len(content) != 0 and "define-fun" in content:
                 # transform to initial predicate
                 copy_relative_files(file_name, solvable_folder)
                 tpl_file_content = content.replace("define-fun", "initial-predicates").replace(") Bool", ")")

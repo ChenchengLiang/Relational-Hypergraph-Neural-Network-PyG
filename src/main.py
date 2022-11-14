@@ -6,13 +6,14 @@ import mlflow
 import numpy as np
 import torch
 from torch_geometric.nn import GCNConv, SAGEConv, FiLMConv
-
 from models import Hyper_classification, Full_connected_model, GNN_classification
 from predict import predict
 from src.data_utils.read_data import get_data
 from train import train
 from utils import write_predicted_label_to_JSON_file,send_email
-
+from torchsummary import summary
+from torch_geometric.profile import get_model_size,count_parameters,get_data_size
+from torch_geometric.profile.utils import byte_to_megabyte
 
 def main():
     np.random.seed(42)
@@ -32,7 +33,7 @@ def main():
     #graph_types = ["hyperEdgeGraph"]
     num_gnn_layers = [2]
     data_loader_shuffle = [False]
-    use_intermediate_gnn_results=[True,False]
+    use_intermediate_gnn_results=[False]
 
     for graph_type in graph_types:
         for bench in benchmarks:
@@ -46,7 +47,7 @@ def main():
                                         run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn,_use_intermediate_gnn_results)
                                 else:
                                     run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle, SAGEConv,_use_intermediate_gnn_results)
-    send_email("train finished")
+    #send_email("train finished")
 
 def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results):
     today=datetime.today().strftime('%Y-%m-%d')
@@ -75,7 +76,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["use_intermediate_gnn_results"]=_use_intermediate_gnn_results
 
     with mlflow.start_run(description=""):
-        edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,reload_data=True)
+        edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,reload_data=False)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         #device = torch.device('cpu')
@@ -97,7 +98,8 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
         else:
             model = Full_connected_model(params["num_classes"], vocabulary_size,
                                          embedding_size=params["embedding_size"]).to(device)
-
+        print("count_parameters",count_parameters(model))
+        print("get_model_size",byte_to_megabyte(get_model_size(model)),"MB\n")
         trained_model = train(train_loader, valid_loader, model, params)
 
         # print("-" * 10 + "trained_model" + "-" * 10)
