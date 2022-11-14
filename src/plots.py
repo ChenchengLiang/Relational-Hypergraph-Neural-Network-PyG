@@ -33,11 +33,17 @@ def loss_plot(train_loss_floats, valid_loss_floats):
     fig.write_html(save_file_name)
     mlflow.log_artifact(save_file_name)
 
+def count_element_in_generator(e,generator):
+    counter=0
+    for i in generator():
+        if e==i:
+            counter+=1
+    return counter
 
 def draw_label_pie_chart(num_label, learning_label_generator, name=""):
     label_name_list = list(range(num_label))
-    flat_list = [item for sublist in learning_label_generator() for item in sublist]
-    values = [flat_list.count(i) for i in label_name_list]
+    flat_list_generator = lambda:(item for sublist in learning_label_generator() for item in sublist)
+    values = [count_element_in_generator(i,flat_list_generator) for i in label_name_list]
     pull = [0.2 if v / sum(values) < 0.01 else 0 for v in values]  # if percentage < 0.01, pull it out from the pie
     fig = go.Figure(data=[go.Pie(labels=label_name_list, values=values, pull=pull)])
     fig.update_layout(title=name+"-"+str(count_generator(learning_label_generator())))
