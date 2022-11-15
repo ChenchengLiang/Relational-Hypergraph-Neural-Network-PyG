@@ -1,12 +1,12 @@
 import torch
 import numpy as np
 import torch.nn.functional as F
-from plots import loss_plot
+from src.plots import loss_plot
 import mlflow.pytorch
 from tqdm import tqdm
 import mlflow
-from torch_utils import get_accuracy
-from train_utils import get_loss_function
+from src.torch_utils import get_accuracy
+from src.train_utils import get_loss_function
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -82,10 +82,10 @@ def train(train_loader,valid_loader,model,params):
         if valid_loss<best_loss:
             best_loss=valid_loss
             best_epoch=epoch
-            torch.save(model, '../models/best_model.pth')
+            torch.save(model, '/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/models/best_model.pth')
 
         if valid_acc == 1:
-            torch.save(model, '../models/best_model.pth')
+            torch.save(model, '/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/models/best_model.pth')
             loss_plot(train_loss_list, valid_loss_list)
             mlflow.log_metric("early stop epoch",epoch)
             return model

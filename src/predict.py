@@ -1,10 +1,8 @@
-from train import run_one_epoch
-import numpy as np
-from utils import manual_flatten
+from src.train import run_one_epoch
 import mlflow
-from plots import draw_label_pie_chart, draw_confusion_matrix
-from torch_utils import get_accuracy
-from train_utils import get_loss_function
+from src.plots import draw_label_pie_chart, draw_confusion_matrix
+from src.torch_utils import get_accuracy
+from src.train_utils import get_loss_function
 import torch
 
 def predict(trained_model, test_loader, params):
@@ -36,4 +34,4 @@ def predict(trained_model, test_loader, params):
     mlflow.log_metric("Predicted Accuracy", acc)
     print(f'Predicted Accuracy: {acc:.4f}')
 
-    return predicted_list, raw_predicted_list, file_name_list
+    return predicted_list, raw_predicted_list, file_name_list, acc

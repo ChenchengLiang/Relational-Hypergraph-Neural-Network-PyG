@@ -9,9 +9,9 @@ from os.path import join as opj
 def main():
     data_path="/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/data"
     benchmark_dict={opj(data_path,"linear-unsolvable-predict-CDHG"):
-                        "./mlruns/1/764e9c18cfdd4700b7a573cd3bbe54f4/artifacts",
+                        "./mlruns/1/f77c4a71fcbf4908bc1f2cb7cdc33882/artifacts",
                     opj(data_path,"linear-unsolvable-predict-CG"):
-                    "./mlruns/1/528002b450324df6b16e61909c09f4ed/artifacts"}
+                    "./mlruns/1/f3a9bb32bf79405b9319e338d9eb9e8c/artifacts"}
     for k in benchmark_dict:
         infer(k,benchmark_dict[k])
 
@@ -21,7 +21,6 @@ def infer(benchmark,artifact_uri):
     best_model = torch.load(model_path)
     #mlflow.pytorch.load_model()
     params=mlflow.artifacts.load_dict(opj(artifact_uri,"params.json"))
-    #optimizer = torch.optim.Adam(best_model.parameters(), lr=params["learning_rate"], weight_decay=5e-4)
 
     #Load test data
     vocabulary, token_map = build_vocabulary(params)

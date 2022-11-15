@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from sklearn.metrics import confusion_matrix
 import plotly.express as px
 import numpy as np
-from utils import count_generator
+from src.utils import count_generator
 plt.style.use("ggplot")
 
 

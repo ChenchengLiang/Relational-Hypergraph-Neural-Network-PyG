@@ -4,7 +4,7 @@ from torch_geometric.nn import MessagePassing
 from torch_geometric.utils import add_self_loops, degree
 from torch import Tensor
 import torch.nn.functional as F
-from torch_utils import get_activation
+from src.torch_utils import get_activation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 class HyperConv(MessagePassing):
     def __init__(self, in_channels, out_channels, edge_arity_dict,activation="relu"):

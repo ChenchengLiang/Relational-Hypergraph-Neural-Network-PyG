@@ -8,8 +8,8 @@ from tqdm import tqdm
 from utils import run_one_shell
 
 def main():
-    folder = sys.argv[1]
-    collect_predicate_from_other_solvers(folder, solver_location=sys.argv[2], shell_timeout=60 * 5)
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/z3-solutions/non-linear/train_data-solved-eldarica-unsolvable-39"#sys.argv[1]
+    #collect_predicate_from_other_solvers(folder, solver_location=sys.argv[2], shell_timeout=60 * 5)
     separate_solvable_cases(folder)
 
 

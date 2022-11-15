@@ -2,8 +2,8 @@ import torch
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv,SAGEConv,FiLMConv
 from torch.nn import Linear, BatchNorm1d, Embedding, ModuleList, LayerNorm, Dropout, ReLU, LeakyReLU, Identity
-from torch_utils import get_activation, initialize_linear_layers
-from layers import HyperConv
+from src.torch_utils import get_activation, initialize_linear_layers
+from src.layers import HyperConv
 
 
 class GNN_classification(torch.nn.Module):

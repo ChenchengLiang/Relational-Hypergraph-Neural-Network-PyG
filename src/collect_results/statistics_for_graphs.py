@@ -28,8 +28,8 @@ def get_statistics(folder):
                                             "templateBool", "templateEq", "templateIneq", "dummy", "unknown", "empty"]]
     data_dict = {"CDHG": {x + "Number": [] for x in node_field_list + binary_edge_name_list + ternary_edge_name_list},
                  "CG": {x + "Number": [] for x in node_field_list + binary_edge_name_list + ternary_edge_name_list}}
-    data_dict["CDHG"].update({"fileName": [], "file_size":[],"costruct_graph_time_consumption": []})
-    data_dict["CG"].update({"fileName": [], "file_size":[],"costruct_graph_time_consumption": []})
+    data_dict["CDHG"].update({"fileName": [], "file_size":[],"file_size_h":[],"costruct_graph_time_consumption": []})
+    data_dict["CG"].update({"fileName": [], "file_size":[],"file_size_h":[],"costruct_graph_time_consumption": []})
     for g in graph_type:
         graph_dict_list = read_files(file_list, g + ".JSON", read_function=read_json_file)
         time_consumption_list = read_files(file_list, file_type="log", read_function=read_graph_generation_log)
@@ -37,6 +37,7 @@ def get_statistics(folder):
             file_name = os.path.basename(graph_dict["file_name"])
             data_dict[graph_type[g]]["fileName"].append(file_name)
             data_dict[graph_type[g]]["file_size"].append(graph_dict["file_size"])
+            data_dict[graph_type[g]]["file_size_h"].append(graph_dict["file_size_h"])
             data_dict[graph_type[g]]["costruct_graph_time_consumption"].append(
                 time_consumption_dict[graph_type[g] + "_time_consumption"])
             for field in node_field_list + binary_edge_name_list + ternary_edge_name_list:

@@ -1,6 +1,6 @@
 from torch.nn import ReLU, LeakyReLU, Identity, Linear, LayerNorm, ModuleList, Tanh
 import numpy as np
-from utils import manual_flatten
+from src.utils import manual_flatten
 import torch
 def get_accuracy(predicted_list,label_list):
     flatten_predicted_list = np.array(manual_flatten(predicted_list)).ravel()
