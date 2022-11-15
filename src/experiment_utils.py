@@ -14,7 +14,7 @@ from src.utils import write_predicted_label_to_JSON_file,send_email
 from torch_geometric.profile import get_model_size,count_parameters,get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
 
-def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,_epochs):
+def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,_epochs,_file_name=""):
     today=datetime.today().strftime('%Y-%m-%d')
     mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
@@ -39,6 +39,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["learning_rate"] = 0.001
     params["gnn"] = _gnn
     params["use_intermediate_gnn_results"]=_use_intermediate_gnn_results
+    params["file_name"]=_file_name
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,reload_data=True)
