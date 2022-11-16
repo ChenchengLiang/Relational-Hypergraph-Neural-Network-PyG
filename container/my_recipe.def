@@ -1,0 +1,27 @@
+BootStrap: docker
+From: ubuntu:20.04
+
+%setup
+    mkdir ${APPTAINER_ROOTFS}/requirement
+
+%files
+    /home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/src .
+    /home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/requirements.txt requirement
+
+%environment
+    export LISTEN_PORT=12345
+    export LC_ALL=C
+
+%post
+    apt-get -y update
+    apt-get -y install pip
+    pip install torch-scatter -f https://data.pyg.org/whl/torch-1.12.1+cu102.html
+    pip install torch-sparse -f https://data.pyg.org/whl/torch-1.12.1+cu102.html
+    pip install torch-geometric
+    pip install mlflow
+    pip install -r requirement/requirements.txt
+
+
+
+%labels
+    Chencheng Liang
