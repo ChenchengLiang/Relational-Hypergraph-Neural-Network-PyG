@@ -6,6 +6,7 @@ from src.data_utils.dataset import HornGraphDataset
 from torch_geometric.loader import DataLoader
 from data_utils.read_data import build_vocabulary
 from os.path import join as opj
+from datetime import datetime
 def main():
     data_path="/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/data"
     benchmark_dict={opj(data_path,"linear-unsolvable-predict-CDHG"):
@@ -30,7 +31,8 @@ def infer(benchmark,artifact_uri):
     test_loader = DataLoader(test_data, batch_size=params["batch_size"], shuffle=True)
 
     #predict
-    mlflow.set_experiment("infer")
+    today = datetime.today().strftime('%Y-%m-%d')
+    mlflow.set_experiment(today+"-infer")
     with mlflow.start_run(description=""):
         predicted_list, raw_predicted_list, file_name_list = predict(best_model, test_loader, params)
     #write back to graph

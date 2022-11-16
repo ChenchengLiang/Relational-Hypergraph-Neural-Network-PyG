@@ -23,6 +23,7 @@ def main():
     data_loader_shuffle = [False]
     use_intermediate_gnn_results=[True,False]
     epochs=200
+    reload_data=True
 
     for graph_type in graph_types:
         for bench in benchmarks:
@@ -33,9 +34,9 @@ def main():
                             for data_shuffle in data_loader_shuffle:
                                 if model == "GNN":
                                     for _gnn in gnns:
-                                        run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn,_use_intermediate_gnn_results,epochs)
+                                        run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn,_use_intermediate_gnn_results,epochs,_reload_data=reload_data)
                                 else:
-                                    run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle, HyperConv,_use_intermediate_gnn_results,epochs)
+                                    run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle, HyperConv,_use_intermediate_gnn_results,epochs,_reload_data=reload_data)
     #send_email("train finished")
 
 
