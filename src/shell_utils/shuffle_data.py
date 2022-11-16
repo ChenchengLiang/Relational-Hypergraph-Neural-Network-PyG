@@ -1,11 +1,12 @@
-import os
+import sys
+sys.path.append("/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG")
 from src.collect_results.utils import copy_relative_files
 from src.utils import get_file_list,make_dirct
 import random
 import os
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/4-ready-for-training"
+    folder = sys.argv[1]
     file_list = get_file_list(folder, "smt2")
     file_list_number=len(file_list)
     random.seed(42)

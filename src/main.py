@@ -10,9 +10,7 @@ def main():
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
 
-    benchmarks = ["../data/linear_dataset_small-overfitting-test-"+str(i) for i in range(6)]
-    #benchmarks = ["../data/linear_dataset_small-overfitting-test"]
-    #benchmarks = ["../data/non-linear-dataset-shuffled"]
+    benchmarks = ["../data/overfitted-train-shuffled"]
     models = [ "hyper_GCN","GNN"]
     #models = ["hyper_GCN"]
     gnns=[SAGEConv,FiLMConv,GCNConv]
