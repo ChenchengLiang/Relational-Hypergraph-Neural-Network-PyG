@@ -1,6 +1,4 @@
 
-import numpy as np
-import torch
 from torch_geometric.nn import GCNConv, SAGEConv, FiLMConv
 from src.layers import HyperConv
 from experiment_utils import run_one_experiment

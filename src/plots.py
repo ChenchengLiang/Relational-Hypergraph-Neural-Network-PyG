@@ -1,4 +1,5 @@
-import seaborn as sns
+import sys
+sys.path.append("../..")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import mlflow

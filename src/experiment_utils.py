@@ -68,6 +68,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
         else:
             model = Full_connected_model(params["num_classes"], vocabulary_size,
                                          embedding_size=params["embedding_size"]).to(device)
+        print("_benchmark",_benchmark)
         print("count_parameters",count_parameters(model))
         print("get_model_size",byte_to_megabyte(get_model_size(model)),"MB\n")
         trained_model = train(train_loader, valid_loader, model, params)
