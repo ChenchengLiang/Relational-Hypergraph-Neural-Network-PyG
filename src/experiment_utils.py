@@ -15,6 +15,10 @@ from torch_geometric.profile import get_model_size,count_parameters,get_data_siz
 from torch_geometric.profile.utils import byte_to_megabyte
 
 def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,_epochs,_file_name="",_reload_data=True):
+    np.random.seed(42)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
+
     today=datetime.today().strftime('%Y-%m-%d')
     mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
@@ -72,7 +76,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
         # predict(trained_model, test_loader, optimizer, ls_func,params["num_classes"], task_type=params["task_type"])
 
         print("-" * 10 + "best_model" + "-" * 10)
-        model_path = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/models/best_model.pth"
+        model_path = "../models/best_model.pth"
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, "model")
         predicted_list, raw_predicted_list, file_name_list, predicted_sccuracy = predict(best_model, test_loader, params)

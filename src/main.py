@@ -6,11 +6,8 @@ from src.layers import HyperConv
 from experiment_utils import run_one_experiment
 
 def main():
-    np.random.seed(42)
-    torch.manual_seed(42)
-    torch.cuda.manual_seed_all(42)
 
-    benchmarks = ["../data/overfitted-train-shuffled"]
+    benchmarks = ["../data/overfitted-train"]
     models = [ "hyper_GCN","GNN"]
     #models = ["hyper_GCN"]
     gnns=[SAGEConv,FiLMConv,GCNConv]
@@ -22,7 +19,7 @@ def main():
     num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results=[True,False]
-    epochs=200
+    epochs=500
     reload_data=True
 
     for graph_type in graph_types:
@@ -30,14 +27,14 @@ def main():
             for model in models:
                 for task in tasks:
                     for num_gnn_layer in num_gnn_layers:
-                        for _use_intermediate_gnn_results in use_intermediate_gnn_results:
-                            for data_shuffle in data_loader_shuffle:
-                                if model == "GNN":
-                                    for _gnn in gnns:
-                                        run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn,_use_intermediate_gnn_results,epochs,_reload_data=reload_data)
-                                else:
+                        for data_shuffle in data_loader_shuffle:
+                            if model == "GNN":
+                                for _gnn in gnns:
+                                    run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,_gnn,False,epochs,_reload_data=reload_data)
+                            else:
+                                for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                     run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle, HyperConv,_use_intermediate_gnn_results,epochs,_reload_data=reload_data)
-    #send_email("train finished")
+#send_email("train finished")
 
 
 

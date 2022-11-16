@@ -82,10 +82,10 @@ def train(train_loader,valid_loader,model,params):
         if valid_loss<best_loss:
             best_loss=valid_loss
             best_epoch=epoch
-            torch.save(model, '/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/models/best_model.pth')
+            torch.save(model, '../models/best_model.pth')
 
         if valid_acc == 1:
-            torch.save(model, '/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/models/best_model.pth')
+            torch.save(model, '../models/best_model.pth')
             loss_plot(train_loss_list, valid_loss_list)
             mlflow.log_metric("early stop epoch",epoch)
             return model
