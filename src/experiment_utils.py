@@ -20,7 +20,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     torch.cuda.manual_seed_all(42)
 
     today=datetime.today().strftime('%Y-%m-%d')
-    mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
+    mlflow.set_experiment(today+"-"+os.path.basename(_benchmark)+"-learning-rate-0.0001")
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
@@ -40,7 +40,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["activation"] = "leak_relu"  # leak_relu, tanh
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = 0
-    params["learning_rate"] = 0.001
+    params["learning_rate"] = 0.0001
     params["gnn"] = _gnn
     params["use_intermediate_gnn_results"]=_use_intermediate_gnn_results
     params["file_name"]=_file_name

@@ -2,6 +2,7 @@ import torch
 from torch_geometric.data import Dataset, Data
 from src.utils import get_file_list, unzip_file, read_one_filed,convert_constant_to_category
 import os
+from tqdm import tqdm
 
 
 class HornGraphDataset(Dataset):
@@ -36,7 +37,7 @@ class HornGraphDataset(Dataset):
 
 
         file_list = self.raw_file_names
-        for index, file_name in enumerate(file_list):
+        for index, file_name in tqdm(enumerate(file_list),desc=os.path.basename(self.root)):
             ############################## read file begin##############################
             unzip_file(file_name)
             json_file_name = file_name[:-len(".zip")]
