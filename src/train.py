@@ -56,8 +56,8 @@ def run_one_epoch(model,data_loader,optimizer,ls_func,train=True,task_type="bina
 def train(train_loader,valid_loader,model,params):
     ls_func = get_loss_function(params).to(device)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"], weight_decay=params["learning_rate"]*0.1)
-    #optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"])
+    #optimizer = torch.optim.SGD(model.parameters(), lr=params["learning_rate"])
 
     train_loss_list=[]
     valid_loss_list=[]

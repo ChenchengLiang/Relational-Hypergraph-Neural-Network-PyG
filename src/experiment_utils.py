@@ -20,7 +20,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     torch.cuda.manual_seed_all(42)
 
     today=datetime.today().strftime('%Y-%m-%d')
-    mlflow.set_experiment(today+"-"+os.path.basename(_benchmark)+"-learning-rate-0.0001")
+    mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
