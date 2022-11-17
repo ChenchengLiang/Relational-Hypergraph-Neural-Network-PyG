@@ -14,7 +14,8 @@ from src.utils import write_predicted_label_to_JSON_file,send_email
 from torch_geometric.profile import get_model_size,count_parameters,get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
 
-def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,_epochs,_file_name="",_reload_data=True):
+def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,
+                       _epochs,_file_name="",_reload_data=True,_self_loop=False):
     np.random.seed(42)
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
@@ -36,11 +37,11 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["num_linear_layer"] = 2
     params["graph_type"] = _graph_type
     params["batch_size"] = 1
-    params["self_loop"] = False
+    params["self_loop"] = _self_loop
     params["activation"] = "leak_relu"  # leak_relu, tanh
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = 0
-    params["learning_rate"] = 0.0001
+    params["learning_rate"] = 0.001
     params["gnn"] = _gnn
     params["use_intermediate_gnn_results"]=_use_intermediate_gnn_results
     params["file_name"]=_file_name
