@@ -16,6 +16,7 @@ def main():
     self_loop = [True]
     epochs = 5
     reload_data = False
+    fix_random_seed=True
 
     for model in models:
         for bench in benchmarks:
@@ -27,12 +28,12 @@ def main():
                                 for _gnn in gnns:
                                     run_one_experiment(model, task, num_gnn_layer, bench, data_shuffle,
                                                        _gnn, False, epochs, _reload_data=reload_data,
-                                                       _self_loop=_self_loop)
+                                                       _self_loop=_self_loop,_file_name=fix_random_seed)
                             else:
                                 for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                     run_one_experiment(model, task, num_gnn_layer, bench, data_shuffle,
                                                        HyperConv, _use_intermediate_gnn_results, epochs,
-                                                       _reload_data=reload_data, _self_loop=_self_loop)
+                                                       _reload_data=reload_data, _self_loop=_self_loop,_file_name=fix_random_seed)
 
 
 # send_email("train finished")

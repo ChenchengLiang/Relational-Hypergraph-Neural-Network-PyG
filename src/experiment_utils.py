@@ -15,10 +15,11 @@ from torch_geometric.profile import get_model_size,count_parameters,get_data_siz
 from torch_geometric.profile.utils import byte_to_megabyte
 
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,
-                       _epochs,_file_name="",_reload_data=True,_self_loop=False):
-    np.random.seed(42)
-    torch.manual_seed(42)
-    torch.cuda.manual_seed_all(42)
+                       _epochs,_file_name="",_reload_data=True,_self_loop=False,_fix_random_seeds=True):
+    if _fix_random_seeds==True:
+        np.random.seed(42)
+        torch.manual_seed(42)
+        torch.cuda.manual_seed_all(42)
 
     today=datetime.today().strftime('%Y-%m-%d')
     mlflow_experiment_name=today+"-"+os.path.basename(_benchmark)
