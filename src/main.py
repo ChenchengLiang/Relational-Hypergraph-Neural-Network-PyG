@@ -4,39 +4,35 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../data/overfitted-train"]
-    models = ["hyper_GCN", "GNN"]
-    # models = ["hyper_GCN"]
+    benchmarks = ["../data/linear_dataset_shuffled-CDHG","../data/linear_dataset_shuffled-CG"]
+    #models = ["hyper_GCN", "GNN"]
+    models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
     tasks = ["template_binary_classification"]
-    graph_types = ["hyperEdgeGraph", "monoDirectionLayerGraph"]
-    # graph_types = ["monoDirectionLayerGraph"]
-    # graph_types = ["hyperEdgeGraph"]
-    num_gnn_layers = [2, 4, 8]
+    num_gnn_layers = [2]
     data_loader_shuffle = [False]
-    use_intermediate_gnn_results = [True, False]
-    self_loop = [True, False]
-    epochs = 500
+    use_intermediate_gnn_results = [False]
+    self_loop = [True]
+    epochs = 5
     reload_data = True
 
     for model in models:
         for bench in benchmarks:
-            for graph_type in graph_types:
-                for task in tasks:
-                    for num_gnn_layer in num_gnn_layers:
-                        for data_shuffle in data_loader_shuffle:
-                            for _self_loop in self_loop:
-                                if model == "GNN":
-                                    for _gnn in gnns:
-                                        run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,
-                                                           _gnn, False, epochs, _reload_data=reload_data,
-                                                           _self_loop=_self_loop)
-                                else:
-                                    for _use_intermediate_gnn_results in use_intermediate_gnn_results:
-                                        run_one_experiment(model, task, graph_type, num_gnn_layer, bench, data_shuffle,
-                                                           HyperConv, _use_intermediate_gnn_results, epochs,
-                                                           _reload_data=reload_data, _self_loop=_self_loop)
+            for task in tasks:
+                for num_gnn_layer in num_gnn_layers:
+                    for data_shuffle in data_loader_shuffle:
+                        for _self_loop in self_loop:
+                            if model == "GNN":
+                                for _gnn in gnns:
+                                    run_one_experiment(model, task, num_gnn_layer, bench, data_shuffle,
+                                                       _gnn, False, epochs, _reload_data=reload_data,
+                                                       _self_loop=_self_loop)
+                            else:
+                                for _use_intermediate_gnn_results in use_intermediate_gnn_results:
+                                    run_one_experiment(model, task, num_gnn_layer, bench, data_shuffle,
+                                                       HyperConv, _use_intermediate_gnn_results, epochs,
+                                                       _reload_data=reload_data, _self_loop=_self_loop)
 
 
 # send_email("train finished")

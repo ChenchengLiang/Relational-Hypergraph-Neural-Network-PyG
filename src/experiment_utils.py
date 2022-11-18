@@ -14,7 +14,7 @@ from src.utils import write_predicted_label_to_JSON_file,send_email
 from torch_geometric.profile import get_model_size,count_parameters,get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
 
-def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,
+def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,
                        _epochs,_file_name="",_reload_data=True,_self_loop=False):
     np.random.seed(42)
     torch.manual_seed(42)
@@ -24,6 +24,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     mlflow_experiment_name=today+"-"+os.path.basename(_benchmark)
     print("mlflow_experiment_name:",mlflow_experiment_name)
     mlflow.set_experiment(mlflow_experiment_name)
+    mlflow.set_tracking_uri("http://localhost:5000") # Specify tracking server
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
@@ -37,7 +38,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["embedding_size"] = 32
     params["num_gnn_layers"] = _num_gnn_layers
     params["num_linear_layer"] = 2
-    params["graph_type"] = _graph_type
+    params["graph_type"] = "hyperEdgeGraph" if "CDHG" in _benchmark else  "monoDirectionLayerGraph"
     params["batch_size"] = 1
     params["self_loop"] = _self_loop
     params["activation"] = "leak_relu"  # leak_relu, tanh
@@ -47,6 +48,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     params["gnn"] = _gnn
     params["use_intermediate_gnn_results"]=_use_intermediate_gnn_results
     params["file_name"]=_file_name
+    params["gradient_clip"]=True
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,reload_data=_reload_data)
@@ -83,7 +85,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
         model_path = "../models/best_model.pth"
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, "model")
-        predicted_list, raw_predicted_list, file_name_list, predicted_sccuracy = predict(best_model, test_loader, params)
+        predicted_list, raw_predicted_list, file_name_list, predicted_accuracy = predict(best_model, test_loader, params)
 
         params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".") + 1:-2]
         mlflow.log_params(params)
@@ -91,4 +93,4 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
 
     write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, params["task_type"],
                                        root=opj(params["benchmark"], "test_data"))
-    return predicted_sccuracy
+    return predicted_accuracy

@@ -1,4 +1,7 @@
 from os.path import join as opj
+
+import mlflow
+
 from src.data_utils.dataset import HornGraphDataset
 from src.utils import remove_processed_file, unzip_file, read_one_filed, get_file_list, convert_constant_to_category
 from src.plots import draw_label_pie_chart
@@ -8,6 +11,7 @@ import os
 
 def get_data(params, reload_data=True):
     vocabulary, token_map = build_vocabulary(params)
+    mlflow.log_dict(token_map,"token_map.json")
 
     root = opj(params["benchmark"], "train_data")
     if reload_data == True:
