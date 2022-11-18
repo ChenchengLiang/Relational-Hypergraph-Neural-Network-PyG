@@ -5,8 +5,8 @@ from experiment_utils import run_one_experiment
 
 def main():
     benchmarks = ["../data/linear_dataset_shuffled-CDHG","../data/linear_dataset_shuffled-CG"]
-    #models = ["hyper_GCN", "GNN"]
-    models = ["hyper_GCN"]
+    models = ["hyper_GCN", "GNN"]
+    #models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification"]
     tasks = ["template_binary_classification"]
@@ -15,7 +15,7 @@ def main():
     use_intermediate_gnn_results = [False]
     self_loop = [True]
     epochs = 5
-    reload_data = True
+    reload_data = False
 
     for model in models:
         for bench in benchmarks:
