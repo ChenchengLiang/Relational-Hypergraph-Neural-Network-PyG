@@ -21,7 +21,9 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
     torch.cuda.manual_seed_all(42)
 
     today=datetime.today().strftime('%Y-%m-%d')
-    mlflow.set_experiment(today+"-"+os.path.basename(_benchmark))
+    mlflow_experiment_name=today+"-"+os.path.basename(_benchmark)
+    print("mlflow_experiment_name:",mlflow_experiment_name)
+    mlflow.set_experiment(mlflow_experiment_name)
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "template_multi_classification": 5}
 
@@ -69,7 +71,7 @@ def run_one_experiment(_model, _task, _graph_type, _num_gnn_layers, _benchmark, 
         else:
             model = Full_connected_model(params["num_classes"], vocabulary_size,
                                          embedding_size=params["embedding_size"]).to(device)
-        print("_benchmark",_benchmark)
+        #print("_benchmark",_benchmark)
         print("count_parameters",count_parameters(model))
         print("get_model_size",byte_to_megabyte(get_model_size(model)),"MB\n")
         trained_model = train(train_loader, valid_loader, model, params)
