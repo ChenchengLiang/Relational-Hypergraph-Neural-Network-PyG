@@ -1,5 +1,5 @@
 /cluster-results
-/container/image.sif
+/container/*.sif
 /src/debug
 /mlruns
 /.idea
