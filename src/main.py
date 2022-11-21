@@ -4,7 +4,7 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../data/linear_dataset_shuffled-CDHG","../data/linear_dataset_shuffled-CG"]
+    benchmarks = ["../data/linear_dataset_one-CDHG","../data/linear_dataset_one-CG"]
     models = ["hyper_GCN", "GNN"]
     #models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
@@ -15,23 +15,23 @@ def main():
     use_intermediate_gnn_results = [False]
     self_loop = [True]
     epochs = 5
-    reload_data = False
+    reload_data = True
     fix_random_seed=True
 
     for model in models:
         for bench in benchmarks:
             for task in tasks:
-                for num_gnn_layer in num_gnn_layers:
+                for _num_gnn_layer in num_gnn_layers:
                     for data_shuffle in data_loader_shuffle:
                         for _self_loop in self_loop:
                             if model == "GNN":
                                 for _gnn in gnns:
-                                    run_one_experiment(model, task, num_gnn_layer, bench, data_shuffle,
+                                    run_one_experiment(model, task, _num_gnn_layer, bench, data_shuffle,
                                                        _gnn, False, epochs, _reload_data=reload_data,
                                                        _self_loop=_self_loop,_file_name=fix_random_seed)
                             else:
                                 for _use_intermediate_gnn_results in use_intermediate_gnn_results:
-                                    run_one_experiment(model, task, num_gnn_layer, bench, data_shuffle,
+                                    run_one_experiment(model, task, _num_gnn_layer, bench, data_shuffle,
                                                        HyperConv, _use_intermediate_gnn_results, epochs,
                                                        _reload_data=reload_data, _self_loop=_self_loop,_file_name=fix_random_seed)
 

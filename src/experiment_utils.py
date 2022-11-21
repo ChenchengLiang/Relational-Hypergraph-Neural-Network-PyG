@@ -77,6 +77,11 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         #print("_benchmark",_benchmark)
         print("count_parameters",count_parameters(model))
         print("get_model_size",byte_to_megabyte(get_model_size(model)),"MB\n")
+
+        params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".") + 1:-2]
+        mlflow.log_params(params)
+        mlflow.log_dict(params, "params.json")
+
         trained_model = train(train_loader, valid_loader, model, params)
 
         # print("-" * 10 + "trained_model" + "-" * 10)
@@ -88,9 +93,6 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         mlflow.pytorch.log_model(best_model, "model")
         predicted_list, raw_predicted_list, file_name_list, predicted_accuracy = predict(best_model, test_loader, params)
 
-        params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".") + 1:-2]
-        mlflow.log_params(params)
-        mlflow.log_dict(params, "params.json")
 
     write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, params["task_type"],
                                        root=opj(params["benchmark"], "test_data"))
