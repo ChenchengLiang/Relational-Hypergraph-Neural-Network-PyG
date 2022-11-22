@@ -14,8 +14,9 @@ from src.utils import write_predicted_label_to_JSON_file,send_email
 from torch_geometric.profile import get_model_size,count_parameters,get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
 
-def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,_gnn,_use_intermediate_gnn_results,
-                       _epochs,_file_name="",_reload_data=True,_self_loop=False,_fix_random_seeds=True):
+def run_one_experiment(_model: object, _task: object, _num_gnn_layers: object, _benchmark: object, data_shuffle: object, _gnn: object,
+                       _use_intermediate_gnn_results: object,
+                       _epochs: object, _file_name: object = "", _reload_data: object = True, _self_loop: object = False, _fix_random_seeds: object = True) -> object:
     if _fix_random_seeds==True:
         np.random.seed(42)
         torch.manual_seed(42)
