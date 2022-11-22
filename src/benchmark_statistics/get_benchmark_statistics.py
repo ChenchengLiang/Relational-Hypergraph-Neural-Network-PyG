@@ -40,8 +40,16 @@ def main():
                                  "unlabeledSingleVariableTemplatesNumber", "unlabeledBinaryVariableTemplatesNumber",
                                  "unlabeledTemplateNumber", "unlabeledTemplateRelationSymbolNumber"]
     for cm in fixed_clause_measurements:
-        data_dict["linear"][cm] = list(get_filed_from_json_file(linear_total_file_list,cm))
-        data_dict["non-linear"][cm] = list(get_filed_from_json_file(non_linear_total_file_list,cm))
+        data_dict["linear"][cm] = list(get_fixed_filed_from_json_file(linear_total_file_list,cm))
+        data_dict["non-linear"][cm] = list(get_fixed_filed_from_json_file(non_linear_total_file_list,cm))
+
+
+    #get non-fix fields
+    read_solving_time_from_json_file(linear_total_file_list)
+    read_solving_time_from_json_file(non_linear_total_file_list)
+    # field_list=["satisfiability","shortest_solving_time","shortest_solving_time_option"]
+    # for field in field_list:
+    #     data_dict["linear"][field] = list(read_solving_time_from_json_file(linear_total_file_list, cm))
 
 
     #write to excel
@@ -52,13 +60,24 @@ def main():
         data = pd.DataFrame(pd.DataFrame(data_dict["non-linear"]))
         data.to_excel(writer, sheet_name="non-linear")
 
+def read_solving_time_from_json_file(file_list):
+    for json_obj in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
+        if len(json_obj)!=0:
+            solving_time_dict={}
+            for k in json_obj:
+                if "solvingTime" in k and int(json_obj[k][0])!=10800000:
+                    solving_time_dict[k]=int(json_obj[k][0])
+            print(solving_time_dict)
+        else:
+            print("unsolvable")
 
-def get_filed_from_json_file(file_list,field):
+def get_fixed_filed_from_json_file(file_list,field):
     for x in read_files(file_list, file_type="solvability.JSON",read_function=read_json_file):
         try:
             yield x[field][0]
         except:
             yield 10800000
+
 def get_linear_file_list():
     linear_sat_list_1=get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/2-uppmax-linear-mined-template/ready_for_graph_construction","smt2")
     linear_sat_list_2=get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/2-uppmax-linear-mined-template/cluster_timeout_folder","smt2")
