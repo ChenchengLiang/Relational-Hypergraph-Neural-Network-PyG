@@ -7,11 +7,8 @@ import mlflow
 from src.torch_utils import get_accuracy
 from src.train_utils import get_loss_function
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
-
-def run_one_epoch(model, data_loader, optimizer, ls_func, train=True, task_type="binary_classification",
+def run_one_epoch(model, data_loader, optimizer, ls_func, device, train=True, task_type="binary_classification",
                   gradient_clip=True):
     running_loss = 0.0
     raw_predicted_list = []
@@ -57,7 +54,7 @@ def run_one_epoch(model, data_loader, optimizer, ls_func, train=True, task_type=
     return running_loss / len(data_loader), predicted_list, raw_predicted_list, label_list, file_name_list
 
 
-def train(train_loader, valid_loader, model, params):
+def train(train_loader, valid_loader, model, device, params):
     ls_func = get_loss_function(params).to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"])
@@ -72,6 +69,7 @@ def train(train_loader, valid_loader, model, params):
         model.train()
         train_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(model, train_loader,
                                                                                                    optimizer, ls_func,
+                                                                                                   device,
                                                                                                    train=True,
                                                                                                    task_type=params[
                                                                                                        "task_type"],
@@ -83,7 +81,7 @@ def train(train_loader, valid_loader, model, params):
         # validating
         model.eval()
         valid_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(model, valid_loader,
-                                                                                                   optimizer, ls_func,
+                                                                                                   optimizer, ls_func,device,
                                                                                                    train=False,
                                                                                                    task_type=params[
                                                                                                        "task_type"],

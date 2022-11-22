@@ -5,14 +5,13 @@ from src.torch_utils import get_accuracy
 from src.train_utils import get_loss_function
 import torch
 
-def predict(trained_model, test_loader, params):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+def predict(trained_model, test_loader,device, params):
     optimizer = torch.optim.Adam(trained_model.parameters(), lr=params["learning_rate"], weight_decay=5e-4)
     ls_func = get_loss_function(params).to(device)
     trained_model.eval()
     test_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(trained_model,
                                                                                               test_loader, optimizer,
-                                                                                              ls_func,
+                                                                                              ls_func,device,
                                                                                               train=False,
                                                                                               task_type=params["task_type"])
 

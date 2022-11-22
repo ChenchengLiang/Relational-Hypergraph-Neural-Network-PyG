@@ -82,7 +82,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         mlflow.log_params(params)
         mlflow.log_dict(params, "params.json")
 
-        trained_model = train(train_loader, valid_loader, model, params)
+        trained_model = train(train_loader, valid_loader, model, device, params)
 
         # print("-" * 10 + "trained_model" + "-" * 10)
         # predict(trained_model, test_loader, optimizer, ls_func,params["num_classes"], task_type=params["task_type"])
@@ -91,7 +91,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         model_path = "../models/best_model.pth"
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, "model")
-        predicted_list, raw_predicted_list, file_name_list, predicted_accuracy = predict(best_model, test_loader, params)
+        predicted_list, raw_predicted_list, file_name_list, predicted_accuracy = predict(best_model, test_loader,device, params)
 
 
     write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, params["task_type"],
