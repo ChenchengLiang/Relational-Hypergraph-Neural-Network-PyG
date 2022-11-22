@@ -1,37 +1,22 @@
 BootStrap: docker
-#From: ubuntu:latest
 From: continuumio/miniconda3
-#From: python:3
-#From: bitnami/pytorch:latest
 
 %setup
     mkdir ${APPTAINER_ROOTFS}/requirement
 
 %files
-    #/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/src .
     /home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/requirements.txt requirement
 
 %environment
     export LISTEN_PORT=12345
     export LC_ALL=C
-    #export LD_LIBRARY_PATH=/usr/lib/cuda/include:/usr/lib/cuda/lib64:/usr/lib/cuda/include:/home/cheli243/anaconda3/lib:/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/venv/lib/python3.8/site-packages/torch/lib
-
 
 %post
-    #apt-get -y update
-    #apt-get -y install pip
-    #pip install -r requirement/requirements.txt
-
-    #pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
-    #pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-1.13.0+cu116.html
-
 
     conda install pip
     pip install -r requirement/requirements.txt
     conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
     conda install pyg -c pyg
-
-
 
 
 
