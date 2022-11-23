@@ -8,7 +8,9 @@ from src.collect_results.utils import read_files, read_json_file, read_smt2_cate
 
 
 def main():
-    linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test", "smt2")
+    linear_total_file_list = get_linear_file_list()
+    # linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test", "smt2")
+
     non_linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test-1", "smt2")
 
     data_dict = {"linear": {}, "non-linear": {}}
@@ -46,6 +48,10 @@ def main():
     read_solving_time_from_json_file(linear_total_file_list, data_dict["linear"])
     read_solving_time_from_json_file(non_linear_total_file_list, data_dict["non-linear"])
 
+    # get graph info
+    read_graph_info_from_json_file(linear_total_file_list, data_dict["linear"])
+    read_graph_info_from_json_file(non_linear_total_file_list, data_dict["non-linear"])
+
     # write to excel
     linear_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks"
     with pd.ExcelWriter(linear_folder + "/benchmark_statistics.xlsx") as writer:
@@ -53,6 +59,33 @@ def main():
         data.to_excel(writer, sheet_name="linear")
         data = pd.DataFrame(pd.DataFrame(data_dict["non-linear"]))
         data.to_excel(writer, sheet_name="non-linear")
+
+
+def read_graph_info_from_json_file(file_list, statistic_dict):
+    graph_fileds = ["CDHG_node_number", "CDHG_binary_edge_number", "CDHG_ternary_edge_number", "CDHG_label_number",
+                    "CG_node_number", "CG_binary_edge_number", "CG_ternary_edge_number", "CG_label_number"]
+    assign_dict_key_empty_list(statistic_dict, graph_fileds)
+    for json_obj_CDHG, json_obj_CG in zip(
+            read_files(file_list, file_type="hyperEdgeGraph.JSON", read_function=read_json_file),
+            read_files(file_list, file_type="monoDirectionLayerGraph.JSON", read_function=read_json_file)):
+        if len(json_obj_CDHG) != 0 and len(json_obj_CG) != 0:
+            statistic_dict["CDHG_node_number"].append(int(json_obj_CDHG["nodeNumber"][0]))
+            statistic_dict["CDHG_binary_edge_number"].append(int(json_obj_CDHG["binaryEdgeNumber"][0]))
+            statistic_dict["CDHG_ternary_edge_number"].append(int(json_obj_CDHG["ternaryHyperEdgeNumber"][0]))
+            statistic_dict["CDHG_label_number"].append(int(json_obj_CDHG["labelNumber"][0]))
+            statistic_dict["CG_node_number"].append(int(json_obj_CG["nodeNumber"][0]))
+            statistic_dict["CG_binary_edge_number"].append(int(json_obj_CG["binaryEdgeNumber"][0]))
+            statistic_dict["CG_ternary_edge_number"].append(int(json_obj_CG["ternaryHyperEdgeNumber"][0]))
+            statistic_dict["CG_label_number"].append(int(json_obj_CG["labelNumber"][0]))
+        else:
+            statistic_dict["CDHG_node_number"].append(0)
+            statistic_dict["CDHG_binary_edge_number"].append(0)
+            statistic_dict["CDHG_ternary_edge_number"].append(0)
+            statistic_dict["CDHG_label_number"].append(0)
+            statistic_dict["CG_node_number"].append(0)
+            statistic_dict["CG_binary_edge_number"].append(0)
+            statistic_dict["CG_ternary_edge_number"].append(0)
+            statistic_dict["CG_label_number"].append(0)
 
 
 def read_solving_time_from_json_file(file_list, statistic_dict):
@@ -168,22 +201,49 @@ def get_fixed_filed_from_json_file(file_list, field):
 
 
 def get_linear_file_list():
-    linear_sat_list_1 = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/2-uppmax-linear-mined-template/ready_for_graph_construction",
-        "smt2")
-    linear_sat_list_2 = get_file_list(
+    # linear_sat_list_check_solvability_timeout=get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/1-uppmax-linear-solvability/cluster_timeout_folder","smt2")
+    linear_sat_list_check_mining_timeout = get_file_list(
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/2-uppmax-linear-mined-template/cluster_timeout_folder",
         "smt2")
-    linear_sat_list = linear_sat_list_1 + linear_sat_list_2
-    linear_unsolvable_list = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/unsolvable-1616/train_data",
+    linear_sat_list_no_simplified_clauses = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/1-no_simplified_clauses",
         "smt2")
+    linear_sat_list_graph_timeout = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/cluster_timeout_folder",
+        "smt2")
+    linear_sat_list_graph_postive_labels = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/3-has-positive-labels",
+        "smt2")
+    linear_sat_list_graph_no_postive_labels = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/3-no-positive-labels",
+        "smt2")
+    linear_sat_list = linear_sat_list_check_mining_timeout + linear_sat_list_no_simplified_clauses + linear_sat_list_graph_timeout + linear_sat_list_graph_postive_labels + linear_sat_list_graph_no_postive_labels
+    print("linear_sat_list", len(linear_sat_list))
+
+    linear_unsolvable_list_labeling_timeout = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/4-uppmax-linear-unsolvable-unlabeled-tempaltes/cluster_timeout_folder",
+        "smt2")
+    linear_unsolvable_list_labeling_unziped = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/4-uppmax-linear-unsolvable-unlabeled-tempaltes/unzip_files",
+        "smt2")
+    linear_unsolvable_list_graph_timeout = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/5-uppmax-linear-unsolvable-graphs/cluster_timeout_folder",
+        "smt2")
+    linear_unsolvable_list_graph = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/5-uppmax-linear-unsolvable-graphs/4-ready-for-training",
+        "smt2")
+    linear_unsolvable_list = linear_unsolvable_list_labeling_timeout + linear_unsolvable_list_labeling_unziped + linear_unsolvable_list_graph_timeout + linear_unsolvable_list_graph
+    print("linear_unsolvable_list", len(linear_unsolvable_list))
+
     liner_unsat_list = get_file_list(
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/UNSAT-2160/solvability",
         "smt2")
+    # todo: get graphs
+
     linear_no_simplified_clauses = get_file_list(
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/no-simplified-clauses-2087/train_data",
         "smt2")
+    # todo: get solvability
 
     total_file_list = linear_sat_list + linear_unsolvable_list + liner_unsat_list + linear_no_simplified_clauses
     print("total_file_list", len(total_file_list))
