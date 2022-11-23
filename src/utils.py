@@ -121,6 +121,15 @@ def convert_bytes(size):
             return "%3.1f %s" % (size, x)
         size /= 1024.0
 
+def select_key_with_value_condition(d,f):
+    v = list(d.values())
+    k = list(d.keys())
+    return k[v.index(f(v))],f(v)
+
+def assign_dict_key_empty_list(d,keys):
+    for k in keys:
+        d[k]=[]
+
 def send_email(subject="python finished"):
     print("send email to chencheng.liang@it.uu.se")
     shell_command = " echo \"Subject:" + subject + " \" | sendmail -F \"chencheng\" chencheng.liang@it.uu.se "

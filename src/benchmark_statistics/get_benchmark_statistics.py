@@ -2,7 +2,7 @@ import os.path
 import sys
 
 sys.path.append("../..")
-from src.utils import get_file_list, unzip_file, compress_file
+from src.utils import get_file_list, select_key_with_value_condition,assign_dict_key_empty_list
 import pandas as pd
 from src.collect_results.utils import read_files, read_json_file, read_smt2_category
 
@@ -46,11 +46,8 @@ def main():
 
 
     #get non-fix fields
-    read_solving_time_from_json_file(linear_total_file_list)
-    read_solving_time_from_json_file(non_linear_total_file_list)
-    # field_list=["satisfiability","shortest_solving_time","shortest_solving_time_option"]
-    # for field in field_list:
-    #     data_dict["linear"][field] = list(read_solving_time_from_json_file(linear_total_file_list, cm))
+    read_solving_time_from_json_file(linear_total_file_list,data_dict["linear"])
+    read_solving_time_from_json_file(non_linear_total_file_list,data_dict["non-linear"])
 
 
     #write to excel
@@ -61,22 +58,58 @@ def main():
         data = pd.DataFrame(pd.DataFrame(data_dict["non-linear"]))
         data.to_excel(writer, sheet_name="non-linear")
 
-def read_solving_time_from_json_file(file_list):
+def read_solving_time_from_json_file(file_list,statistic_dict):
+    record_fields=["min_solving_time_option","min_solving_time (s)","max_solving_time_option","max_solving_time (s)","satisfiability","solvable_option_list"]
+    assign_dict_key_empty_list(statistic_dict,record_fields)
     for json_obj in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
-        if len(json_obj)!=0:
+        if len(json_obj)!=0: #has solvability file
             solving_time_dict={}
+            solvable_option_dict={}
             for k in json_obj:
-                if "solvingTime" in k and int(json_obj[k][0])!=10800000:
+                if "solvingTime" in k:
                     solving_time_dict[k]=int(json_obj[k][0])
-            if len(solving_time_dict)!=0:
-                print(solving_time_dict)
-                #todo get satisficability and shortest solving time
-            else:
-                print("unsolvable")
-                #todo return 10800000
-        else:
-            print("unsolvable")
-            # todo return 10800000
+                    if int(json_obj[k][0])!=10800000:
+                        solvable_option_dict[k]=int(json_obj[k][0])
+            if len(solving_time_dict)!=0: #solvable with solvability file
+
+                min_solving_option,min_solving_time=select_key_with_value_condition(solving_time_dict,min)
+                max_solving_option, max_solving_time = select_key_with_value_condition(solving_time_dict, max)
+                satisfiability = get_satisfiability(json_obj,min_solving_option)
+                
+                statistic_dict["min_solving_time_option"].append(min_solving_option.replace("solvingTime_",""))
+                statistic_dict["min_solving_time (s)"].append(min_solving_time/1000)
+                statistic_dict["max_solving_time_option"].append(max_solving_option.replace("solvingTime_",""))
+                statistic_dict["max_solving_time (s)"].append(max_solving_time/1000)
+                statistic_dict["satisfiability"].append(satisfiability)
+                statistic_dict["solvable_option_list"].append(str([x.replace("solvingTime_","")for x in solvable_option_dict.keys()]))
+
+            else: #unsolvable with solvability file
+                statistic_dict["min_solving_time_option"].append("unsolvable")
+                statistic_dict["min_solving_time (s)"].append(10800)
+                statistic_dict["max_solving_time_option"].append("unsolvable")
+                statistic_dict["max_solving_time (s)"].append(10800)
+                statistic_dict["satisfiability"].append("unknown")
+                statistic_dict["solvable_option_list"].append("")
+        else:#no solvability file
+            statistic_dict["min_solving_time_option"].append("unsolvable")
+            statistic_dict["min_solving_time (s)"].append(10800)
+            statistic_dict["max_solving_time_option"].append("unsolvable")
+            statistic_dict["max_solving_time (s)"].append(10800)
+            statistic_dict["satisfiability"].append("unknown")
+            statistic_dict["solvable_option_list"].append("")
+
+
+
+
+
+def get_satisfiability(json_obj,min_solving_option):
+    satisfiability=int(json_obj[min_solving_option.replace("solvingTime","satisfiability")][0])
+    if satisfiability==1:
+        return "safe"
+    elif satisfiability==0:
+        return "unsafe"
+    else:
+        return "unknown"
 
 def get_fixed_filed_from_json_file(file_list,field):
     for x in read_files(file_list, file_type="solvability.JSON",read_function=read_json_file):
