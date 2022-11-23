@@ -4,7 +4,7 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../data/overfitted-train-shuffled-CDHG","../data/overfitted-train-shuffled-CG"]
+    benchmarks = ["../data/linear_dataset_one-CDHG","../data/linear_dataset_one-CG"]
     _self_loop = False
 
     # load data

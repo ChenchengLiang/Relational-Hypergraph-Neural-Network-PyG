@@ -5,7 +5,6 @@ from torch_geometric.utils import add_self_loops, degree
 from torch import Tensor
 import torch.nn.functional as F
 from src.torch_utils import get_activation
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 class HyperConv(MessagePassing):
     def __init__(self, in_channels, out_channels, edge_arity_dict,activation="relu"):
         super().__init__()
@@ -30,7 +29,7 @@ class HyperConv(MessagePassing):
         # x has shape [N, in_channels]
         # element in edge_list has shape [edge_arity, E]
 
-        aggregated_messages = torch.zeros(len(x),self.embedding_size).to(device)#[N, embedding_size]
+        aggregated_messages = torch.zeros(len(x),self.embedding_size,device=x.device)#.to(device)#[N, embedding_size]
         linear_layer_counter=0
         for edges in edge_list:
             edge_arity=len(edges)
@@ -41,7 +40,7 @@ class HyperConv(MessagePassing):
                 #print("position_edge_index",len(position_edge_index),position_edge_index)
                 gathered_nodes = torch.index_select(x, dim=0, index=position_edge_index)
                 node_features_in_edge_columns.append(gathered_nodes)
-            concatednated_node_features=torch.concat(node_features_in_edge_columns,dim=-1).to(device) #[E, embedding_size*2]
+            concatednated_node_features=torch.concat(node_features_in_edge_columns,dim=-1)#[E, embedding_size*2]
             #print("concatednated_node_features.shape",concatednated_node_features.shape)
 
             # Step 2: Linearly transform concatenated neighbors and add to messages.
