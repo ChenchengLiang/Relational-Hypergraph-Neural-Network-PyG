@@ -33,12 +33,13 @@ def main():
     # get fix clause attributes
     fixed_clause_measurements = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
                                  "relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
-                                 "minedSingleVariableTemplatesNumber", "minedBinaryVariableTemplatesNumber",
-                                 "minedTemplateNumber", "minedTemplateRelationSymbolNumber",
-                                 "labeledSingleVariableTemplatesNumber", "labeledBinaryVariableTemplatesNumber",
-                                 "labeledTemplateNumber", "labeledTemplateRelationSymbolNumber",
-                                 "unlabeledSingleVariableTemplatesNumber", "unlabeledBinaryVariableTemplatesNumber",
-                                 "unlabeledTemplateNumber", "unlabeledTemplateRelationSymbolNumber"]
+                                 # "minedSingleVariableTemplatesNumber", "minedBinaryVariableTemplatesNumber",
+                                 # "minedTemplateNumber", "minedTemplateRelationSymbolNumber",
+                                 # "labeledSingleVariableTemplatesNumber", "labeledBinaryVariableTemplatesNumber",
+                                 # "labeledTemplateNumber", "labeledTemplateRelationSymbolNumber",
+                                 # "unlabeledSingleVariableTemplatesNumber", "unlabeledBinaryVariableTemplatesNumber",
+                                 # "unlabeledTemplateNumber", "unlabeledTemplateRelationSymbolNumber"
+                                 ]
     for cm in fixed_clause_measurements:
         data_dict["linear"][cm] = list(get_fixed_filed_from_json_file(linear_total_file_list,cm))
         data_dict["non-linear"][cm] = list(get_fixed_filed_from_json_file(non_linear_total_file_list,cm))
@@ -67,9 +68,15 @@ def read_solving_time_from_json_file(file_list):
             for k in json_obj:
                 if "solvingTime" in k and int(json_obj[k][0])!=10800000:
                     solving_time_dict[k]=int(json_obj[k][0])
-            print(solving_time_dict)
+            if len(solving_time_dict)!=0:
+                print(solving_time_dict)
+                #todo get satisficability and shortest solving time
+            else:
+                print("unsolvable")
+                #todo return 10800000
         else:
             print("unsolvable")
+            # todo return 10800000
 
 def get_fixed_filed_from_json_file(file_list,field):
     for x in read_files(file_list, file_type="solvability.JSON",read_function=read_json_file):

@@ -43,9 +43,9 @@ def run_one_experiment(_model: object, _task: object, _num_gnn_layers: object, _
     params["graph_type"] = "hyperEdgeGraph" if "CDHG" in _benchmark else  "monoDirectionLayerGraph"
     params["batch_size"] = 1
     params["self_loop"] = _self_loop
-    params["activation"] = "leak_relu"  # leak_relu, tanh
+    params["activation"] = "relu"  # leak_relu, tanh
     params["data_loader_shuffle"] = data_shuffle
-    params["drop_out_rate"] = 0
+    params["drop_out_rate"] = 0.1
     params["learning_rate"] = 0.001
     params["gnn"] = _gnn
     params["use_intermediate_gnn_results"]=_use_intermediate_gnn_results
