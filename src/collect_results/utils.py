@@ -5,12 +5,16 @@ import glob
 from shutil import copy
 from tqdm import tqdm
 def read_json_file(f,json_obj):
-    loaded_graph = json.load(f)
-    for field in loaded_graph:
-        # print(bcolors.GRENN + str(field) + str(loaded_graph[field]) + bcolors.RESET)
-        json_obj[str(field)] = loaded_graph[field]
-    return json_obj
-
+    try:
+        loaded_graph = json.load(f)
+        for field in loaded_graph:
+            # print(bcolors.GRENN + str(field) + str(loaded_graph[field]) + bcolors.RESET)
+            json_obj[str(field)] = loaded_graph[field]
+        return json_obj
+    except:
+        print("json.load() error", f)
+        copy_relative_files(f[:f.find("smt2")+4],"")
+        return {}
 
 def read_graph_generation_log(f,json_obj):
     for l in f.readlines():
