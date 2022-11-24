@@ -85,13 +85,14 @@ def read_one_filed(file_name, field_name):
     return loaded_graph[field_name]
 
 
-def unzip_file(zip_file):
+def unzip_file(zip_file,verbose=False):
     if os.path.exists(zip_file):
         import zipfile
         with zipfile.ZipFile(zip_file, 'r') as zip_ref:
             zip_ref.extractall(os.path.dirname(zip_file))
     else:
-        print("zip file " + zip_file + " not existed")
+        if verbose==True:
+            print("zip file " + zip_file + " not existed")
 
 
 def manual_flatten(target_list):

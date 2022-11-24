@@ -11,43 +11,43 @@ def main():
     linear_total_file_list = get_linear_file_list()
     #linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test", "smt2")
 
-    #non_linear_total_file_list = get_non_linear_file_list()
-    non_linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test-1", "smt2")
+    non_linear_total_file_list = get_non_linear_file_list()
+    #non_linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test-1", "smt2")
 
     data_dict = {"linear": {}, "non-linear": {}}
 
-    # # get file names
-    # data_dict["linear"]["file_name"] = [os.path.basename(x["file_name"]) for x in
-    #                                     read_files(linear_total_file_list, file_type="",
-    #                                                read_function=read_smt2_category)]
-    # data_dict["non-linear"]["file_name"] = [os.path.basename(x["file_name"]) for x in
-    #                                         read_files(non_linear_total_file_list, file_type="",
-    #                                                    read_function=read_smt2_category)]
-    # # get fix smt attributes
-    # smt_measurements = ["file_size", "file_size_h", "category"]
-    # for sm in smt_measurements:
-    #     data_dict["linear"][sm] = [x[sm] for x in
-    #                                read_files(linear_total_file_list, file_type="", read_function=read_smt2_category)]
-    #     data_dict["non-linear"][sm] = [x[sm] for x in
-    #                                    read_files(non_linear_total_file_list, file_type="",
-    #                                               read_function=read_smt2_category)]
-    # # get fix clause attributes
-    # fixed_clause_measurements = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
-    #                              "relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
-    #                              # "minedSingleVariableTemplatesNumber", "minedBinaryVariableTemplatesNumber",
-    #                              # "minedTemplateNumber", "minedTemplateRelationSymbolNumber",
-    #                              # "labeledSingleVariableTemplatesNumber", "labeledBinaryVariableTemplatesNumber",
-    #                              # "labeledTemplateNumber", "labeledTemplateRelationSymbolNumber",
-    #                              # "unlabeledSingleVariableTemplatesNumber", "unlabeledBinaryVariableTemplatesNumber",
-    #                              # "unlabeledTemplateNumber", "unlabeledTemplateRelationSymbolNumber"
-    #                              ]
-    # for cm in fixed_clause_measurements:
-    #     data_dict["linear"][cm] = list(get_fixed_filed_from_json_file(linear_total_file_list, cm))
-    #     data_dict["non-linear"][cm] = list(get_fixed_filed_from_json_file(non_linear_total_file_list, cm))
-    #
-    # # get non-fix fields
-    # read_solving_time_from_json_file(linear_total_file_list, data_dict["linear"])
-    # read_solving_time_from_json_file(non_linear_total_file_list, data_dict["non-linear"])
+    # get file names
+    data_dict["linear"]["file_name"] = [os.path.basename(x["file_name"]) for x in
+                                        read_files(linear_total_file_list, file_type="",
+                                                   read_function=read_smt2_category)]
+    data_dict["non-linear"]["file_name"] = [os.path.basename(x["file_name"]) for x in
+                                            read_files(non_linear_total_file_list, file_type="",
+                                                       read_function=read_smt2_category)]
+    # get fix smt attributes
+    smt_measurements = ["file_size", "file_size_h", "category"]
+    for sm in smt_measurements:
+        data_dict["linear"][sm] = [x[sm] for x in
+                                   read_files(linear_total_file_list, file_type="", read_function=read_smt2_category)]
+        data_dict["non-linear"][sm] = [x[sm] for x in
+                                       read_files(non_linear_total_file_list, file_type="",
+                                                  read_function=read_smt2_category)]
+    # get fix clause attributes
+    fixed_clause_measurements = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
+                                 "relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
+                                 # "minedSingleVariableTemplatesNumber", "minedBinaryVariableTemplatesNumber",
+                                 # "minedTemplateNumber", "minedTemplateRelationSymbolNumber",
+                                 # "labeledSingleVariableTemplatesNumber", "labeledBinaryVariableTemplatesNumber",
+                                 # "labeledTemplateNumber", "labeledTemplateRelationSymbolNumber",
+                                 # "unlabeledSingleVariableTemplatesNumber", "unlabeledBinaryVariableTemplatesNumber",
+                                 # "unlabeledTemplateNumber", "unlabeledTemplateRelationSymbolNumber"
+                                 ]
+    for cm in fixed_clause_measurements:
+        data_dict["linear"][cm] = list(get_fixed_filed_from_json_file(linear_total_file_list, cm))
+        data_dict["non-linear"][cm] = list(get_fixed_filed_from_json_file(non_linear_total_file_list, cm))
+
+    # get non-fix fields
+    read_solving_time_from_json_file(linear_total_file_list, data_dict["linear"])
+    read_solving_time_from_json_file(non_linear_total_file_list, data_dict["non-linear"])
 
     # get graph info
     read_graph_info_from_json_file(linear_total_file_list, data_dict["linear"])
@@ -55,7 +55,7 @@ def main():
 
     # write to excel
     linear_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks"
-    with pd.ExcelWriter(linear_folder + "/benchmark_statistics.xlsx") as writer:
+    with pd.ExcelWriter(linear_folder + "/benchmark_statistics_split_clauses_1.xlsx") as writer:
         data = pd.DataFrame(pd.DataFrame(data_dict["linear"]))
         data.to_excel(writer, sheet_name="linear")
         data = pd.DataFrame(pd.DataFrame(data_dict["non-linear"]))
@@ -69,7 +69,7 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
     for json_obj_CDHG, json_obj_CG in zip(
             read_files(file_list, file_type="hyperEdgeGraph.JSON", read_function=read_json_file),
             read_files(file_list, file_type="monoDirectionLayerGraph.JSON", read_function=read_json_file)):
-        if len(json_obj_CDHG) != 0 and len(json_obj_CG) != 0:
+        if len(json_obj_CDHG) >3 and len(json_obj_CG) > 3:
             statistic_dict["CDHG_node_number"].append(int(json_obj_CDHG["nodeNumber"][0]))
             statistic_dict["CDHG_binary_edge_number"].append(int(json_obj_CDHG["binaryEdgeNumber"][0]))
             statistic_dict["CDHG_ternary_edge_number"].append(int(json_obj_CDHG["ternaryHyperEdgeNumber"][0]))
@@ -79,14 +79,14 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
             statistic_dict["CG_ternary_edge_number"].append(int(json_obj_CG["ternaryHyperEdgeNumber"][0]))
             statistic_dict["CG_label_number"].append(int(json_obj_CG["labelNumber"][0]))
         else:
-            statistic_dict["CDHG_node_number"].append(0)
-            statistic_dict["CDHG_binary_edge_number"].append(0)
-            statistic_dict["CDHG_ternary_edge_number"].append(0)
-            statistic_dict["CDHG_label_number"].append(0)
-            statistic_dict["CG_node_number"].append(0)
-            statistic_dict["CG_binary_edge_number"].append(0)
-            statistic_dict["CG_ternary_edge_number"].append(0)
-            statistic_dict["CG_label_number"].append(0)
+            statistic_dict["CDHG_node_number"].append(-1)
+            statistic_dict["CDHG_binary_edge_number"].append(-1)
+            statistic_dict["CDHG_ternary_edge_number"].append(-1)
+            statistic_dict["CDHG_label_number"].append(-1)
+            statistic_dict["CG_node_number"].append(-1)
+            statistic_dict["CG_binary_edge_number"].append(-1)
+            statistic_dict["CG_ternary_edge_number"].append(-1)
+            statistic_dict["CG_label_number"].append(-1)
 
 
 def read_solving_time_from_json_file(file_list, statistic_dict):
@@ -239,11 +239,13 @@ def get_non_linear_file_list():
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/UNSAT-3668/solvability",
         "smt2")
     print("non-linear_unsat_list", len(unsat_list))
+    # todo: get graphs
 
     no_simplified_clauses_list = get_file_list(
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/no-simplified-clauses-1697/train_data",
         "smt2")
     print("non-linear_no_simplified_clauses_list", len(no_simplified_clauses_list))
+    # todo: get solvability
 
     total_file_list = sat_list + unsolvable_list + unsat_list + no_simplified_clauses_list
     print("non-linear total_file_list", len(total_file_list))
@@ -268,7 +270,6 @@ def get_linear_file_list():
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/3-no-positive-labels",
         "smt2")
     linear_sat_list = linear_sat_list_check_mining_timeout + linear_sat_list_no_simplified_clauses + linear_sat_list_graph_timeout + linear_sat_list_graph_postive_labels + linear_sat_list_graph_no_postive_labels
-    linear_sat_list=[]
     print("linear_sat_list", len(linear_sat_list))
 
 
@@ -285,8 +286,10 @@ def get_linear_file_list():
     linear_unsolvable_list_graph = get_file_list(
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/5-uppmax-linear-unsolvable-graphs/4-ready-for-training",
         "smt2")
-    linear_unsolvable_list = linear_unsolvable_list_labeling_timeout + linear_unsolvable_list_labeling_unziped + linear_unsolvable_list_graph_timeout + linear_unsolvable_list_graph
-    linear_unsolvable_list=linear_unsolvable_list_graph
+    linear_unsolvable_list_split_clause_solvable = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/unsolvable-1635/solvable-by-splitclauses0-19",
+        "smt2")
+    linear_unsolvable_list = linear_unsolvable_list_labeling_timeout + linear_unsolvable_list_labeling_unziped + linear_unsolvable_list_graph_timeout + linear_unsolvable_list_graph + linear_unsolvable_list_split_clause_solvable
     print("linear_unsolvable_list", len(linear_unsolvable_list))
 
     liner_unsat_list = get_file_list(
@@ -296,10 +299,9 @@ def get_linear_file_list():
     # todo: get graphs
 
     linear_no_simplified_clauses = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/no-simplified-clauses-2087/train_data",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/no-simplified-clauses-2068/solvability",
         "smt2")
     print("linear_no_simplified_clauses",len(linear_no_simplified_clauses))
-    # todo: get solvability
 
     total_file_list = linear_sat_list + linear_unsolvable_list + liner_unsat_list + linear_no_simplified_clauses
     print("linear total_file_list", len(total_file_list))

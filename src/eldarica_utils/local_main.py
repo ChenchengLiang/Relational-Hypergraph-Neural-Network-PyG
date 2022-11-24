@@ -26,10 +26,15 @@ def main():
     #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-unsolvable-unlabeled-tempaltes",
     #     file_numebr=4, target_message="ready_for_graph_construction", source="generate-unlabeled-tempaltes")
 
+    #for no-simplified clause solvability
+    separate_corner_cases_from_cluster_mineTemplates(
+    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-no-simplified-clauses-solvability-2087",
+    file_numebr=3, target_message="ready_for_template_mining",source="check-solvability")
+
     # for constructed graphs
-    separate_corner_cases_from_cluster_graph_construction(
-        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs",
-        file_numebr=11, target_message="not-timeout-cases", source="construct-graphs")
+    # separate_corner_cases_from_cluster_graph_construction(
+    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs",
+    #     file_numebr=11, target_message="not-timeout-cases", source="construct-graphs")
     # separate_corner_cases_from_cluster_graph_construction(
     #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-graphs",
     #     file_numebr=11, target_message="not-timeout-cases",source="construct-graphs")
