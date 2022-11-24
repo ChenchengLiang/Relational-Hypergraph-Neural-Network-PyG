@@ -28,8 +28,10 @@ def main():
 
     #for no-simplified clause solvability
     separate_corner_cases_from_cluster_mineTemplates(
-    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-no-simplified-clauses-solvability-2087",
-    file_numebr=3, target_message="ready_for_template_mining",source="check-solvability")
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-no-simplified-clauses-solvability-1697.zip",
+        file_numebr=3, target_message="ready_for_template_mining", source="check-solvability")
+
+
 
     # for constructed graphs
     # separate_corner_cases_from_cluster_graph_construction(

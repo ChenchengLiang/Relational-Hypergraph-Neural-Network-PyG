@@ -184,7 +184,11 @@ def assign_values_to_unsolvable_problem(statistic_dict):
 
 
 def get_satisfiability(json_obj, min_solving_option):
-    satisfiability = int(json_obj[min_solving_option.replace("solvingTime", "satisfiability")][0])
+    try:
+        satisfiability = int(json_obj[min_solving_option.replace("solvingTime", "satisfiability")][0])
+    except:
+        satisfiability = int(json_obj["satisfiability"][0])
+
     if satisfiability == 1:
         return "safe"
     elif satisfiability == 0:
@@ -242,10 +246,9 @@ def get_non_linear_file_list():
     # todo: get graphs
 
     no_simplified_clauses_list = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/no-simplified-clauses-1697/train_data",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/no-simplified-clauses-1697/solvability",
         "smt2")
     print("non-linear_no_simplified_clauses_list", len(no_simplified_clauses_list))
-    # todo: get solvability
 
     total_file_list = sat_list + unsolvable_list + unsat_list + no_simplified_clauses_list
     print("non-linear total_file_list", len(total_file_list))
