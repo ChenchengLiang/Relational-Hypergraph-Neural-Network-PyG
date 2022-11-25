@@ -6,7 +6,7 @@ from src.train_utils import get_loss_function
 import torch
 
 def predict(trained_model, test_loader,device, params):
-    optimizer = torch.optim.Adam(trained_model.parameters(), lr=params["learning_rate"], weight_decay=5e-4)
+    optimizer = torch.optim.Adam(trained_model.parameters(), lr=params["learning_rate"])
     ls_func = get_loss_function(params).to(device)
     trained_model.eval()
     test_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(trained_model,
@@ -24,8 +24,7 @@ def predict(trained_model, test_loader,device, params):
 
     print("-" * 10)
     acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
-    # flatten_predicted_list = np.array(manual_flatten(predicted_list)).ravel()
-    # flatten_label_list = np.array(manual_flatten(label_list)).ravel()
+
     draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"])
 
     # correct = (flatten_predicted_list == flatten_label_list).sum()
