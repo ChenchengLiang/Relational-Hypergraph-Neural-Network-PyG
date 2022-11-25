@@ -4,7 +4,7 @@ from src.collect_results.utils import copy_relative_files
 from src.utils import get_file_list,make_dirct
 import random
 import os
-
+from shutil import copy
 def main():
     folder = sys.argv[1]
     file_list = get_file_list(folder, "smt2")
@@ -18,17 +18,21 @@ def main():
     valid_files = file_list[int(file_list_number * train_fold):int(file_list_number * (1 - valid_fold))]
     test_files = file_list[int(file_list_number * (1 - test_fold)):file_list_number]
 
-    shuffled_folder=make_dirct(folder +  "-shuffled")
+    shuffled_folder_cdhg=make_dirct(folder +  "-shuffled-CDHG")
+    shuffled_folder_cg = make_dirct(folder + "-shuffled-CG")
 
     for fold_file_list,fold in zip([train_files,valid_files,test_files],["train_data","valid_data","test_data"]):
-        copy_files_to_folds(shuffled_folder,fold_file_list,fold)
+        copy_files_to_folds(shuffled_folder_cdhg,fold_file_list,fold,"hyperEdgeGraph")
+        copy_files_to_folds(shuffled_folder_cg, fold_file_list, fold, "monoDirectionLayerGraph")
 
-def copy_files_to_folds(shuffled_folder,fold_file_list,fold):
+def copy_files_to_folds(shuffled_folder,fold_file_list,fold,graph_type=""):
     shuffled_folder_train = make_dirct(os.path.join(shuffled_folder, fold))
     shuffled_folder_train_raw = make_dirct(os.path.join(shuffled_folder_train, "raw"))
     for file in fold_file_list:
-        file=file[:-len(".zip")]
-        copy_relative_files(file,shuffled_folder_train_raw)
+        file_name = file[:-len(".zip")]
+        copy(file, shuffled_folder_train_raw)
+        copy(file_name + "."+graph_type+".JSON.zip", shuffled_folder_train_raw)
+
 
 if __name__ == '__main__':
     main()
