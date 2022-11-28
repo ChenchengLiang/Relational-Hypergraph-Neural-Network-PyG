@@ -27,7 +27,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     print("mlflow_experiment_name:", mlflow_experiment_name)
     mlflow.set_experiment(mlflow_experiment_name)
     mlflow.set_tracking_uri("http://localhost:5000")  # Specify tracking server
-    task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
+    task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,"unsat_core_binary_classification":2,
                            "template_multi_classification": 5}
 
     params = {}
