@@ -112,6 +112,9 @@ class HornGraphDataset(Dataset):
             target_indices = node_indices
             argument_indices = read_one_filed(json_file_name, "argumentIndices")
             target_label = [1 if i in argument_indices else 0 for i in node_indices]
+        elif self.learning_task in ["unsat_core_binary_classification"]:
+            target_indices = read_one_filed(json_file_name, "labelIndices")
+            target_label = read_one_filed(json_file_name, "labelList")
         else:
             target_indices = node_indices
             target_label= [1]*len(node_indices)

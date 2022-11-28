@@ -22,21 +22,28 @@ def main():
     data_fold = ["train_data", "valid_data", "test_data"]
     file_type = "smt2"
 
-    # get getSolvability # 15 hours
+    # description: get getSolvability # 15 hours
     for a in manual_abstract_options:
         for s in split_clause_option:
             parameters_pipeline.append(
                 " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) + " -log ")
 
-    # get labeled templates # 3 hours
+    # description: get labeled templates # 3 hours
     #parameters_pipeline.append(" -mineTemplates -log ")
 
-    # for unsolvable set get unlabeled templates # 3 hours
+    # description: get labeled unsatcores # 3 hours
+    #parameters_pipeline.append(" -mineCounterExample:union -log ")
+
+    # description: for unsolvable set get unlabeled templates # 3 hours
     #parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
 
-    # construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -log ")
-    # parameters_pipeline.append(" -getHornGraph:CG -log ")
+    # description: construct graphs for template selection # 6 hours
+    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:template -log ")
+    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:template -log ")
+
+    # description: construct graphs for unsatcore # 6 hours
+    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -log ")
+    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -log ")
 
     # # description: check solvability for sinlge template set # 15 hours
     # for s in split_clause_option:
@@ -128,7 +135,7 @@ def call_Eldarica_one_time(run_shell_command, file_name, eldarica_parameter_list
     return used_time
 
 def change_eldarica_parameters(file, params):
-    if "mineTemplates" in params:
+    if "mineTemplates" in params or "mineCounterExample" in params:
         params = params + get_eldarica_option_by_shortest_solving_Time(file)
     return params
 

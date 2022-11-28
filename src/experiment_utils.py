@@ -16,14 +16,14 @@ from torch_geometric.profile.utils import byte_to_megabyte
 
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
                        _epochs, _file_name="", _reload_data=True,
-                       _self_loop=False, _fix_random_seeds=True, _experiment_data=True) -> object:
+                       _self_loop=False, _fix_random_seeds=True, _experiment_date=True) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
         torch.cuda.manual_seed_all(42)
 
     today = datetime.today().strftime('%Y-%m-%d')
-    mlflow_experiment_name = today + "-" + os.path.basename(_benchmark) if _experiment_data==True else os.path.basename(_benchmark)
+    mlflow_experiment_name = today + "-" + os.path.basename(_benchmark) if _experiment_date==True else os.path.basename(_benchmark)
     print("mlflow_experiment_name:", mlflow_experiment_name)
     mlflow.set_experiment(mlflow_experiment_name)
     mlflow.set_tracking_uri("http://localhost:5000")  # Specify tracking server
@@ -55,6 +55,8 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,
                                                                                                      reload_data=_reload_data)
+
+        #todo: fix embedding layer outside of the training, otherwise random seed will affect them.
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         # device = torch.device('cpu')

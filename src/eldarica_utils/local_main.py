@@ -27,9 +27,19 @@ def main():
     #     file_numebr=4, target_message="ready_for_graph_construction", source="generate-unlabeled-tempaltes")
 
     #for no-simplified clause solvability
+    # separate_corner_cases_from_cluster_mineTemplates(
+    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-no-simplified-clauses-solvability-1697.zip",
+    #     file_numebr=3, target_message="ready_for_template_mining", source="check-solvability")
+
+    #for unsat problem solvability
     separate_corner_cases_from_cluster_mineTemplates(
-        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-no-simplified-clauses-solvability-1697.zip",
-        file_numebr=3, target_message="ready_for_template_mining", source="check-solvability")
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-unsat-divided-2160",
+        file_numebr=3, target_message="ready_for_counter_example_mining", source="check-solvability")
+    separate_corner_cases_from_cluster_mineTemplates(
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-unsat-divided-3668",
+        file_numebr=3, target_message="ready_for_counter_example_mining", source="check-solvability")
+
+
 
 
 

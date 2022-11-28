@@ -11,6 +11,8 @@
 *.sh
 /tutorial
 /benchmarks
+/eldarica-graph-generation-temp.zip
+/eldarica-graph-generation-temp
 /eldarica-graph-generation
 /models
 /figures
