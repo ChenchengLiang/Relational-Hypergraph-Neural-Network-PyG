@@ -17,7 +17,9 @@ def main():
     non_linear_data = pd.read_excel(xls, 'non-linear')
     print(linear_data.keys())
 
-    linear_safe = {"category": []}
+    linear_category_summary = get_category_summary(linear_data)
+    non_linear_category_summary = get_category_summary(non_linear_data)
+
 
     linear_summary = get_statistic_summary(linear_data)
     non_linear_summary = get_statistic_summary(non_linear_data)
@@ -27,16 +29,33 @@ def main():
     with pd.ExcelWriter(
             "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/benchmark_statistics_split_clauses_1-summary.xlsx") as writer:
         linear_data.pop("Unnamed: 0")
-        data = pd.DataFrame(pd.DataFrame(linear_data))
-        data.to_excel(writer, sheet_name="linear")
+        pd.DataFrame(pd.DataFrame(linear_data)).to_excel(writer, sheet_name="linear")
         non_linear_data.pop("Unnamed: 0")
-        data = pd.DataFrame(pd.DataFrame(non_linear_data))
-        data.to_excel(writer, sheet_name="non_linear")
-        data = pd.DataFrame(pd.DataFrame(linear_summary))
-        data.to_excel(writer, sheet_name="linear_summary")
-        data = pd.DataFrame(pd.DataFrame(non_linear_summary))
-        data.to_excel(writer, sheet_name="non_linear_summary")
+        pd.DataFrame(pd.DataFrame(non_linear_data)).to_excel(writer, sheet_name="non_linear")
+        pd.DataFrame(pd.DataFrame(linear_summary)).to_excel(writer, sheet_name="linear_summary")
+        pd.DataFrame(pd.DataFrame(non_linear_summary)).to_excel(writer, sheet_name="non_linear_summary")
+        pd.DataFrame(pd.DataFrame(linear_category_summary)).to_excel(writer, sheet_name="linear_category_summary")
+        pd.DataFrame(pd.DataFrame(non_linear_category_summary)).to_excel(writer, sheet_name="non_linear_category_summary")
 
+
+def get_category_summary(data_dict):
+    category_dict={"category_name": [], "total_number":[],"safe_number": [], "unsafe_number": [], "unknown_number": []}
+    category_list=sorted(list(set(data_dict["category"])))
+    for c in category_list:
+        satisfiability_in_one_category=get_target_row_by_condition(data_dict, "category", c, "satisfiability")
+        category_dict["category_name"].append(c)
+        category_dict["safe_number"].append(satisfiability_in_one_category.count("safe"))
+        category_dict["unsafe_number"].append(satisfiability_in_one_category.count("unsafe"))
+        category_dict["unknown_number"].append(satisfiability_in_one_category.count("unknown"))
+        category_dict["total_number"].append(len(satisfiability_in_one_category))
+    #add verification sum at last row
+    category_dict["category_name"].append("verification_sum")
+    category_dict["safe_number"].append(sum(category_dict["safe_number"]))
+    category_dict["unsafe_number"].append(sum(category_dict["unsafe_number"]))
+    category_dict["unknown_number"].append(sum(category_dict["unknown_number"]))
+    category_dict["total_number"].append(sum(category_dict["total_number"]))
+
+    return category_dict
 
 def get_statistic_summary(data_dict):
     summary = {"statistic_name": [], "statistic_value": []}
