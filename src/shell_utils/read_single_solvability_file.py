@@ -1,7 +1,9 @@
-from utils import read_files,read_json_file
+import sys
+sys.path.append("/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG")
+from src.collect_results.utils import read_files,read_json_file
 
 def main():
-    file="/home/cheli243/Desktop/debug/prune-clauses-test/chc-LIA-Lin_0005.smt2.zip"
+    file=sys.argv[1]
     print_filled_fields(file,"","")
 
 

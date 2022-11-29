@@ -10,6 +10,7 @@ def main():
     # separate_corner_cases_from_cluster_mineTemplates(
     #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-solvability",
     #     file_numebr=3, target_message="ready_for_template_mining", source="check-solvability")
+
     # for mined templates
     # separate_corner_cases_from_cluster_mineTemplates(
     #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-mined-template",

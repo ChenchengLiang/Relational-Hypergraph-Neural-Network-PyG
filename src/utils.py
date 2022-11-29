@@ -2,7 +2,7 @@ import glob
 import os
 import json
 import subprocess
-
+import re
 
 def write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, task_type,
                                        root="../data/test_data"):
@@ -135,3 +135,7 @@ def send_email(subject="python finished"):
     print("send email to chencheng.liang@it.uu.se")
     shell_command = " echo \"Subject:" + subject + " \" | sendmail -F \"chencheng\" chencheng.liang@it.uu.se "
     subprocess.Popen(shell_command, shell=True)
+
+def camel_to_snake(name):
+    name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).lower()
