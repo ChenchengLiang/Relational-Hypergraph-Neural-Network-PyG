@@ -54,8 +54,8 @@ def main():
     read_graph_info_from_json_file(non_linear_total_file_list, data_dict["non-linear"])
 
     # write to excel
-    linear_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks"
-    with pd.ExcelWriter(linear_folder + "/benchmark_statistics_split_clauses_1.xlsx") as writer:
+    benchmark_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks"
+    with pd.ExcelWriter(benchmark_folder + "/benchmark_statistics_split_clauses_1.xlsx") as writer:
         data = pd.DataFrame(pd.DataFrame(data_dict["linear"]))
         data.to_excel(writer, sheet_name="linear")
         data = pd.DataFrame(pd.DataFrame(data_dict["non-linear"]))

@@ -33,11 +33,11 @@ def main():
 
     #for unsat problem solvability
     separate_corner_cases_from_cluster_mineTemplates(
-        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-unsat-divided-2160",
+        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear_unsat_2160-solvability",
         file_numebr=3, target_message="ready_for_counter_example_mining", source="check-solvability")
-    separate_corner_cases_from_cluster_mineTemplates(
-        folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-unsat-divided-3668",
-        file_numebr=3, target_message="ready_for_counter_example_mining", source="check-solvability")
+    # separate_corner_cases_from_cluster_mineTemplates(
+    #     folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-unsat-divided-3668",
+    #     file_numebr=3, target_message="ready_for_counter_example_mining", source="check-solvability")
 
 
 

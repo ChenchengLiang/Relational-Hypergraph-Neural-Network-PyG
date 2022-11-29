@@ -1,8 +1,8 @@
 from utils import read_files,read_json_file
 
 def main():
-    file="/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/test/train_data/chc-LIA-non-lin_005.smt2.zip"
-    print_filled_fields(file,"","PredictedCG")
+    file="/home/cheli243/Desktop/debug/prune-clauses-test/chc-LIA-Lin_0005.smt2.zip"
+    print_filled_fields(file,"","")
 
 
 def print_filled_fields(file,key_word_1="",key_word_2=""):
@@ -11,7 +11,7 @@ def print_filled_fields(file,key_word_1="",key_word_2=""):
     collected_fields=[]
     for j in json_obj_list:
         for field in j:
-            if j[field][0]!="10800000" and key_word_1 in field and key_word_2 in field:
+            if field != "file_name" and field != "file_size" and j[field][0]!="10800000" and key_word_1 in field and key_word_2 in field:
                 collected_fields.append([field,j[field]])
                 #print(field,j[field])
     print("collected_fields",len(collected_fields))
