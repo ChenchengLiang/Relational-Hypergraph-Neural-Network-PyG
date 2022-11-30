@@ -80,8 +80,6 @@ class HornGraphDataset(Dataset):
             target_indices_tensor = torch.tensor(target_indices, dtype=torch.long)
             y_tensor = torch.tensor(target_label)
 
-            edge_list = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in edge_list]
-
             data = Data(x=x_tensor,
                         edge_index=torch.tensor([[0, 0]]).t().contiguous(),
                         y=y_tensor,
@@ -100,14 +98,15 @@ class HornGraphDataset(Dataset):
 
     def get(self, idx):
         data = torch.load(os.path.join(self.processed_dir, f'data_{idx}.pt'))
-        self.process_edge_list(data)
+        self._process_edge_list(data)
         return data
 
-    def process_edge_list(self,data):
+    def _process_edge_list(self,data):
         if self._add_self_loop == True:
             slef_loop_edges = [[i, i] for i in range(len(data["x"]))]
             data["edge_list"].append(slef_loop_edges)
             data["edge_arity_dict"]["selfLoopEdges"] = len(slef_loop_edges[0])
+        data["edge_list"] = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in data["edge_list"]]
 
     def _construct_learning_label_and_edges(self,json_file_name,graph_edge_list,node_indices):
         if self.learning_task in ["template_binary_classification","template_multi_classification"]:
