@@ -7,7 +7,7 @@ from src.layers import HyperConv
 
 
 class GNN_classification(torch.nn.Module):
-    def __init__(self,  label_size, vocabulary_size, embedding_size, num_gnn_layers, num_linear_layer,
+    def __init__(self,  label_size, vocabulary_size,edge_arity_dict, embedding_size, num_gnn_layers, num_linear_layer,
                  activation,gnn=GCNConv,feature_size=1,drop_out_probability=0):
         super().__init__()
         self.embedding_size = embedding_size
@@ -15,6 +15,7 @@ class GNN_classification(torch.nn.Module):
         self.feature_size=feature_size
         self.linear_in = Linear(feature_size, embedding_size)
         self.embedding = Embedding(vocabulary_size, embedding_size)
+        self._edge_arity_dict=edge_arity_dict
 
         # initialize conv layers
         self.conv_list = ModuleList()
@@ -47,7 +48,10 @@ class GNN_classification(torch.nn.Module):
             x = self.linear_in(x)
 
 
-        edges = edge_list[0]
+        #use global binary edge as edge index
+        for i,(edge,edge_dict_key) in enumerate(zip(edge_list,self._edge_arity_dict)):
+            if edge_dict_key=="binaryEdge":
+                edges = edge_list[i]
 
         # GNN layers
         for conv, ln, act,drop in zip(self.conv_list, self.conv_ln_list,self.conv_act_list,self.conv_drop_list):

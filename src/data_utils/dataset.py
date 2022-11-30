@@ -17,6 +17,7 @@ class HornGraphDataset(Dataset):
         self.learning_task=params["learning_task"]
         self._add_self_loop=params["add_self_loop_edges"]
         self._add_backward_edges=params["add_backward_edges"]
+        self._add_global_edges = params["add_global_edges"]
         super().__init__(root, transform, pre_transform, pre_filter)
 
     @property
@@ -48,13 +49,10 @@ class HornGraphDataset(Dataset):
 
             #ASTEdge
             if self.graph_type == "hyperEdgeGraph":
-                graph_edge_list = ["binaryEdge",
-                                   "relationSymbolArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge","quantifierEdge",
-                                   "controlFlowHyperEdge", "dataFlowHyperEdge",
-                                   "ternaryHyperEdge"
-                                   ]
+                graph_edge_list = ["relationSymbolArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge","quantifierEdge",
+                                   "controlFlowHyperEdge", "dataFlowHyperEdge"]
             else:
-                graph_edge_list = ["binaryEdge",
+                graph_edge_list = [
                                    "relationSymbolArgumentEdge","relationSymbolInstanceEdge", "argumentInstanceEdge",
                                    "clauseHeadEdge","clauseBodyEdge", "clauseArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge",
                                    "dataEdge","quantifierEdge"]
@@ -108,10 +106,23 @@ class HornGraphDataset(Dataset):
             data["edge_arity_dict"]["selfLoopEdges"] = len(slef_loop_edges[0])
         if self._add_backward_edges ==True:
             #todo could add backward edge as new edge type
-            for edges,edge_dict_key in zip(data["edge_list"],data["edge_arity_dict"]):
+            for i,(edges,edge_dict_key) in enumerate(zip(data["edge_list"],data["edge_arity_dict"])):
                 if len(edges[0])==2 and edge_dict_key!="selfLoopEdges":
                     backward_edges=[[edge[1],edge[0]] for edge in edges]
-                    edges=edges+backward_edges
+                    data["edge_list"][i]=edges+backward_edges
+        if self._add_global_edges == True:
+            binary_global_edges=[]
+            ternary_global_edges=[]
+            for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
+                if len(edges[0])==2:
+                    binary_global_edges.extend(edges)
+                if len(edges[0])==3:
+                    ternary_global_edges.extend(edges)
+            data["edge_list"].append(binary_global_edges)
+            data["edge_arity_dict"]["binaryEdge"] = len(binary_global_edges[0])
+            if len(ternary_global_edges)!=0:
+                data["edge_list"].append(ternary_global_edges)
+                data["edge_arity_dict"]["ternaryHyperEdge"] = len(ternary_global_edges[0])
 
 
         data["edge_list"] = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in data["edge_list"]]
