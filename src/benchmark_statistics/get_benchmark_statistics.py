@@ -5,14 +5,15 @@ sys.path.append("../..")
 from src.utils import get_file_list, select_key_with_value_condition, assign_dict_key_empty_list
 import pandas as pd
 from src.collect_results.utils import read_files, read_json_file, read_smt2_category
+from src.collect_results.utils import get_min_max_solving_time
 
 
 def main():
-    linear_total_file_list = get_linear_file_list()
-    #linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test", "smt2")
+    #linear_total_file_list = get_linear_file_list()
+    linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test", "smt2")
 
-    non_linear_total_file_list = get_non_linear_file_list()
-    #non_linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test-1", "smt2")
+    #non_linear_total_file_list = get_non_linear_file_list()
+    non_linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test-1", "smt2")
 
     data_dict = {"linear": {}, "non-linear": {}}
 
@@ -110,49 +111,51 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     if int(json_obj[k][0]) != 10800000:
                         solvable_option_dict[k] = int(json_obj[k][0])
             if len(solving_time_dict) != 0:  # solvable with solvability file
+                get_min_max_solving_time(solving_time_dict,statistic_dict,json_obj,min)
+                get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, max)
+                # min_solving_option, min_solving_time = select_key_with_value_condition(solving_time_dict, min)
+                # max_solving_option, max_solving_time = select_key_with_value_condition(solving_time_dict, max)
+                #satisfiability = get_satisfiability(json_obj, min_solving_option)
+                satisfiability = get_satisfiability(json_obj, statistic_dict["min_solving_time_option"])
+                # min_solving_time_cegar_interation_number = int(
+                #     json_obj[min_solving_option.replace("solvingTime", "cegarIterationNumber")][0])
+                # min_solving_time_generated_predicate_number = int(
+                #     json_obj[min_solving_option.replace("solvingTime", "generatedPredicateNumber")][0])
+                # min_solving_time_average_predicate_size = int(
+                #     json_obj[min_solving_option.replace("solvingTime", "averagePredicateSize")][0])
+                # min_solving_time_predicate_generator_time = int(
+                #     json_obj[min_solving_option.replace("solvingTime", "predicateGeneratorTime")][0])
+                #
+                # max_solving_time_cegar_interation_number = int(
+                #     json_obj[max_solving_option.replace("solvingTime", "cegarIterationNumber")][0])
+                # max_solving_time_generated_predicate_number = int(
+                #     json_obj[max_solving_option.replace("solvingTime", "generatedPredicateNumber")][0])
+                # max_solving_time_average_predicate_size = int(
+                #     json_obj[max_solving_option.replace("solvingTime", "averagePredicateSize")][0])
+                # max_solving_time_predicate_generator_time = int(
+                #     json_obj[max_solving_option.replace("solvingTime", "predicateGeneratorTime")][0])
 
-                min_solving_option, min_solving_time = select_key_with_value_condition(solving_time_dict, min)
-                max_solving_option, max_solving_time = select_key_with_value_condition(solving_time_dict, max)
-                satisfiability = get_satisfiability(json_obj, min_solving_option)
-                min_solving_time_cegar_interation_number = int(
-                    json_obj[min_solving_option.replace("solvingTime", "cegarIterationNumber")][0])
-                min_solving_time_generated_predicate_number = int(
-                    json_obj[min_solving_option.replace("solvingTime", "generatedPredicateNumber")][0])
-                min_solving_time_average_predicate_size = int(
-                    json_obj[min_solving_option.replace("solvingTime", "averagePredicateSize")][0])
-                min_solving_time_predicate_generator_time = int(
-                    json_obj[min_solving_option.replace("solvingTime", "predicateGeneratorTime")][0])
-
-                max_solving_time_cegar_interation_number = int(
-                    json_obj[max_solving_option.replace("solvingTime", "cegarIterationNumber")][0])
-                max_solving_time_generated_predicate_number = int(
-                    json_obj[max_solving_option.replace("solvingTime", "generatedPredicateNumber")][0])
-                max_solving_time_average_predicate_size = int(
-                    json_obj[max_solving_option.replace("solvingTime", "averagePredicateSize")][0])
-                max_solving_time_predicate_generator_time = int(
-                    json_obj[max_solving_option.replace("solvingTime", "predicateGeneratorTime")][0])
-
-                statistic_dict["min_solving_time_option"].append(min_solving_option.replace("solvingTime_", ""))
-                statistic_dict["min_solving_time (s)"].append(min_solving_time / 1000)
-                statistic_dict["min_solving_time_cegar_interation_number"].append(
-                    min_solving_time_cegar_interation_number)
-                statistic_dict["min_solving_time_generated_predicate_number"].append(
-                    min_solving_time_generated_predicate_number)
-                statistic_dict["min_solving_time_average_predicate_size"].append(
-                    min_solving_time_average_predicate_size)
-                statistic_dict["min_solving_time_predicate_generator_time"].append(
-                    min_solving_time_predicate_generator_time)
-
-                statistic_dict["max_solving_time_option"].append(max_solving_option.replace("solvingTime_", ""))
-                statistic_dict["max_solving_time (s)"].append(max_solving_time / 1000)
-                statistic_dict["max_solving_time_cegar_interation_number"].append(
-                    max_solving_time_cegar_interation_number)
-                statistic_dict["max_solving_time_generated_predicate_number"].append(
-                    max_solving_time_generated_predicate_number)
-                statistic_dict["max_solving_time_average_predicate_size"].append(
-                    max_solving_time_average_predicate_size)
-                statistic_dict["max_solving_time_predicate_generator_time"].append(
-                    max_solving_time_predicate_generator_time)
+                # statistic_dict["min_solving_time_option"].append(min_solving_option.replace("solvingTime_", ""))
+                # statistic_dict["min_solving_time (s)"].append(min_solving_time / 1000)
+                # statistic_dict["min_solving_time_cegar_interation_number"].append(
+                #     min_solving_time_cegar_interation_number)
+                # statistic_dict["min_solving_time_generated_predicate_number"].append(
+                #     min_solving_time_generated_predicate_number)
+                # statistic_dict["min_solving_time_average_predicate_size"].append(
+                #     min_solving_time_average_predicate_size)
+                # statistic_dict["min_solving_time_predicate_generator_time"].append(
+                #     min_solving_time_predicate_generator_time)
+                #
+                # statistic_dict["max_solving_time_option"].append(max_solving_option.replace("solvingTime_", ""))
+                # statistic_dict["max_solving_time (s)"].append(max_solving_time / 1000)
+                # statistic_dict["max_solving_time_cegar_interation_number"].append(
+                #     max_solving_time_cegar_interation_number)
+                # statistic_dict["max_solving_time_generated_predicate_number"].append(
+                #     max_solving_time_generated_predicate_number)
+                # statistic_dict["max_solving_time_average_predicate_size"].append(
+                #     max_solving_time_average_predicate_size)
+                # statistic_dict["max_solving_time_predicate_generator_time"].append(
+                #     max_solving_time_predicate_generator_time)
 
                 statistic_dict["satisfiability"].append(satisfiability)
                 statistic_dict["solvable_option_list"].append(

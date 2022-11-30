@@ -7,14 +7,15 @@ def main():
     benchmarks = ["../benchmarks/unsatcore_data_one-CDHG", "../benchmarks/unsatcore_data_one-CG"]
 
     # load data
+    # task="unsat_core_binary_classification"
     # for _benchmark in benchmarks:
-    #     run_one_experiment("hyper_GCN", "unsat_core_binary_classification", _num_gnn_layers=2, _benchmark=_benchmark,
+    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
     #                        data_shuffle=False, _gnn=HyperConv, _use_intermediate_gnn_results=True, _epochs=1,
     #                        _reload_data=True, _self_loop=False,_add_global_edges=False, _file_name=True)
 
     # train
-    # models = ["hyper_GCN", "GNN"]
-    models = ["hyper_GCN"]
+    models = ["hyper_GCN", "GNN"]
+    #models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
