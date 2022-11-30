@@ -15,7 +15,8 @@ class HornGraphDataset(Dataset):
         self.token_map=token_map
         self.graph_type = params["graph_type"]
         self.learning_task=params["learning_task"]
-        self.self_loop=params["self_loop"]
+        self._add_self_loop=params["add_self_loop_edges"]
+        self._add_backward_edges=params["add_backward_edges"]
         super().__init__(root, transform, pre_transform, pre_filter)
 
     @property
@@ -99,8 +100,14 @@ class HornGraphDataset(Dataset):
 
     def get(self, idx):
         data = torch.load(os.path.join(self.processed_dir, f'data_{idx}.pt'))
+        self.process_edge_list(data)
         return data
 
+    def process_edge_list(self,data):
+        if self._add_self_loop == True:
+            slef_loop_edges = [[i, i] for i in range(len(data["x"]))]
+            data["edge_list"].append(slef_loop_edges)
+            data["edge_arity_dict"]["selfLoopEdges"] = len(slef_loop_edges[0])
 
     def _construct_learning_label_and_edges(self,json_file_name,graph_edge_list,node_indices):
         if self.learning_task in ["template_binary_classification","template_multi_classification"]:
@@ -137,11 +144,6 @@ class HornGraphDataset(Dataset):
                     edges = [binary_dummy_edge]
             edge_arity_dict[feild] = len(edges[0])
             edge_list.append(edges)
-
-        if self.self_loop == True:
-            slef_loop_edges = [[i, i] for i in range(num_node)]
-            edge_list.append(slef_loop_edges)
-            edge_arity_dict["selfLoopEdges"] = len(slef_loop_edges[0])
 
         return edge_list, edge_arity_dict
 

@@ -13,7 +13,7 @@ def main():
     for file in get_file_list(folder,"smt2"):
         print(file)
         file_name=file[:-len(".zip")]
-        
+
 
 
 if __name__ == '__main__':

@@ -72,7 +72,6 @@ class HyperConv(MessagePassing):
         linear_layers_ln=ModuleList()
         linear_layers_act=ModuleList()
         for k in self.edge_arity_dict:
-            #todo: control self-loop here instead of input data
             for _ in range(self.edge_arity_dict[k]):
                 linear_layers.append(Linear(self.embedding_size * self.edge_arity_dict[k], self.embedding_size,bias=False))
                 linear_layers_ln.append(LayerNorm(self.embedding_size))

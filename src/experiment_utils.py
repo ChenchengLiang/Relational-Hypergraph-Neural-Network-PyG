@@ -16,7 +16,7 @@ from torch_geometric.profile.utils import byte_to_megabyte
 
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
                        _epochs, _file_name="", _reload_data=True,
-                       _self_loop=False, _fix_random_seeds=True, _experiment_date=True) -> object:
+                       _self_loop=False,_backward_edges=False, _fix_random_seeds=True, _experiment_date=True) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
@@ -42,7 +42,8 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["num_linear_layer"] = 2
     params["graph_type"] = "hyperEdgeGraph" if "CDHG" in _benchmark else "monoDirectionLayerGraph"
     params["batch_size"] = 1
-    params["self_loop"] = _self_loop
+    params["add_self_loop_edges"] = _self_loop
+    params["add_backward_edges"] = _backward_edges
     params["activation"] = "relu"  # leak_relu, tanh
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = 0.1
