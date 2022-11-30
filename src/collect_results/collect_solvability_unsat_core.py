@@ -1,6 +1,6 @@
 import os.path
 
-from utils import read_files, read_json_file
+from utils import read_files, read_json_file,get_sumary_folder
 from src.utils import get_file_list, make_dirct, select_key_with_value_condition, assign_dict_key_empty_list
 import pandas as pd
 from src.collect_results.utils import get_min_max_solving_time
@@ -8,6 +8,7 @@ from src.collect_results.utils import get_min_max_solving_time
 
 def main():
     folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore_solvability/data"
+    summary_folder = get_sumary_folder(folder)
     record_fields = ["file_name", "satisfiability",
                      "min_solving_time_option", "min_solving_time (s)",
                      "min_solving_time_cegar_interation_number",
@@ -35,18 +36,16 @@ def main():
             get_min_max_solving_time(solving_time_dict, solvability_dict, object, min)
             get_min_max_solving_time(solving_time_dict, solvability_dict, object, max)
 
-
-
-
         else:
             solvability_dict["satisfiability"].append("unknown")
             for field in record_fields:
                 if field not in ["file_name", "satisfiability"]:
                     solvability_dict[field] = 10800
 
-    print("solvability_dict",solvability_dict)
+
+
     # write to excel
-    with pd.ExcelWriter(os.path.dirname(folder) + "/solvability_summary.xlsx") as writer:
+    with pd.ExcelWriter(summary_folder + "/solvability_summary.xlsx") as writer:
         data = pd.DataFrame(pd.DataFrame(solvability_dict))
         data.to_excel(writer, sheet_name="solvability")
 
