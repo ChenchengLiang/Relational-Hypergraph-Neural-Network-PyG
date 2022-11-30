@@ -106,6 +106,14 @@ class HornGraphDataset(Dataset):
             slef_loop_edges = [[i, i] for i in range(len(data["x"]))]
             data["edge_list"].append(slef_loop_edges)
             data["edge_arity_dict"]["selfLoopEdges"] = len(slef_loop_edges[0])
+        if self._add_backward_edges ==True:
+            #todo could add backward edge as new edge type
+            for edges,edge_dict_key in zip(data["edge_list"],data["edge_arity_dict"]):
+                if len(edges[0])==2 and edge_dict_key!="selfLoopEdges":
+                    backward_edges=[[edge[1],edge[0]] for edge in edges]
+                    edges=edges+backward_edges
+
+
         data["edge_list"] = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in data["edge_list"]]
 
     def _construct_learning_label_and_edges(self,json_file_name,graph_edge_list,node_indices):
