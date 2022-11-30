@@ -13,7 +13,8 @@ def print_filled_fields(file,key_word_1="",key_word_2=""):
     collected_fields=[]
     for j in json_obj_list:
         for field in j:
-            if field != "file_name" and field != "file_size" and j[field][0]!="10800000" and key_word_1 in field and key_word_2 in field:
+            print("field",field)
+            if field not in ["file_name","file_size","file_size_h","dummyFiled"] and j[field][0]!="10800000" and key_word_1 in field and key_word_2 in field:
                 collected_fields.append([field,j[field]])
                 #print(field,j[field])
     print("collected_fields",len(collected_fields))
