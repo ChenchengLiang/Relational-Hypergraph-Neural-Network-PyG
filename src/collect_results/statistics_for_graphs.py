@@ -1,5 +1,5 @@
 import os.path
-from src.utils import get_file_list,assign_dict_key_empty_list
+from src.utils import get_file_list, assign_dict_key_empty_list
 from utils import read_files, get_sumary_folder, read_json_file, read_graph_generation_log
 import pandas as pd
 from statistics import mean
@@ -10,6 +10,7 @@ def main():
     get_statistics(folder)
     # folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-non-linear-graphs/4-ready-for-training"
     # get_statistics(folder)
+
 
 def get_statistics(folder):
     summary_folder = get_sumary_folder(folder)
@@ -26,14 +27,13 @@ def get_statistics(folder):
                                             "operator", "constant", "guard", "clause", "clauseHead", "clauseBody",
                                             "clauseArgument",
                                             "templateBool", "templateEq", "templateIneq", "dummy", "unknown", "empty"]]
-    record_fields=["file_name","file_size","file_size_h","costruct_graph_time_consumption"]+[x + "Number" for x in node_field_list + binary_edge_name_list + ternary_edge_name_list]
-    data_dict={"CDHG":{},"CG":{}}
+    record_fields = ["file_name", "file_size", "file_size_h", "costruct_graph_time_consumption"] + [x + "Number" for x
+                                                                                                    in
+                                                                                                    node_field_list + binary_edge_name_list + ternary_edge_name_list]
+    data_dict = {"CDHG": {}, "CG": {}}
     assign_dict_key_empty_list(data_dict["CDHG"], record_fields)
     assign_dict_key_empty_list(data_dict["CG"], record_fields)
-    # data_dict = {"CDHG": {x + "Number": [] for x in node_field_list + binary_edge_name_list + ternary_edge_name_list},
-    #              "CG": {x + "Number": [] for x in node_field_list + binary_edge_name_list + ternary_edge_name_list}}
-    # data_dict["CDHG"].update({"file_name": [], "file_size":[],"file_size_h":[],"costruct_graph_time_consumption": []})
-    # data_dict["CG"].update({"file_name": [], "file_size":[],"file_size_h":[],"costruct_graph_time_consumption": []})
+
     for g in graph_type:
         graph_dict_list = read_files(file_list, g + ".JSON", read_function=read_json_file)
         time_consumption_list = read_files(file_list, file_type="log", read_function=read_graph_generation_log)
@@ -71,6 +71,7 @@ def get_statistics(folder):
         for k in summary_dict:
             data = pd.DataFrame(pd.DataFrame(summary_dict[k]))
             data.to_excel(writer, sheet_name=k)
+
 
 if __name__ == '__main__':
     main()
