@@ -89,3 +89,4 @@ def get_min_max_solving_time(solving_time_dict, data_dict, object, func=min):
         solving_time_average_predicate_size)
     data_dict[func.__name__ + "_solving_time_predicate_generator_time"].append(
         solving_time_predicate_generator_time)
+    return solving_option

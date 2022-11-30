@@ -111,46 +111,42 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     if int(json_obj[k][0]) != 10800000:
                         solvable_option_dict[k] = int(json_obj[k][0])
             if len(solving_time_dict) != 0:  # solvable with solvability file
-                get_min_max_solving_time(solving_time_dict,statistic_dict,json_obj,min)
-                get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, max)
+                min_solving_option=get_min_max_solving_time(solving_time_dict,statistic_dict,json_obj,min)
+                max_solving_option=get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, max)
 
-                #satisfiability = get_satisfiability(json_obj, min_solving_option)
-                satisfiability = get_satisfiability(json_obj, statistic_dict["min_solving_time_option"])
+                satisfiability = get_satisfiability(json_obj, min_solving_option)
+
 
                 statistic_dict["satisfiability"].append(satisfiability)
                 statistic_dict["solvable_option_list"].append(
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))
 
             else:  # unsolvable with solvability file
-                assign_values_to_unsolvable_problem(statistic_dict)
+                assign_values_to_unsolvable_problem(statistic_dict,record_fields)
+
         else:  # no solvability file
-            assign_values_to_unsolvable_problem(statistic_dict)
+            assign_values_to_unsolvable_problem(statistic_dict,record_fields)
 
 
-def assign_values_to_unsolvable_problem(statistic_dict):
-    statistic_dict["min_solving_time_option"].append("unsolvable")
-    statistic_dict["min_solving_time (s)"].append(10800)
-    statistic_dict["min_solving_time_cegar_interation_number"].append(10800000)
-    statistic_dict["min_solving_time_generated_predicate_number"].append(10800000)
-    statistic_dict["min_solving_time_average_predicate_size"].append(10800000)
-    statistic_dict["min_solving_time_predicate_generator_time"].append(10800000)
-
-    statistic_dict["max_solving_time_option"].append("unsolvable")
-    statistic_dict["max_solving_time (s)"].append(10800)
-    statistic_dict["max_solving_time_cegar_interation_number"].append(10800000)
-    statistic_dict["max_solving_time_generated_predicate_number"].append(10800000)
-    statistic_dict["max_solving_time_average_predicate_size"].append(10800000)
-    statistic_dict["max_solving_time_predicate_generator_time"].append(10800000)
-
-    statistic_dict["satisfiability"].append("unknown")
-    statistic_dict["solvable_option_list"].append("")
+#
+def assign_values_to_unsolvable_problem(statistic_dict,record_fields):
+    for rf in record_fields:
+        if rf != "satisfiability":
+            statistic_dict[rf].append(10800000)
+        else:
+            statistic_dict[rf].append("unknown")
 
 
 def get_satisfiability(json_obj, min_solving_option):
     try:
+        print(json_obj["file_name"])
+        print("min_solving_option",min_solving_option)
         satisfiability = int(json_obj[min_solving_option.replace("solvingTime", "satisfiability")][0])
     except:
-        satisfiability = int(json_obj["satisfiability"][0])
+        try:
+            satisfiability = int(json_obj["satisfiability"][0])
+        except:
+            satisfiability=-1
 
     if satisfiability == 1:
         return "safe"
