@@ -38,6 +38,7 @@ def read_smt2_category(f, json_obj):
 
 
 def read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
+    '''notice: this is a generator and the returned interator can only be used once'''
     for file in tqdm(file_list, desc="read " + file_type):
         file_name = file[:-len(".zip")]
         json_file = file_name + "." + file_type if len(file_type) != 0 else file_name
