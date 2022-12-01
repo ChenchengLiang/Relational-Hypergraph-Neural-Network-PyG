@@ -166,22 +166,22 @@ def get_fixed_filed_from_json_file(file_list, field):
 
 def get_non_linear_file_list():
     sat_list_mining_timeout = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/2-uppmax-non-linear-mined-template/cluster_timeout_folder",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/2-uppmax-SAT-mined-template/cluster_timeout_folder",
         "smt2")
     sat_list_no_simplified_clauses = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-non-linear-graphs/1-no_simplified_clauses",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/1-no_simplified_clauses",
         "smt2")
     sat_list_graph_timeout = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-non-linear-graphs/cluster_timeout_folder",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/cluster_timeout_folder",
         "smt2")
     sat_list_no_templates = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-non-linear-graphs/2-no_template",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/2-no_template",
         "smt2")
     sat_list_graph_postive_labels = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-non-linear-graphs/3-has-positive-labels",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/3-has-positive-labels",
         "smt2")
     sat_list_graph_no_postive_labels = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-non-linear-graphs/3-no-positive-labels",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/3-no-positive-labels",
         "smt2")
     sat_list = sat_list_mining_timeout + sat_list_no_simplified_clauses + sat_list_graph_timeout + sat_list_no_templates + sat_list_graph_postive_labels + sat_list_graph_no_postive_labels
     print("non-linear_sat_list", len(sat_list))
@@ -217,19 +217,19 @@ def get_non_linear_file_list():
 def get_linear_file_list():
     # linear_sat_list_check_solvability_timeout=get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/1-uppmax-linear-solvability/cluster_timeout_folder","smt2")
     linear_sat_list_check_mining_timeout = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/2-uppmax-linear-mined-template/cluster_timeout_folder",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/2-uppmax-SAT-mined-template/cluster_timeout_folder",
         "smt2")
     linear_sat_list_no_simplified_clauses = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/1-no_simplified_clauses",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/1-no_simplified_clauses",
         "smt2")
     linear_sat_list_graph_timeout = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/cluster_timeout_folder",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/cluster_timeout_folder",
         "smt2")
     linear_sat_list_graph_postive_labels = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/3-has-positive-labels",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/3-has-positive-labels",
         "smt2")
     linear_sat_list_graph_no_postive_labels = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-linear-graphs/3-no-positive-labels",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/3-uppmax-SAT-graphs/3-no-positive-labels",
         "smt2")
     linear_sat_list = linear_sat_list_check_mining_timeout + linear_sat_list_no_simplified_clauses + linear_sat_list_graph_timeout + linear_sat_list_graph_postive_labels + linear_sat_list_graph_no_postive_labels
     print("linear_sat_list", len(linear_sat_list))
