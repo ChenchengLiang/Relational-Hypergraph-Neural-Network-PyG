@@ -20,7 +20,6 @@ def main():
     linear_category_summary = get_category_summary(linear_data)
     non_linear_category_summary = get_category_summary(non_linear_data)
 
-
     linear_summary = get_statistic_summary(linear_data)
     non_linear_summary = get_statistic_summary(non_linear_data)
 
@@ -35,27 +34,46 @@ def main():
         pd.DataFrame(pd.DataFrame(linear_summary)).to_excel(writer, sheet_name="linear_summary")
         pd.DataFrame(pd.DataFrame(non_linear_summary)).to_excel(writer, sheet_name="non_linear_summary")
         pd.DataFrame(pd.DataFrame(linear_category_summary)).to_excel(writer, sheet_name="linear_category_summary")
-        pd.DataFrame(pd.DataFrame(non_linear_category_summary)).to_excel(writer, sheet_name="non_linear_category_summary")
+        pd.DataFrame(pd.DataFrame(non_linear_category_summary)).to_excel(writer,
+                                                                         sheet_name="non_linear_category_summary")
 
 
 def get_category_summary(data_dict):
-    category_dict={"category_name": [], "total_number":[],"safe_number": [], "unsafe_number": [], "unknown_number": []}
-    category_list=sorted(list(set(data_dict["category"])))
+    columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number","min_clause_number_before_simplification",
+               "max_clause_number_before_simplification","mean_clause_number_before_simplification"]
+    category_dict = {}
+    assign_dict_key_empty_list(category_dict, columns)
+
+    category_list = sorted(list(set(data_dict["category"])))
     for c in category_list:
-        satisfiability_in_one_category=get_target_row_by_condition(data_dict, "category", c, "satisfiability")
+        satisfiability_in_one_category = get_target_row_by_condition(data_dict, "category", c, "satisfiability")
         category_dict["category_name"].append(c)
         category_dict["safe_number"].append(satisfiability_in_one_category.count("safe"))
         category_dict["unsafe_number"].append(satisfiability_in_one_category.count("unsafe"))
         category_dict["unknown_number"].append(satisfiability_in_one_category.count("unknown"))
         category_dict["total_number"].append(len(satisfiability_in_one_category))
-    #add verification sum at last row
+
+        clause_number_before_simplification_in_one_category = get_target_row_by_condition(data_dict, "category", c,
+                                                                                          "clauseNumberBeforeSimplification")
+        category_dict["min_clause_number_before_simplification"].append(
+            min(clause_number_before_simplification_in_one_category))
+        category_dict["max_clause_number_before_simplification"].append(
+            max(clause_number_before_simplification_in_one_category))
+        category_dict["mean_clause_number_before_simplification"].append(
+            mean(clause_number_before_simplification_in_one_category))
+
+    # add verification sum at last row
     category_dict["category_name"].append("verification_sum")
     category_dict["safe_number"].append(sum(category_dict["safe_number"]))
     category_dict["unsafe_number"].append(sum(category_dict["unsafe_number"]))
     category_dict["unknown_number"].append(sum(category_dict["unknown_number"]))
     category_dict["total_number"].append(sum(category_dict["total_number"]))
+    category_dict["min_clause_number_before_simplification"].append(-1)
+    category_dict["max_clause_number_before_simplification"].append(-1)
+    category_dict["mean_clause_number_before_simplification"].append(-1)
 
     return category_dict
+
 
 def get_statistic_summary(data_dict):
     summary = {"statistic_name": [], "statistic_value": []}
@@ -79,7 +97,8 @@ def get_statistic_summary(data_dict):
                                "min_solving_time_predicate_generator_time"]:
             write_min_max_mean_to_dict(summary_dict,
                                        target_list=get_target_row_by_condition(data_dict, "satisfiability", cond,
-                                                                               target_coloumn), prefix=cond, suffix=target_coloumn)
+                                                                               target_coloumn), prefix=cond,
+                                       suffix=target_coloumn)
 
     for k in summary_dict:
         summary["statistic_name"].append(k)
