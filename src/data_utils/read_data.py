@@ -37,9 +37,6 @@ def get_data(params, reload_data=True):
     # test_data = train_data
     train_valid_test_number = [len(train_data), len(valid_data), len(test_data)]
     print("train-valid-test:", train_valid_test_number)
-    print("add_backward_edges", params["add_backward_edges"])
-    print("add_self_loop_edges", params["add_self_loop_edges"])
-    print("add_global_edges",params["add_global_edges"])
     print("train_data[0]", train_data[0])
     # print("train_data[0].y", train_data[0].y)
 

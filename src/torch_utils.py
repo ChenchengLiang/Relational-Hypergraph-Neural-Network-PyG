@@ -33,3 +33,14 @@ def initialize_linear_layers(num_linear_layer, embedding_size, activation, dropo
         linear_dropout_list.append(Dropout(p=dropout_probability))
     return linear_list, linear_ln_list, linear_act_list,linear_dropout_list
 
+def forward_linear_layers(x,linear_list,linear_ln_list,linear_act_list,linear_dropout_list,linear_out,training):
+    for i, (lin, ln, act, drop) in enumerate(
+            zip(linear_list, linear_ln_list, linear_act_list, linear_dropout_list)):
+        x = lin(x)
+        x = ln(x)
+        if training == True and i < len(linear_list) - 1:  # don't dropout at last conv layer
+            x = drop(x)  # x = F.dropout(x, p=0.8, training=self.training)
+        x = act(x)
+
+    x = linear_out(x)
+    return x
