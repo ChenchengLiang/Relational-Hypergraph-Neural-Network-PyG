@@ -40,7 +40,8 @@ def main():
 
 def get_category_summary(data_dict):
     columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number","min_clause_number_before_simplification",
-               "max_clause_number_before_simplification","mean_clause_number_before_simplification"]
+               "max_clause_number_before_simplification","mean_clause_number_before_simplification","min_clause_number_after_simplification",
+               "max_clause_number_after_simplification","mean_clause_number_after_simplification"]
     category_dict = {}
     assign_dict_key_empty_list(category_dict, columns)
 
@@ -62,6 +63,15 @@ def get_category_summary(data_dict):
         category_dict["mean_clause_number_before_simplification"].append(
             mean(clause_number_before_simplification_in_one_category))
 
+        clause_number_after_simplification_in_one_category = get_target_row_by_condition(data_dict, "category", c,
+                                                                                          "clauseNumberAfterSimplification")
+        category_dict["min_clause_number_after_simplification"].append(
+            min(clause_number_after_simplification_in_one_category))
+        category_dict["max_clause_number_after_simplification"].append(
+            max(clause_number_after_simplification_in_one_category))
+        category_dict["mean_clause_number_after_simplification"].append(
+            mean(clause_number_after_simplification_in_one_category))
+
     # add verification sum at last row
     category_dict["category_name"].append("verification_sum")
     category_dict["safe_number"].append(sum(category_dict["safe_number"]))
@@ -71,6 +81,9 @@ def get_category_summary(data_dict):
     category_dict["min_clause_number_before_simplification"].append(-1)
     category_dict["max_clause_number_before_simplification"].append(-1)
     category_dict["mean_clause_number_before_simplification"].append(-1)
+    category_dict["min_clause_number_after_simplification"].append(-1)
+    category_dict["max_clause_number_after_simplification"].append(-1)
+    category_dict["mean_clause_number_after_simplification"].append(-1)
 
     return category_dict
 
