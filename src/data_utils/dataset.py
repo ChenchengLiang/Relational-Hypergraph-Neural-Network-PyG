@@ -1,22 +1,22 @@
 import torch
 from torch_geometric.data import Dataset, Data
-from src.utils import get_file_list, unzip_file, read_one_filed,convert_constant_to_category
+from src.utils import get_file_list, unzip_file, read_one_filed, convert_constant_to_category
 import os
 from tqdm import tqdm
 
 
 class HornGraphDataset(Dataset):
-    def __init__(self, root, params,token_map,transform=None, pre_transform=None, pre_filter=None):
+    def __init__(self, root, params, token_map, transform=None, pre_transform=None, pre_filter=None):
         """
                 root = Where the dataset should be stored. This folder is split
                 """
         self.root = root
         self.num_classes = params["num_classes"]
-        self.token_map=token_map
+        self.token_map = token_map
         self.graph_type = params["graph_type"]
-        self.learning_task=params["learning_task"]
-        self._add_self_loop=params["add_self_loop_edges"]
-        self._add_backward_edges=params["add_backward_edges"]
+        self.learning_task = params["learning_task"]
+        self._add_self_loop = params["add_self_loop_edges"]
+        self._add_backward_edges = params["add_backward_edges"]
         self._add_global_edges = params["add_global_edges"]
         super().__init__(root, transform, pre_transform, pre_filter)
 
@@ -37,33 +37,31 @@ class HornGraphDataset(Dataset):
 
     def process(self):
 
-
         file_list = self.raw_file_names
-        for index, file_name in tqdm(enumerate(file_list),desc=os.path.basename(self.root)):
+        for index, file_name in tqdm(enumerate(file_list), desc=os.path.basename(self.root)):
             ############################## read file begin##############################
             unzip_file(file_name)
             json_file_name = file_name[:-len(".zip")]
             node_symbol_list = read_one_filed(json_file_name, "nodeSymbolList")
-            num_node=len(node_symbol_list)
+            num_node = len(node_symbol_list)
             node_indices = list(range(num_node))
 
-            #ASTEdge
+            # ASTEdge
             if self.graph_type == "hyperEdgeGraph":
-                graph_edge_list = ["relationSymbolArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge","quantifierEdge",
+                graph_edge_list = ["relationSymbolArgumentEdge", "ASTLeftEdge", "ASTRightEdge", "ASTEdge", "guardEdge",
+                                   "quantifierEdge",
                                    "controlFlowHyperEdge", "dataFlowHyperEdge"]
             else:
-                graph_edge_list = [
-                                   "relationSymbolArgumentEdge","relationSymbolInstanceEdge", "argumentInstanceEdge",
-                                   "clauseHeadEdge","clauseBodyEdge", "clauseArgumentEdge","ASTLeftEdge", "ASTRightEdge", "guardEdge",
-                                   "dataEdge","quantifierEdge"]
-
+                graph_edge_list = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
+                                   "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge", "ASTLeftEdge",
+                                   "ASTRightEdge", "ASTEdge", "guardEdge", "dataEdge", "quantifierEdge"]
 
             # form learning label according to the task
             target_indices, target_label, graph_edge_list = self._construct_learning_label_and_edges(json_file_name,
                                                                                                      graph_edge_list,
                                                                                                      node_indices)
 
-            edge_list, edge_arity_dict = self._construct_edge_list(json_file_name, graph_edge_list,num_node)
+            edge_list, edge_arity_dict = self._construct_edge_list(json_file_name, graph_edge_list, num_node)
 
             if os.path.exists(json_file_name):
                 os.remove(json_file_name)
@@ -99,36 +97,35 @@ class HornGraphDataset(Dataset):
         self._process_edge_list(data)
         return data
 
-    def _process_edge_list(self,data):
+    def _process_edge_list(self, data):
         if self._add_self_loop == True:
             slef_loop_edges = [[i, i] for i in range(len(data["x"]))]
             data["edge_list"].append(slef_loop_edges)
             data["edge_arity_dict"]["selfLoopEdges"] = len(slef_loop_edges[0])
-        if self._add_backward_edges ==True:
-            #todo could add backward edge as new edge type
-            for i,(edges,edge_dict_key) in enumerate(zip(data["edge_list"],data["edge_arity_dict"])):
-                if len(edges[0])==2 and edge_dict_key!="selfLoopEdges":
-                    backward_edges=[[edge[1],edge[0]] for edge in edges]
-                    data["edge_list"][i]=edges+backward_edges
-        if self._add_global_edges == True:
-            binary_global_edges=[]
-            ternary_global_edges=[]
+        if self._add_backward_edges == True:
+            # todo could add backward edge as new edge type
             for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
-                if len(edges[0])==2:
+                if len(edges[0]) == 2 and edge_dict_key != "selfLoopEdges":
+                    backward_edges = [[edge[1], edge[0]] for edge in edges]
+                    data["edge_list"][i] = edges + backward_edges
+        if self._add_global_edges == True:
+            binary_global_edges = []
+            ternary_global_edges = []
+            for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
+                if len(edges[0]) == 2:
                     binary_global_edges.extend(edges)
-                if len(edges[0])==3:
+                if len(edges[0]) == 3:
                     ternary_global_edges.extend(edges)
             data["edge_list"].append(binary_global_edges)
             data["edge_arity_dict"]["binaryEdge"] = len(binary_global_edges[0])
-            if len(ternary_global_edges)!=0:
+            if len(ternary_global_edges) != 0:
                 data["edge_list"].append(ternary_global_edges)
                 data["edge_arity_dict"]["ternaryHyperEdge"] = len(ternary_global_edges[0])
 
-
         data["edge_list"] = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in data["edge_list"]]
 
-    def _construct_learning_label_and_edges(self,json_file_name,graph_edge_list,node_indices):
-        if self.learning_task in ["template_binary_classification","template_multi_classification"]:
+    def _construct_learning_label_and_edges(self, json_file_name, graph_edge_list, node_indices):
+        if self.learning_task in ["template_binary_classification", "template_multi_classification"]:
             target_indices = read_one_filed(json_file_name, "labelIndices")
             target_label = read_one_filed(json_file_name, "labelList")
             graph_edge_list = graph_edge_list + ["templateEdge"]
@@ -142,12 +139,10 @@ class HornGraphDataset(Dataset):
             target_label = read_one_filed(json_file_name, "labelList")
         else:
             target_indices = node_indices
-            target_label= [1]*len(node_indices)
-        return target_indices,target_label,graph_edge_list
+            target_label = [1] * len(node_indices)
+        return target_indices, target_label, graph_edge_list
 
-
-
-    def _construct_edge_list(self, json_file_name, edge_list_fields,num_node):
+    def _construct_edge_list(self, json_file_name, edge_list_fields, num_node):
         binary_dummy_edge = [0, 0]
         tenary_dummy_edge = [0, 0, 0]
         edge_list = []
@@ -165,7 +160,6 @@ class HornGraphDataset(Dataset):
 
         return edge_list, edge_arity_dict
 
-
     def tokenize_symbols(self, token_map, node_symbols, graph_type):
         if graph_type == "hyperEdgeGraph":
             unknown_node_map = {"CONTROL": "unknown_predicate", "guard": "unknown_guard",
@@ -178,7 +172,7 @@ class HornGraphDataset(Dataset):
                                 "clause": "unknown_clause",
                                 "clauseHead": "unknown_clauseHead", "clauseBody": "unknown_clauseBody",
                                 "clauseArgument": "unknown_clauseArgument",
-                                "template_Eqs": "unknown_templateEqs","template_Ineqs": "unknown_templateIneqs",
+                                "template_Eqs": "unknown_templateEqs", "template_Ineqs": "unknown_templateIneqs",
                                 "template_Bool": "unknown_templateBool"}
 
         converted_node_symbols = [convert_constant_to_category(word) for word in node_symbols]
