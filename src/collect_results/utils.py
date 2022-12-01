@@ -69,7 +69,7 @@ def copy_relative_files(file_name, folder):
 
 
 def get_min_max_solving_time(solving_time_dict, data_dict, object, func=min):
-    solving_option, min_solving_time = select_key_with_value_condition(solving_time_dict, func)
+    solving_option, solving_time = select_key_with_value_condition(solving_time_dict, func)
     solving_time_cegar_interation_number = int(
         object[solving_option.replace("solvingTime", "cegarIterationNumber")][0])
     solving_time_generated_predicate_number = int(
@@ -80,7 +80,7 @@ def get_min_max_solving_time(solving_time_dict, data_dict, object, func=min):
         object[solving_option.replace("solvingTime", "predicateGeneratorTime")][0])
 
     data_dict[func.__name__ + "_solving_time_option"].append(solving_option.replace("solvingTime_", ""))
-    data_dict[func.__name__ + "_solving_time (s)"].append(min_solving_time / 1000)
+    data_dict[func.__name__ + "_solving_time (s)"].append(solving_time / 1000)
     data_dict[func.__name__ + "_solving_time_cegar_interation_number"].append(
         solving_time_cegar_interation_number)
     data_dict[func.__name__ + "_solving_time_generated_predicate_number"].append(
@@ -90,3 +90,11 @@ def get_min_max_solving_time(solving_time_dict, data_dict, object, func=min):
     data_dict[func.__name__ + "_solving_time_predicate_generator_time"].append(
         solving_time_predicate_generator_time)
     return solving_option
+
+
+def get_solving_time_dict(object):
+    solving_time_dict = {}
+    for field in object:
+        if "solvingTime" in field:
+            solving_time_dict[field] = int(object[field][0])
+    return solving_time_dict

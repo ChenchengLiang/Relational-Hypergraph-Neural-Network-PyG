@@ -4,6 +4,7 @@ from utils import read_files, read_json_file,get_sumary_folder
 from src.utils import get_file_list, make_dirct, select_key_with_value_condition, assign_dict_key_empty_list
 import pandas as pd
 from src.collect_results.utils import get_min_max_solving_time
+from utils import get_solving_time_dict
 
 
 def main():
@@ -30,10 +31,7 @@ def main():
             if int(object["satisfiability-CDHG"][0]) == 0 or int(object["satisfiability-CG"][0]) == 0:
                 solvability_dict["satisfiability"].append("unsafe")
 
-                solving_time_dict = {}
-                for field in object:
-                    if "solvingTime" in field:
-                        solving_time_dict[field] = int(object[field][0])
+                solving_time_dict = get_solving_time_dict(object)
                 get_min_max_solving_time(solving_time_dict, solvability_dict, object, min)
                 get_min_max_solving_time(solving_time_dict, solvability_dict, object, max)
 

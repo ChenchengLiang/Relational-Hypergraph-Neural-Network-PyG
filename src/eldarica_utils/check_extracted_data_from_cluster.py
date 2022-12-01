@@ -1,32 +1,35 @@
 import os.path
 import shutil
 from shutil import copy
-from src.utils import get_file_list, make_dirct
+from src.utils import get_file_list, make_dirct,select_key_with_value_condition
 import glob
 import gzip
-from src.collect_results.utils import read_files, read_json_file, copy_relative_files
+from src.collect_results.utils import read_files, read_json_file, copy_relative_files,get_solving_time_dict
 from tqdm import tqdm
+from src.benchmark_statistics.utils import read_satisfiability
 
 
 def separate_files_by_solvability_fields(folder):
-    solvability_object_list=read_files(get_file_list(folder,"smt2"),"solvbility.JSON",read_function=read_json_file)
+    solvability_object_list=read_files(get_file_list(folder,"smt2"),"solvability.JSON",read_function=read_json_file)
     sat_folder=make_dirct(os.path.dirname(folder)+"/SAT")
-    sat_has_simplified_clauses_folder = make_dirct(os.path.dirname(sat_folder) + "/has-simplified-clauses")
-    sat_no_simplified_clauses_folder = make_dirct(os.path.dirname(sat_folder) + "/no-simplified-clauses")
+    sat_has_simplified_clauses_folder = make_dirct(sat_folder + "/has-simplified-clauses")
+    sat_no_simplified_clauses_folder = make_dirct(sat_folder + "/no-simplified-clauses")
     unsat_folder=make_dirct(os.path.dirname(folder)+"/UNSAT")
-    unsat_has_simplified_clauses_folder = make_dirct(os.path.dirname(unsat_folder) + "/has-simplified-clauses")
-    unsat_no_simplified_clauses_folder = make_dirct(os.path.dirname(unsat_folder) + "/no-simplified-clauses")
+    unsat_has_simplified_clauses_folder = make_dirct(unsat_folder + "/has-simplified-clauses")
+    unsat_no_simplified_clauses_folder = make_dirct(unsat_folder+ "/no-simplified-clauses")
     unknown_folder = make_dirct(os.path.dirname(folder) + "/UNKNOWN")
     unknown_with_solvability_folder=make_dirct(unknown_folder+"/solvability")
     unknown_without_solvability_folder = make_dirct(unknown_folder + "/no-solvability")
     for object in solvability_object_list:
-        if len(object) > 1:
-            if object["satisfiability"]==1: #sat
+        if len(object) > 1: #has solvability file
+            min_solving_option, min_solving_time = select_key_with_value_condition(get_solving_time_dict(object), min)
+            satisfiability = read_satisfiability(object, min_solving_option=min_solving_option)
+            if satisfiability==1: #sat
                 if int(object["clauseNumberAfterSimplification"][0])==0:
                     copy_relative_files(object["file_name"], sat_no_simplified_clauses_folder)
                 else:
                     copy_relative_files(object["file_name"], sat_has_simplified_clauses_folder)
-            elif object["satisfiability"]==0: #unsat
+            elif satisfiability==0: #unsat
                 if int(object["clauseNumberAfterSimplification"][0]) == 0:
                     copy_relative_files(object["file_name"], unsat_no_simplified_clauses_folder)
                 else:

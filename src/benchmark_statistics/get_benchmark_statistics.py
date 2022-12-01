@@ -6,6 +6,7 @@ from src.utils import get_file_list, select_key_with_value_condition, assign_dic
 import pandas as pd
 from src.collect_results.utils import read_files, read_json_file, read_smt2_category
 from src.collect_results.utils import get_min_max_solving_time
+from utils import read_satisfiability
 
 
 def main():
@@ -137,16 +138,10 @@ def assign_values_to_unsolvable_problem(statistic_dict,record_fields):
             statistic_dict[rf].append("unknown")
 
 
+
+
 def get_satisfiability(json_obj, min_solving_option):
-    try:
-        print(json_obj["file_name"])
-        print("min_solving_option",min_solving_option)
-        satisfiability = int(json_obj[min_solving_option.replace("solvingTime", "satisfiability")][0])
-    except:
-        try:
-            satisfiability = int(json_obj["satisfiability"][0])
-        except:
-            satisfiability=-1
+    satisfiability=read_satisfiability(json_obj, min_solving_option)
 
     if satisfiability == 1:
         return "safe"
