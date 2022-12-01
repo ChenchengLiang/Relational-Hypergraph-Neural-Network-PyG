@@ -8,6 +8,34 @@ from src.collect_results.utils import read_files, read_json_file, copy_relative_
 from tqdm import tqdm
 
 
+def separate_files_by_solvability_fields(folder):
+    solvability_object_list=read_files(get_file_list(folder,"smt2"),"solvbility.JSON",read_function=read_json_file)
+    sat_folder=make_dirct(os.path.dirname(folder)+"/SAT")
+    sat_has_simplified_clauses_folder = make_dirct(os.path.dirname(sat_folder) + "/has-simplified-clauses")
+    sat_no_simplified_clauses_folder = make_dirct(os.path.dirname(sat_folder) + "/no-simplified-clauses")
+    unsat_folder=make_dirct(os.path.dirname(folder)+"/UNSAT")
+    unsat_has_simplified_clauses_folder = make_dirct(os.path.dirname(unsat_folder) + "/has-simplified-clauses")
+    unsat_no_simplified_clauses_folder = make_dirct(os.path.dirname(unsat_folder) + "/no-simplified-clauses")
+    unknown_folder = make_dirct(os.path.dirname(folder) + "/UNKNOWN")
+    unknown_with_solvability_folder=make_dirct(unknown_folder+"/solvability")
+    unknown_without_solvability_folder = make_dirct(unknown_folder + "/no-solvability")
+    for object in solvability_object_list:
+        if len(object)!=0:
+            if object["satisfiability"]==1: #sat
+                if int(object["clauseNumberAfterSimplification"][0])==0:
+                    copy_relative_files(object["file_name"], sat_no_simplified_clauses_folder)
+                else:
+                    copy_relative_files(object["file_name"], sat_has_simplified_clauses_folder)
+            elif object["satisfiability"]==0: #unsat
+                if int(object["clauseNumberAfterSimplification"][0]) == 0:
+                    copy_relative_files(object["file_name"], unsat_no_simplified_clauses_folder)
+                else:
+                    copy_relative_files(object["file_name"], unsat_has_simplified_clauses_folder)
+            else: #unknown, has clause info
+                copy_relative_files(object["file_name"], unknown_with_solvability_folder)
+        else: #unknown, no solvability file clause info (terminate in preprocessing)
+            copy_relative_files(object["file_name"], unknown_without_solvability_folder)
+
 def separate_corner_cases_from_cluster_solvability(folder, file_numebr, target_message, source=""):
     zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder, source)
     separated_folder = separate_cluster_timeout_case(zip_file_folder, file_number=file_numebr,

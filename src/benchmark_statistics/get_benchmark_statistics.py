@@ -102,7 +102,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                      "solvable_option_list"]
     assign_dict_key_empty_list(statistic_dict, record_fields)
     for json_obj in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
-        if len(json_obj) != 0:  # has solvability file
+        if len(json_obj) > 3 :  # has solvability file
             solving_time_dict = {}
             solvable_option_dict = {}
             for k in json_obj:

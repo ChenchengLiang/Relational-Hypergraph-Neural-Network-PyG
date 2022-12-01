@@ -24,19 +24,25 @@ def main():
     solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
                                          read_function=read_json_file)
     for object in solvability_object_list:
-        solvability_dict["file_name"].append(os.path.basename(object["file_name"]))
+        if len(object)>3: # has solvability
+            solvability_dict["file_name"].append(os.path.basename(object["file_name"]))
 
-        if int(object["satisfiability-CDHG"][0]) == 0 or int(object["satisfiability-CG"][0]) == 0:
-            solvability_dict["satisfiability"].append("unsafe")
+            if int(object["satisfiability-CDHG"][0]) == 0 or int(object["satisfiability-CG"][0]) == 0:
+                solvability_dict["satisfiability"].append("unsafe")
 
-            solving_time_dict = {}
-            for field in object:
-                if "solvingTime" in field:
-                    solving_time_dict[field] = int(object[field][0])
-            get_min_max_solving_time(solving_time_dict, solvability_dict, object, min)
-            get_min_max_solving_time(solving_time_dict, solvability_dict, object, max)
+                solving_time_dict = {}
+                for field in object:
+                    if "solvingTime" in field:
+                        solving_time_dict[field] = int(object[field][0])
+                get_min_max_solving_time(solving_time_dict, solvability_dict, object, min)
+                get_min_max_solving_time(solving_time_dict, solvability_dict, object, max)
 
-        else:
+            else:
+                solvability_dict["satisfiability"].append("unknown")
+                for field in record_fields:
+                    if field not in ["file_name", "satisfiability"]:
+                        solvability_dict[field] = 10800
+        else: #no solvability file
             solvability_dict["satisfiability"].append("unknown")
             for field in record_fields:
                 if field not in ["file_name", "satisfiability"]:

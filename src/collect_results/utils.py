@@ -43,10 +43,10 @@ def read_files(file_list, file_type="solvability.JSON", read_function=read_json_
         json_file = file_name + "." + file_type if len(file_type) != 0 else file_name
         unzip_file(json_file + ".zip")
         json_obj = {}
+        json_obj["file_name"] = json_file[:-len(file_type) - 1]
+        json_obj["file_size"] = os.path.getsize(json_file)
+        json_obj["file_size_h"] = convert_bytes(os.path.getsize(json_file))
         if os.path.exists(json_file):
-            json_obj["file_name"] = json_file
-            json_obj["file_size"] = os.path.getsize(json_file)
-            json_obj["file_size_h"] = convert_bytes(os.path.getsize(json_file))
             with open(json_file) as f:
                 read_function(f, json_obj)
                 # delete unziped file
