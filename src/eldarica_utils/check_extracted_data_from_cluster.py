@@ -12,7 +12,6 @@ def separate_corner_cases_from_cluster_solvability(folder, file_numebr, target_m
     zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder, source)
     separated_folder = separate_cluster_timeout_case(zip_file_folder, file_number=file_numebr,
                                                      target_message=target_message)
-    #todo check solvability
 
 def separate_corner_cases_from_cluster_mineTemplates(folder, file_numebr, target_message, source=""):
     zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder, source)

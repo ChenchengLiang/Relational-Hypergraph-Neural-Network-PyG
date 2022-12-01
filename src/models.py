@@ -29,8 +29,8 @@ class GNN_classification(torch.nn.Module):
             self.conv_drop_list.append(Dropout(self.drop_out_probability))
 
         # initialize linear layers
-        self.linear_list, self.linear_ln_list, self.linear_act_list = initialize_linear_layers(
-            num_linear_layer=num_linear_layer, embedding_size=embedding_size, activation=activation)
+        self.linear_list, self.linear_ln_list, self.linear_act_list, self.linear_dropout_list = initialize_linear_layers(
+            num_linear_layer=num_linear_layer, embedding_size=embedding_size, activation=activation,dropout_probability=drop_out_probability)
 
         output_size = 1 if label_size == 2 else label_size
         self.linear_out = Linear(embedding_size, output_size)
@@ -67,17 +67,18 @@ class GNN_classification(torch.nn.Module):
         x = torch.index_select(x, dim=0, index=target_indices)
 
         # linear layers
-        for lin, ln, act in zip(self.linear_list, self.linear_ln_list, self.linear_act_list):
+        for lin, ln, act, drop in zip(self.linear_list, self.linear_ln_list, self.linear_act_list, self.linear_dropout_list):
             x = lin(x)
             x = ln(x)
-            # x = F.dropout(x, p=0.8, training=self.training)
+            if self.training == True:
+                x = drop(x)
             x = act(x)
 
         x = self.linear_out(x)
         return x
 
 
-class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classification
+class Hyper_classification(torch.nn.Module):
     def __init__(self, label_size, vocabulary_size, edge_arity_dict, embedding_size, num_gnn_layers,
                  num_linear_layer, activation,feature_size=1,drop_out_probability=0,use_intermediate_gnn_results=False):
         super().__init__()
@@ -105,8 +106,8 @@ class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classif
         self.linear_transformation_for_intermediate_results = Linear(embedding_size * (num_gnn_layers+1), embedding_size)
 
         # initialize linear layers
-        self.linear_list, self.linear_ln_list, self.linear_act_list = initialize_linear_layers(
-            num_linear_layer=num_linear_layer, embedding_size=embedding_size, activation=activation)
+        self.linear_list, self.linear_ln_list, self.linear_act_list, self.linear_dropout_list = initialize_linear_layers(
+            num_linear_layer=num_linear_layer, embedding_size=embedding_size, activation=activation,dropout_probability=drop_out_probability)
 
         output_size = 1 if label_size == 2 else label_size
         self.linear_out = Linear(embedding_size, output_size)
@@ -143,10 +144,11 @@ class Hyper_classification(torch.nn.Module): #todo integrate this to GNN_classif
             x = torch.index_select(x, dim=0, index=target_indices)
 
         # linear layers
-        for lin, ln, act in zip(self.linear_list, self.linear_ln_list, self.linear_act_list):
+        for lin, ln, act, drop in zip(self.linear_list, self.linear_ln_list, self.linear_act_list, self.linear_dropout_list):
             x = lin(x)
             x = ln(x)
-            # x = F.dropout(x, p=0.8, training=self.training)
+            if self.training==True: # x = F.dropout(x, p=0.8, training=self.training)
+                x=drop(x)
             x = act(x)
 
         x = self.linear_out(x)

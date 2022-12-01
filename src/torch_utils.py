@@ -1,4 +1,4 @@
-from torch.nn import ReLU, LeakyReLU, Identity, Linear, LayerNorm, ModuleList, Tanh
+from torch.nn import ReLU, LeakyReLU, Identity, Linear, LayerNorm, ModuleList, Tanh, Dropout
 import numpy as np
 from src.utils import manual_flatten
 import torch
@@ -21,13 +21,15 @@ def get_activation(activation):
         return Identity()
 
 
-def initialize_linear_layers(num_linear_layer, embedding_size, activation):
+def initialize_linear_layers(num_linear_layer, embedding_size, activation, dropout_probability):
     linear_list = ModuleList()
     linear_ln_list = ModuleList()
     linear_act_list = ModuleList()
+    linear_dropout_list = ModuleList()
     for i in range(num_linear_layer):
         linear_list.append(Linear(embedding_size, embedding_size))
         linear_ln_list.append(LayerNorm(embedding_size))
         linear_act_list.append(get_activation(activation))
-    return linear_list, linear_ln_list, linear_act_list
+        linear_dropout_list.append(Dropout(p=dropout_probability))
+    return linear_list, linear_ln_list, linear_act_list,linear_dropout_list
 
