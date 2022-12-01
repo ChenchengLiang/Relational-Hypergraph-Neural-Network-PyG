@@ -80,30 +80,33 @@ def get_solvability_summary_by_abstract_option(abstract_option_list, folder):
 
     # fill in solvability_summary_by_abstract_option by iterating the solvability list
     for solvability_object in solvability_object_list:
-        for op in solvability_summary_by_abstract_option:
-            measurement_dict = {m: int(solvability_object[m + "_" + op][0]) for m in measurement_list}
-            if measurement_dict["solvingTime"] != 10800000:
-                solvability_summary_by_abstract_option[op]["solvable_number"] += 1
-                solvability_summary_by_abstract_option[op]["solvable_list"].append(
-                    os.path.basename(solvability_object["file_name"]))
-                for m in measurement_list:
-                    solvability_summary_by_abstract_option[op][m + "_list"].append(measurement_dict[m])
+        if len(solvability_object) > 1:
+            for op in solvability_summary_by_abstract_option:
+                measurement_dict = {m: int(solvability_object[m + "_" + op][0]) for m in measurement_list}
+                if measurement_dict["solvingTime"] != 10800000:
+                    solvability_summary_by_abstract_option[op]["solvable_number"] += 1
+                    solvability_summary_by_abstract_option[op]["solvable_list"].append(
+                        os.path.basename(solvability_object["file_name"]))
+                    for m in measurement_list:
+                        solvability_summary_by_abstract_option[op][m + "_list"].append(measurement_dict[m])
 
-        # todo check this implementation when have the whole dataset
-        # get unique solved list by differernt abstract option
-        for i in solvability_summary_by_abstract_option:
-            solvable_set_from_other_option = []
-            for j in solvability_summary_by_abstract_option:
-                if j != i:
-                    solvable_set_from_other_option = solvable_set_from_other_option + \
-                                                     solvability_summary_by_abstract_option[j][
-                                                         "solvable_list"]
-            solvable_set_from_other_option = list(set(solvable_set_from_other_option))
-            unique_solved_list = set(solvability_summary_by_abstract_option[i]["solvable_list"]).difference(
-                set(solvable_set_from_other_option))
-            if len(unique_solved_list) != 0:
-                solvability_summary_by_abstract_option[i]["unique_solvable_number"] = len(unique_solved_list)
-                solvability_summary_by_abstract_option[i]["unique_solvable_list"] = list(unique_solved_list)
+            # todo check this implementation when have the whole dataset
+            # get unique solved list by differernt abstract option
+            for i in solvability_summary_by_abstract_option:
+                solvable_set_from_other_option = []
+                for j in solvability_summary_by_abstract_option:
+                    if j != i:
+                        solvable_set_from_other_option = solvable_set_from_other_option + \
+                                                         solvability_summary_by_abstract_option[j][
+                                                             "solvable_list"]
+                solvable_set_from_other_option = list(set(solvable_set_from_other_option))
+                unique_solved_list = set(solvability_summary_by_abstract_option[i]["solvable_list"]).difference(
+                    set(solvable_set_from_other_option))
+                if len(unique_solved_list) != 0:
+                    solvability_summary_by_abstract_option[i]["unique_solvable_number"] = len(unique_solved_list)
+                    solvability_summary_by_abstract_option[i]["unique_solvable_list"] = list(unique_solved_list)
+        else:
+            pass
 
     return solvability_summary_by_abstract_option
 

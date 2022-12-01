@@ -70,7 +70,7 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
     for json_obj_CDHG, json_obj_CG in zip(
             read_files(file_list, file_type="hyperEdgeGraph.JSON", read_function=read_json_file),
             read_files(file_list, file_type="monoDirectionLayerGraph.JSON", read_function=read_json_file)):
-        if len(json_obj_CDHG) >3 and len(json_obj_CG) > 3:
+        if len(json_obj_CDHG) > 1 and len(json_obj_CG) > 1:
             statistic_dict["CDHG_node_number"].append(int(json_obj_CDHG["nodeNumber"][0]))
             statistic_dict["CDHG_binary_edge_number"].append(int(json_obj_CDHG["binaryEdgeNumber"][0]))
             statistic_dict["CDHG_ternary_edge_number"].append(int(json_obj_CDHG["ternaryHyperEdgeNumber"][0]))
@@ -102,7 +102,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                      "solvable_option_list"]
     assign_dict_key_empty_list(statistic_dict, record_fields)
     for json_obj in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
-        if len(json_obj) > 3 :  # has solvability file
+        if len(json_obj) > 1 :  # has solvability file
             solving_time_dict = {}
             solvable_option_dict = {}
             for k in json_obj:

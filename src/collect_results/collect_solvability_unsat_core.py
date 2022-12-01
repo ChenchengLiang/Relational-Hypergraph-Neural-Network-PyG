@@ -24,7 +24,7 @@ def main():
     solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
                                          read_function=read_json_file)
     for object in solvability_object_list:
-        if len(object)>3: # has solvability
+        if len(object) > 1: # has solvability
             solvability_dict["file_name"].append(os.path.basename(object["file_name"]))
 
             if int(object["satisfiability-CDHG"][0]) == 0 or int(object["satisfiability-CG"][0]) == 0:

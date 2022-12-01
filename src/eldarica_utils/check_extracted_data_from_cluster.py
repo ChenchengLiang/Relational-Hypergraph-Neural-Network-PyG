@@ -20,7 +20,7 @@ def separate_files_by_solvability_fields(folder):
     unknown_with_solvability_folder=make_dirct(unknown_folder+"/solvability")
     unknown_without_solvability_folder = make_dirct(unknown_folder + "/no-solvability")
     for object in solvability_object_list:
-        if len(object)!=0:
+        if len(object) > 1:
             if object["satisfiability"]==1: #sat
                 if int(object["clauseNumberAfterSimplification"][0])==0:
                     copy_relative_files(object["file_name"], sat_no_simplified_clauses_folder)
@@ -92,9 +92,13 @@ def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_n
     try:
         for g in tqdm(graph_dict_list,desc=separate_function.__name__):
             file_name = g["file_name"][:g["file_name"].find(".hyperEdgeGraph.JSON")]
-            separate_function(g, file_name, target_folder, exception_folder)
+            if len(g)>3:
+                separate_function(g, file_name, target_folder, exception_folder)
+            else:
+                print("error: no graph file",file_name)
     except:
         print("file existed")
+
 
     print(os.path.basename(target_folder), len(get_file_list(target_folder, file_type="smt2")))
     print(os.path.basename(exception_folder), len(get_file_list(exception_folder, file_type="smt2")))

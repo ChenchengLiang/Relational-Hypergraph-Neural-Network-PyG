@@ -42,10 +42,18 @@ def get_statistics(folder):
             data_dict[graph_type[g]]["file_name"].append(file_name)
             data_dict[graph_type[g]]["file_size"].append(graph_dict["file_size"])
             data_dict[graph_type[g]]["file_size_h"].append(graph_dict["file_size_h"])
-            data_dict[graph_type[g]]["costruct_graph_time_consumption"].append(
-                time_consumption_dict[graph_type[g] + "_time_consumption"])
-            for field in node_field_list + binary_edge_name_list + ternary_edge_name_list:
-                data_dict[graph_type[g]][field + "Number"].append(graph_dict[field + "Number"][0])
+
+            if len(graph_dict) > 1 and len(time_consumption_dict) > 1: #has graph file
+                for field in node_field_list + binary_edge_name_list + ternary_edge_name_list:
+                    data_dict[graph_type[g]][field + "Number"].append(graph_dict[field + "Number"][0])
+                data_dict[graph_type[g]]["costruct_graph_time_consumption"].append(
+                    time_consumption_dict[graph_type[g] + "_time_consumption"])
+            else: #has no graph file
+                for field in node_field_list + binary_edge_name_list + ternary_edge_name_list:
+                    data_dict[graph_type[g]][field + "Number"].append(-1)
+                data_dict[graph_type[g]]["costruct_graph_time_consumption"].append(-1)
+
+
 
     # print(data_dict["CDHG"])
     # print(data_dict["CG"])
