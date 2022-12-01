@@ -28,31 +28,39 @@ def main():
             parameters_pipeline.append(
                 " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) + " -log ")
 
-    # description: get labeled templates # 3 hours
-    #parameters_pipeline.append(" -mineTemplates -log ")
+    # unsatcore: get labeled data # 3 hours
+    # parameters_pipeline.append(" -mineCounterExample:union -log ")
 
-    # description: get labeled unsatcores # 3 hours
-    #parameters_pipeline.append(" -mineCounterExample:union -log ")
-
-    # description: for unsolvable set get unlabeled templates # 3 hours
-    #parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
-
-    # description: construct graphs for template selection # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:template -log ")
-    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:template -log ")
-
-    # description: construct graphs for unsatcore # 6 hours
+    # unsatcore: construct graphs # 6 hours
     # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -log ")
     # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -log ")
 
-    # # description: check solvability for sinlge template set # 15 hours
+    # unsatcore: check solvability differernt threshold # 36 hours
+    #for g in [CDHG,CG]:
+        #for threshold in [0.5,0.4,0.3,0.2,0.1,0.05]:
+            #parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:"+str(threshold)+" -hornGraphType:"+g+" -log ")
+
+    # template_selection: get labeled templates # 3 hours
+    #parameters_pipeline.append(" -mineTemplates -log ")
+
+
+    # template_selection: for unsolvable set get unlabeled templates # 3 hours
+    #parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
+
+    # template_selection: construct graphs # 6 hours
+    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:template -log ")
+    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:template -log ")
+
+
+
+    # # template_selection: check solvability for sinlge template set # 15 hours
     # for s in split_clause_option:
     #     for ao in predicted_abstract_options + other_abstract_options:  # manual_abstract_options
     #         parameters_pipeline.append(
     #             " -getSolvability " + " -fixRandomSeed " + " -abstract:" + ao + " -splitClauses:" + s + " -t:" + str(
     #                 eldarica_timeout))
     #
-    # # description: check solvability for predicted template set with different cost # 12 hours
+    # # template_selection: check solvability for predicted template set with different cost # 12 hours
     # # unlabeled and random template set can use shape cost, but not important
     # for ao in predicted_abstract_options:
     #     for s in split_clause_option:
@@ -61,7 +69,7 @@ def main():
     #                 " -getSolvability " + " -fixRandomSeed " + " -abstract:" + ao + " -readCostType:" + c + " -splitClauses:" + s + " -t:" + str(
     #                     eldarica_timeout))
     # #
-    # # description: check solvability for combined predicates with two template set, union # 72 hours
+    # # template_selection: check solvability for combined predicates with two template set, union # 72 hours
     # for ao in ["term", "oct", "relEqs", "relIneqs"]:
     #     for s in split_clause_option:
     #         for g in ["CDHG","CG"]:
@@ -69,7 +77,7 @@ def main():
     #                 parameters_pipeline.append(" -getSolvability " + " -fixRandomSeed " + " -combineTemplateStrategy:union " +" -hornGraphType:"+g+
     #                                            " -abstract:" + ao + " -readCostType:" + c + " -splitClauses:" + s + " -t:" + str(eldarica_timeout))
     #
-    # # description: check solvability for combined predicates with two template set, random # 72 hourse
+    # # template_selection: check solvability for combined predicates with two template set, random # 72 hourse
     # for ao in ["term", "oct", "relEqs", "relIneqs"]:
     #     for s in split_clause_option:
     #         for g in ["CG","CDHG"]:
