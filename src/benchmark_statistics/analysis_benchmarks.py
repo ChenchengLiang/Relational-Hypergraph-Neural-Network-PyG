@@ -39,9 +39,14 @@ def main():
 
 
 def get_category_summary(data_dict):
-    columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number","min_clause_number_before_simplification",
-               "max_clause_number_before_simplification","mean_clause_number_before_simplification","min_clause_number_after_simplification",
-               "max_clause_number_after_simplification","mean_clause_number_after_simplification"]
+    basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number"]
+    target_column_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification","min_solving_time (s)"]
+    category_summary_columns=[]
+    for x in ["min","max","mean"]:
+        for t in target_column_list:
+            category_summary_columns.append(x+"_"+camel_to_snake(t))
+    columns=basic_info_columns+category_summary_columns
+
     category_dict = {}
     assign_dict_key_empty_list(category_dict, columns)
 
@@ -56,6 +61,7 @@ def get_category_summary(data_dict):
 
         min_max_mean_one_column_by_row(data_dict,category_dict,"category",c,"clauseNumberBeforeSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
+        min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "min_solving_time (s)")
 
 
     # add verification sum at last row
@@ -64,12 +70,9 @@ def get_category_summary(data_dict):
     category_dict["unsafe_number"].append(sum(category_dict["unsafe_number"]))
     category_dict["unknown_number"].append(sum(category_dict["unknown_number"]))
     category_dict["total_number"].append(sum(category_dict["total_number"]))
-    category_dict["min_clause_number_before_simplification"].append(-1)
-    category_dict["max_clause_number_before_simplification"].append(-1)
-    category_dict["mean_clause_number_before_simplification"].append(-1)
-    category_dict["min_clause_number_after_simplification"].append(-1)
-    category_dict["max_clause_number_after_simplification"].append(-1)
-    category_dict["mean_clause_number_after_simplification"].append(-1)
+    for x in category_summary_columns:
+        category_dict[x].append(-1)
+
 
     return category_dict
 
@@ -77,12 +80,10 @@ def get_category_summary(data_dict):
 def min_max_mean_one_column_by_row(data_dict,target_dict,column,one_row,terget_column):
     clause_number_before_simplification_in_one_category = get_target_row_by_condition(data_dict, column, one_row,
                                                                                       terget_column)
-    target_dict["min_"+camel_to_snake(terget_column)].append(
-        min(clause_number_before_simplification_in_one_category))
-    target_dict["max_"+camel_to_snake(terget_column)].append(
-        max(clause_number_before_simplification_in_one_category))
-    target_dict["mean_"+camel_to_snake(terget_column)].append(
-        mean(clause_number_before_simplification_in_one_category))
+    for func in [min, max,mean]:
+        target_dict[func.__name__+"_"+camel_to_snake(terget_column)].append(
+            func(clause_number_before_simplification_in_one_category))
+
 
 def get_statistic_summary(data_dict):
     summary = {"statistic_name": [], "statistic_value": []}
