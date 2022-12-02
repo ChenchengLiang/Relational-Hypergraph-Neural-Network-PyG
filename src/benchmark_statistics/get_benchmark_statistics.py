@@ -258,10 +258,10 @@ def get_linear_file_list():
                              + unsolvable_list_in_unsat
     print("linear_unsolvable_list", len(linear_unsolvable_list))
 
-    unsat_list = get_file_list(
+    linear_unsat_list = get_file_list(
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/UNSAT-2160/ready_for_counter_example_mining",
         "smt2")
-    print("liner_unsat_list",len(unsat_list))
+    print("liner_unsat_list",len(linear_unsat_list))
     # todo: get graphs
 
     linear_no_simplified_clauses = get_file_list(
@@ -269,7 +269,7 @@ def get_linear_file_list():
         "smt2")
     print("linear_no_simplified_clauses",len(linear_no_simplified_clauses))
 
-    total_file_list = linear_sat_list + linear_unsolvable_list + unsat_list + linear_no_simplified_clauses
+    total_file_list = linear_sat_list + linear_unsolvable_list + linear_unsat_list + linear_no_simplified_clauses
     print("linear total_file_list", len(total_file_list))
     return total_file_list
 

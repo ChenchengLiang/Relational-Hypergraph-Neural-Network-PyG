@@ -1,6 +1,7 @@
 /cluster-results
 /container/*.sif
 /src/debug
+/src/figures
 /mlruns
 /.idea
 *.iml

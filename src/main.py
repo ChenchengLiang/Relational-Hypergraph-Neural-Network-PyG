@@ -4,7 +4,7 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../benchmarks/unsat-train-shuffled-CDHG", "../benchmarks/unsat-train-shuffled-CG"]
+    benchmarks = ["../benchmarks/temp-CDHG", "../benchmarks/temp-CG"]
 
     # load data
     task="unsat_core_binary_classification"
