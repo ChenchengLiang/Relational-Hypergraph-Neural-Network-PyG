@@ -58,7 +58,7 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
                                                                        "1-no_simplified_clauses",
                                                                        separate_no_simplified_clauses)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "2-has_template",
-                                                                       "2-no_template", separate_no_template_cases)
+                                                                       "2-no_labels", separate_no_label_cases)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-has-positive-labels",
                                                                        "3-no-positive-labels",
                                                                        separate_no_labeled_template_cases)
@@ -73,7 +73,7 @@ def separate_no_simplified_clauses(g, file_name, target_folder, exception_folder
         copy_relative_files(file_name, target_folder)
 
 
-def separate_no_template_cases(g, file_name, target_folder, exception_folder):
+def separate_no_label_cases(g, file_name, target_folder, exception_folder):
     if g["labelNumber"][0] == 0:
         copy_relative_files(file_name, exception_folder)
     else:

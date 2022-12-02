@@ -4,10 +4,10 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../benchmarks/template-binary-classification-small-CDHG", "../benchmarks/template-binary-classification-small-CG"]
+    benchmarks = ["../benchmarks/unsat-train-shuffled-CDHG", "../benchmarks/unsat-train-shuffled-CG"]
 
     # load data
-    task="template_binary_classification"
+    task="unsat_core_binary_classification"
     for _benchmark in benchmarks:
         run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
                            data_shuffle=False, _gnn=HyperConv, _use_intermediate_gnn_results=True, _epochs=1,
@@ -18,10 +18,10 @@ def main():
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
-    tasks = ["template_binary_classification"]
+    tasks = ["unsat_core_binary_classification"]
     num_gnn_layers = [2]
     data_loader_shuffle = [False]
-    use_intermediate_gnn_results = [True]
+    use_intermediate_gnn_results = [False]
     epochs = 100
     reload_data = False
     fix_random_seed = True
