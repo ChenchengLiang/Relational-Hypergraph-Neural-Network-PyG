@@ -10,11 +10,11 @@ from utils import read_satisfiability
 
 
 def main():
-    #linear_total_file_list = get_linear_file_list()
-    linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test", "smt2")
+    linear_total_file_list = get_linear_file_list()
+    #linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test", "smt2")
 
-    #non_linear_total_file_list = get_non_linear_file_list()
-    non_linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test-1", "smt2")
+    non_linear_total_file_list = get_non_linear_file_list()
+    #non_linear_total_file_list = get_file_list("/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test-1", "smt2")
 
     data_dict = {"linear": {}, "non-linear": {}}
 
@@ -190,11 +190,14 @@ def get_non_linear_file_list():
     unsolvable_list_graph = get_file_list(
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/5-uppmax-non-linear-unsolvable-graphs/4-ready-for-training",
         "smt2")
-    unsolvable_list = unsolvable_list_labeling_timeout + unsolvable_list_graph_timeout + unsolvable_list_graph
+    unsolvable_list_in_unsat=get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/UNSAT-2160/cluster_timeout_folder",
+        "smt2")
+    unsolvable_list = unsolvable_list_labeling_timeout + unsolvable_list_graph_timeout + unsolvable_list_graph + unsolvable_list_in_unsat
     print("non-linear_unsolvable_list", len(unsolvable_list))
 
     unsat_list = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/UNSAT-3668/solvability",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/UNSAT-2160/ready_for_counter_example_mining",
         "smt2")
     print("non-linear_unsat_list", len(unsat_list))
     # todo: get graphs
@@ -246,11 +249,14 @@ def get_linear_file_list():
     linear_unsolvable_list_split_clause_solvable = get_file_list(
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/unsolvable-1635/solvable-by-splitclauses0-19",
         "smt2")
-    linear_unsolvable_list = linear_unsolvable_list_labeling_timeout + linear_unsolvable_list_labeling_unziped + linear_unsolvable_list_graph_timeout + linear_unsolvable_list_graph + linear_unsolvable_list_split_clause_solvable
+    unsolvable_list_in_unsat = get_file_list(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/UNSAT-3668/cluster_timeout_folder",
+        "smt2")
+    linear_unsolvable_list = linear_unsolvable_list_labeling_timeout + linear_unsolvable_list_labeling_unziped + linear_unsolvable_list_graph_timeout + linear_unsolvable_list_graph + linear_unsolvable_list_split_clause_solvable + unsolvable_list_in_unsat
     print("linear_unsolvable_list", len(linear_unsolvable_list))
 
     liner_unsat_list = get_file_list(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/splitClause1/UNSAT-2160/solvability",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/splitClause1/UNSAT-3668/ready_for_counter_example_mining",
         "smt2")
     print("liner_unsat_list",len(liner_unsat_list))
     # todo: get graphs

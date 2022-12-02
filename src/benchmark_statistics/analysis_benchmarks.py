@@ -40,6 +40,7 @@ def main():
 
 def get_category_summary(data_dict):
     basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number"]
+    #could add any number fields corresponding to category column
     target_column_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification","min_solving_time (s)"]
     category_summary_columns=[]
     for x in ["min","max","mean"]:
