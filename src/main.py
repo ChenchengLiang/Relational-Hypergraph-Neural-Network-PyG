@@ -4,7 +4,7 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../benchmarks/temp-CDHG", "../benchmarks/temp-CG"]
+    benchmarks = ["../benchmarks/unsatcore_data_one-CDHG", "../benchmarks/unsatcore_data_one-CG"]
 
     # load data
     task="unsat_core_binary_classification"
@@ -22,7 +22,7 @@ def main():
     num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    epochs = 100
+    epochs = 2
     reload_data = False
     fix_random_seed = True
     self_loop = [True]

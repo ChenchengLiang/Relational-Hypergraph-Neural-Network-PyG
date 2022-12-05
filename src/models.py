@@ -118,7 +118,7 @@ class Hyper_classification(torch.nn.Module):
         else:
             x = self.linear_in(x)
 
-        # add option sotre output from each layer and concatenate in the end
+        #output from each layer (including embedding layer) and concatenate them in the end
         intermediate_layer_results = [x]
         # GNN layers
         for i, (conv, ln, act, drop) in enumerate(
@@ -132,11 +132,10 @@ class Hyper_classification(torch.nn.Module):
 
         if self.use_intermediate_gnn_results == True:
             x = torch.concat(intermediate_layer_results, dim=1)
-            x = torch.index_select(x, dim=0, index=target_indices)
+            x = torch.index_select(x, dim=0, index=target_indices) # gather label node
             x = self.linear_transformation_for_intermediate_results(x)
         else:
-            # gather template node
-            x = torch.index_select(x, dim=0, index=target_indices)
+            x = torch.index_select(x, dim=0, index=target_indices) # gather label node
 
         # linear layers
         x=forward_linear_layers(x, self.linear_list, self.linear_ln_list, self.linear_act_list, self.linear_dropout_list, self.linear_out,self.training)
