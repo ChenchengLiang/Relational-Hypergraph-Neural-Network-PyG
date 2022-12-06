@@ -11,13 +11,15 @@ from src.benchmark_statistics.utils import read_satisfiability
 
 def separate_files_by_solvability_fields(folder):
     solvability_object_list=read_files(get_file_list(folder,"smt2"),"solvability.JSON",read_function=read_json_file)
-    sat_folder=make_dirct(os.path.dirname(folder)+"/SAT")
+    folder_base_name=os.path.basename(folder)
+    summary_folder=make_dirct(os.path.dirname(folder)+"/"+folder_base_name+"_separate_summary")
+    sat_folder=make_dirct(summary_folder+"/SAT")
     sat_has_simplified_clauses_folder = make_dirct(sat_folder + "/has-simplified-clauses")
     sat_no_simplified_clauses_folder = make_dirct(sat_folder + "/no-simplified-clauses")
-    unsat_folder=make_dirct(os.path.dirname(folder)+"/UNSAT")
+    unsat_folder=make_dirct(summary_folder+"/UNSAT")
     unsat_has_simplified_clauses_folder = make_dirct(unsat_folder + "/has-simplified-clauses")
     unsat_no_simplified_clauses_folder = make_dirct(unsat_folder+ "/no-simplified-clauses")
-    unknown_folder = make_dirct(os.path.dirname(folder) + "/UNKNOWN")
+    unknown_folder = make_dirct(summary_folder + "/UNKNOWN")
     unknown_with_solvability_folder=make_dirct(unknown_folder+"/solvability")
     unknown_without_solvability_folder = make_dirct(unknown_folder + "/no-solvability")
     for object in solvability_object_list:

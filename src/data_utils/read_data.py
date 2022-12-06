@@ -89,11 +89,13 @@ def build_vocabulary(params):
     for fold in ["train_data", "valid_data", "test_data"]:
         folder = opj(params["benchmark"], fold) + "/raw"
         total_file_list += get_file_list(folder, "." + params["graph_type"] + ".JSON")
+
+    fixed_symbol = ["initial_0", "false_0", "dummy_0", "unknown_0", "empty"]
+    canonical_symbol_key = ["relationSymbol", "relationSymbolArgument", "variable", "operator", "constant", "guard",
+                            "clause", "clauseHead", "clauseBody", "clauseArgument", "templateBool", "templateEq",
+                            "templateIneq"]
     initial_vocabulary_set = set(
-        ["unknown_" + t for t in ["relationSymbol", "relationSymbolArgument", "variable",
-                                  "operator", "constant", "guard",
-                                  "clause", "clauseHead", "clauseBody", "clauseArgument",
-                                  "templateBool", "templateEq", "templateIneq"]] + ["initial", "false","dummy", "empty"])
+        ["unknown_" + t for t in canonical_symbol_key] + fixed_symbol)
     vocabulary_set = initial_vocabulary_set
 
     for file_name in total_file_list:

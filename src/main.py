@@ -4,7 +4,7 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore_pipeline_small-shuffled-CDHG", "../benchmarks/unsatcore_pipeline_small-shuffled-CG"]
+    benchmarks = ["../benchmarks/unsatcore_pipeline_small-overfitting-CDHG", "../benchmarks/unsatcore_pipeline_small-overfitting-CG"]
 
     # load data
     # task="unsat_core_binary_classification"
@@ -19,10 +19,10 @@ def main():
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
-    num_gnn_layers = [2]
+    num_gnn_layers = [2,4]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    epochs = 500
+    epochs = 200
     reload_data = False
     fix_random_seed = True
     self_loop = [True]
