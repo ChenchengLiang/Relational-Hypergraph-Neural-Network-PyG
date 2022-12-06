@@ -8,6 +8,8 @@
 *.xml
 /src/__pycache__
 /src/mlruns
+/src/models
+/src/debug_main.py
 /src/eldarica_utils/local_main.py
 /src/eldarica_utils/local_extract_data.py
 /venv

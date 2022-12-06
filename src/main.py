@@ -7,11 +7,11 @@ def main():
     benchmarks = ["../benchmarks/unsatcore_pipeline_small-shuffled-CDHG", "../benchmarks/unsatcore_pipeline_small-shuffled-CG"]
 
     # load data
-    task="unsat_core_binary_classification"
-    for _benchmark in benchmarks:
-        run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
-                           data_shuffle=False, _gnn=HyperConv, _use_intermediate_gnn_results=True, _epochs=1,
-                           _reload_data=True, _self_loop=False,_add_global_edges=False, _file_name=True)
+    # task="unsat_core_binary_classification"
+    # for _benchmark in benchmarks:
+    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
+    #                        data_shuffle=False, _gnn=HyperConv, _use_intermediate_gnn_results=True, _epochs=1,
+    #                        _reload_data=True, _self_loop=False,_add_global_edges=False, _file_name=True)
 
     # train
     #models = ["hyper_GCN", "GNN"]
@@ -22,7 +22,7 @@ def main():
     num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    epochs = 10
+    epochs = 500
     reload_data = False
     fix_random_seed = True
     self_loop = [True]
