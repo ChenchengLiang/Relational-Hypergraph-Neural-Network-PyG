@@ -11,7 +11,7 @@ import os
 
 def get_data(params, reload_data=True):
     vocabulary, token_map = build_vocabulary(params)
-    mlflow.log_dict(token_map,"token_map.json")
+    mlflow.log_dict(token_map, "token_map.json")
 
     root = opj(params["benchmark"], "train_data")
     if reload_data == True:
@@ -46,14 +46,14 @@ def get_data(params, reload_data=True):
 
     edge_arity_dict = train_data[0].edge_arity_dict
 
-    dataset_distribution_values = draw_label_pie_chart(params["num_classes"], lambda : (t.y for t in dataset), "all-data")
+    dataset_distribution_values = draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in dataset),
+                                                       "all-data")
 
-
-    draw_label_pie_chart(params["num_classes"], lambda : (t.y for t in train_data), "train-data")
-    draw_label_pie_chart(params["num_classes"], lambda : (t.y for t in valid_data), "valid-data")
-    draw_label_pie_chart(params["num_classes"], lambda : (t.y for t in test_data), "test-data")
+    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in train_data), "train-data")
+    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in valid_data), "valid-data")
+    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in test_data), "test-data")
     class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values]
-    print("class_weight",class_weight)
+    print("class_weight", class_weight)
     params["class_weight"] = class_weight
     params["edge_arity_dict"] = edge_arity_dict
     params["train_valid_test"] = train_valid_test_number
@@ -61,15 +61,40 @@ def get_data(params, reload_data=True):
     return edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params
 
 
+def build_fixed_vocabulary(params):
+    fixed_symbol=[ "initial_0", "false_0", "dummy_0", "unknown", "empty"]
+    canonical_symbol_key=["relationSymbol","relationSymbolArgument", "variable","operator", "constant", "guard",
+    "clause", "clauseHead", "clauseBody", "clauseArgument","templateBool", "templateEq", "templateIneq"]
+    canonical_symbol = []
+    for x in canonical_symbol_key:
+        for i in range(0,1000000):
+            canonical_symbol.append(x+"_"+str(i))
+
+    vocabulary_set=fixed_symbol+canonical_symbol
+
+    token_map = {}
+    token_id = 0
+
+    vocabulary_set = set([convert_constant_to_category(w) for w in vocabulary_set])
+    for word in sorted(vocabulary_set):
+        token_map[word] = token_id
+        token_id = token_id + 1
+    # print("vocabulary_set",len(vocabulary_set),vocabulary_set)
+    # print("token_map",len(token_map),token_map)
+    return vocabulary_set, token_map
+
+
 def build_vocabulary(params):
     total_file_list = []
     for fold in ["train_data", "valid_data", "test_data"]:
         folder = opj(params["benchmark"], fold) + "/raw"
         total_file_list += get_file_list(folder, "." + params["graph_type"] + ".JSON")
-    vocabulary_set = set(
-        ["dummy", "unknown_node", "unknown_predicate", "unknown_symbolic_constant", "unknown_predicate_argument",
-         "unknown_operator", "unknown_constant", "unknown_guard", "unknown_template", "unknown_predicateName",
-         "unknown_clause", "unknown_clauseHead", "unknown_clauseBody", "unknown_clauseArgument"])
+    initial_vocabulary_set = set(
+        ["unknown_" + t for t in ["relationSymbol", "relationSymbolArgument", "variable",
+                                  "operator", "constant", "guard",
+                                  "clause", "clauseHead", "clauseBody", "clauseArgument",
+                                  "templateBool", "templateEq", "templateIneq"]] + ["initial", "false","dummy", "empty"])
+    vocabulary_set = initial_vocabulary_set
 
     for file_name in total_file_list:
         unzip_file(file_name)
@@ -81,7 +106,6 @@ def build_vocabulary(params):
 
     token_map = {}
     token_id = 0
-    # todo: pad vocabulary_set
 
     vocabulary_set = set([convert_constant_to_category(w) for w in vocabulary_set])
     for word in sorted(vocabulary_set):

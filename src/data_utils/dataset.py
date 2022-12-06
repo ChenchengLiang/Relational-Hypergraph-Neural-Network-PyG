@@ -161,19 +161,23 @@ class HornGraphDataset(Dataset):
         return edge_list, edge_arity_dict
 
     def tokenize_symbols(self, token_map, node_symbols, graph_type):
-        if graph_type == "hyperEdgeGraph":
-            unknown_node_map = {"CONTROL": "unknown_predicate", "guard": "unknown_guard",
-                                "predicateArgument": "unknown_predicate_argument", "template": "unknown_template",
-                                "symbolicConstant": "unknown_symbolic_constant"}
-        else:
-            unknown_node_map = {"relationSymbolArgument": "unknown_relationSymbolArgument",
-                                "constant": "unknown_Constant",
-                                "relationSymbol": "unknown_relationSymbol",
-                                "clause": "unknown_clause",
-                                "clauseHead": "unknown_clauseHead", "clauseBody": "unknown_clauseBody",
-                                "clauseArgument": "unknown_clauseArgument",
-                                "template_Eqs": "unknown_templateEqs", "template_Ineqs": "unknown_templateIneqs",
-                                "template_Bool": "unknown_templateBool"}
+        # if graph_type == "hyperEdgeGraph":
+        #     unknown_node_map = {"CONTROL": "unknown_predicate", "guard": "unknown_guard",
+        #                         "predicateArgument": "unknown_predicate_argument", "template": "unknown_template",
+        #                         "symbolicConstant": "unknown_symbolic_constant"}
+        # else:
+        #     unknown_node_map = {"relationSymbolArgument": "unknown_relationSymbolArgument",
+        #                         "constant": "unknown_Constant",
+        #                         "relationSymbol": "unknown_relationSymbol",
+        #                         "clause": "unknown_clause",
+        #                         "clauseHead": "unknown_clauseHead", "clauseBody": "unknown_clauseBody",
+        #                         "clauseArgument": "unknown_clauseArgument",
+        #                         "template_Eqs": "unknown_templateEqs", "template_Ineqs": "unknown_templateIneqs",
+        #                         "template_Bool": "unknown_templateBool"}
+        canonical_symbol_key = ["relationSymbol", "relationSymbolArgument", "variable", "operator", "constant", "guard",
+                                "clause", "clauseHead", "clauseBody", "clauseArgument", "templateBool", "templateEq",
+                                "templateIneq"]
+        unknown_node_map={x:"unknown_"+x for x in canonical_symbol_key}
 
         converted_node_symbols = [convert_constant_to_category(word) for word in node_symbols]
         # node tokenization
@@ -203,4 +207,6 @@ class HornGraphDataset(Dataset):
                 if temp_flag == 0:
                     # print("node_symbols",symbol)
                     tokenized_node_label_ids.append(token_map["unknown_node"])
+
+
         return tokenized_node_label_ids
