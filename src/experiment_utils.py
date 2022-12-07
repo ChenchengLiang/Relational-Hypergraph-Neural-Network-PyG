@@ -80,7 +80,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
                                          num_gnn_layers=params["num_gnn_layers"],
                                          num_linear_layer=params["num_linear_layer"],
                                          activation=params["activation"],
-                                         drop_out_probability=params["drop_out_rate"],
+                                         dropout_probability=params["drop_out_rate"],
                                          use_intermediate_gnn_results=params["use_intermediate_gnn_results"]).to(device)
         else:
             model = Full_connected_model(params["num_classes"], vocabulary_size,
