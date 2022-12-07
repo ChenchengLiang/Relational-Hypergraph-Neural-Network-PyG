@@ -4,25 +4,28 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore_pipeline_small-overfitting-CDHG", "../benchmarks/unsatcore_pipeline_small-overfitting-CG"]
+    benchmarks = ["../benchmarks/unsatcore_pipeline_small-overfitting-CDHG",
+                  "../benchmarks/unsatcore_pipeline_small-overfitting-CG"]
 
     # load data
-    # task="unsat_core_binary_classification"
-    # for _benchmark in benchmarks:
-    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
-    #                        data_shuffle=False, _gnn=HyperConv, _use_intermediate_gnn_results=True, _epochs=1,
-    #                        _reload_data=True, _self_loop=False,_add_global_edges=False, _file_name=True)
+    task = "unsat_core_binary_classification"
+    for _benchmark in benchmarks:
+        run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
+                           data_shuffle=False, _gnn=HyperConv, _use_intermediate_gnn_results=True, _epochs=1,
+                           _reload_data=True, _self_loop=False, _add_global_edges=False, _file_name=True)
 
     # train
-    #models = ["hyper_GCN", "GNN"]
+    # models = ["hyper_GCN", "GNN"]
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
-    num_gnn_layers = [2,4]
+    num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    epochs = 200
+    drop_out_rate = {"gnn_dropout_rate": 0.1, "mlp_dropout_rate": 0}
+    num_linear_layer = 4
+    epochs = 500
     reload_data = False
     fix_random_seed = True
     self_loop = [True]
@@ -39,8 +42,10 @@ def main():
                                 for _gnn in gnns:
                                     run_one_experiment(model, task, _num_gnn_layer, bench, data_shuffle,
                                                        _gnn, False, epochs, _reload_data=reload_data,
-                                                       _self_loop=False, _add_backward_edges=False, _add_global_edges=True,
-                                                       _file_name=fix_random_seed)
+                                                       _self_loop=False, _add_backward_edges=False,
+                                                       _add_global_edges=True,
+                                                       _file_name=fix_random_seed, _drop_out_rate=drop_out_rate,
+                                                       _num_linear_layer=num_linear_layer)
                             else:
                                 for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                     for _add_backward_edge in add_backward_edges:
@@ -50,7 +55,8 @@ def main():
                                                                _reload_data=reload_data, _self_loop=_self_loop,
                                                                _add_backward_edges=_add_backward_edge,
                                                                _add_global_edges=_add_global_edges,
-                                                               _file_name=fix_random_seed)
+                                                               _file_name=fix_random_seed, _drop_out_rate=drop_out_rate,
+                                                               _num_linear_layer=num_linear_layer)
 
 
 # send_email("train finished")

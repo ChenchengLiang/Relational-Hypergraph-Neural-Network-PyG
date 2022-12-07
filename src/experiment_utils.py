@@ -17,7 +17,7 @@ from torch_geometric.profile.utils import byte_to_megabyte
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
                        _epochs, _file_name="", _reload_data=True,
                        _self_loop=False, _add_backward_edges=False,_add_global_edges=False, _fix_random_seeds=True,
-                       _experiment_date=True) -> object:
+                       _experiment_date=True,_drop_out_rate={"gnn_dropout_rate":0,"mlp_dropout_rate":0},_num_linear_layer=4) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
@@ -42,7 +42,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
     params["embedding_size"] = 32
     params["num_gnn_layers"] = _num_gnn_layers
-    params["num_linear_layer"] = 2
+    params["num_linear_layer"] = _num_linear_layer
     params["graph_type"] = "hyperEdgeGraph" if "CDHG" in _benchmark else "monoDirectionLayerGraph"
     params["batch_size"] = 1
     params["add_self_loop_edges"] = _self_loop
@@ -50,7 +50,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["add_global_edges"] = _add_global_edges
     params["activation"] = "relu"  # leak_relu, tanh
     params["data_loader_shuffle"] = data_shuffle
-    params["drop_out_rate"] = 0.1
+    params["drop_out_rate"] = _drop_out_rate
     params["learning_rate"] = 0.001
     params["gnn"] = _gnn
     params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results

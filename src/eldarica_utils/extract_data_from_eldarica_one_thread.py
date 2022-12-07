@@ -18,13 +18,13 @@ def main():
     file_type = "smt2"
 
     # description: get getSolvability # 15 hours
-    for a in manual_abstract_options:
-        for s in split_clause_option:
-            parameters_pipeline.append(
-                " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) )
+    # for a in manual_abstract_options:
+    #     for s in split_clause_option:
+    #         parameters_pipeline.append(
+    #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) )
 
     # unsatcore: get labeled data # 3 hours
-    # parameters_pipeline.append(" -mineCounterExample:union ")
+    parameters_pipeline.append(" -mineCounterExample:union ")
 
     # unsatcore: construct graphs # 6 hours
     # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -log ")
