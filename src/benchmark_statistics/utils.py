@@ -139,7 +139,7 @@ def get_category_summary(data_dict):
     target_column_list = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification", "min_solving_time (s)"]
     category_summary_columns = []
     for t in target_column_list:
-        for x in ["min", "max", "mean"]:
+        for x in ["min", "max", "mean","sorted_mid"]:
             category_summary_columns.append(x + "_" + camel_to_snake(t))
     columns = basic_info_columns + category_summary_columns
 
@@ -172,16 +172,16 @@ def get_category_summary(data_dict):
 
 
 def min_max_mean_one_column_by_row(data_dict, target_dict, column, one_row, terget_column):
-    clause_number_before_simplification_in_one_category = get_target_row_by_condition(data_dict, column, one_row,
+    terget_column_in_one_category = get_target_row_by_condition(data_dict, column, one_row,
                                                                                       terget_column)
-    clause_number_before_simplification_in_one_category = [float(x) for x in
-                                                           clause_number_before_simplification_in_one_category]
-    for func in [min, max, mean]:
+    terget_column_in_one_category = [float(x) for x in
+                                                           terget_column_in_one_category]
+    for func in [min, max, mean, sorted_mid]:
         target_dict[func.__name__ + "_" + camel_to_snake(terget_column)].append(
-            func(clause_number_before_simplification_in_one_category))
+            func(terget_column_in_one_category))
 
-    #todo sorted mid
-
+def sorted_mid(l):
+    return sorted(l)[int(len(l)/2)]
 
 def get_statistic_summary(data_dict):
     summary = {"statistic_name": [], "statistic_value": []}
@@ -220,10 +220,9 @@ def write_min_max_mean_to_dict(summary_dict, target_list, prefix, suffix):
     suffix = camel_to_snake(suffix)
     target_list = [0] if len(target_list) == 0 else target_list
     target_list = [float(x) for x in target_list]
-    summary_dict[prefix + "_min_" + suffix] = min(target_list)
-    summary_dict[prefix + "_max_" + suffix] = max(target_list)
-    summary_dict[prefix + "_mean_" + suffix] = mean(target_list)
-    summary_dict[prefix + "_sorted_mid_" + suffix] = sorted(target_list)[int(len(target_list) / 2)]
+    for func in [min,max,mean,sorted_mid]:
+        summary_dict[prefix + "_"+func.__name__+"_" + suffix] = func(target_list)
+
 
 
 def get_target_row_by_condition(data_dict, condition_column, condition, target_column):
