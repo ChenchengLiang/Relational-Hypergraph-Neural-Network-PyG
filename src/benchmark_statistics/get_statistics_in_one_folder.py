@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append("../..")
-from utils import get_fixed_filed_from_json_file,read_solving_time_from_json_file,read_graph_info_from_json_file,get_category_summary,get_statistic_summary
+from utils import *
 from src.utils import get_file_list
 import os
 import pandas as pd
@@ -43,10 +43,15 @@ def main():
     # get graph info
     read_graph_info_from_json_file(file_list, data_dict)
 
-
     category_summary = get_category_summary(data_dict)
 
     statistic_summary = get_statistic_summary(data_dict)
+
+    #filter list that has the same value
+    filter_columns(data_dict)
+    filter_columns(category_summary)
+    statistic_summary=filter_rows(statistic_summary, "statistic_value")
+
 
     # write to excel
     benchmark_folder = os.path.dirname(folder)

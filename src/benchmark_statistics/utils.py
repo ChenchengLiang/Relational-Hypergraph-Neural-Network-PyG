@@ -4,17 +4,41 @@ from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean
 from src.utils import camel_to_snake
 
-def read_satisfiability(json_obj,min_solving_option):
+
+def filter_rows(data_dict, column):
+    index_list = []
+    for i, v in enumerate(data_dict[column]):
+        if v == 0 or v == 10800 or v == 10800000:
+            index_list.append(i)
+
+    temp_data_dict = {}
+    assign_dict_key_empty_list(temp_data_dict, data_dict.keys())
+
+    for k in data_dict:
+        for i, v in enumerate(data_dict[k]):
+            if i not in index_list:
+                temp_data_dict[k].append(data_dict[k][i])
+    return temp_data_dict
+
+
+def filter_columns(data_dict):
+    meaningless_keys = []
+    for k in data_dict:
+        if len(set(data_dict[k])) == 1:
+            meaningless_keys.append(k)
+    for k in meaningless_keys:
+        data_dict.pop(k)
+
+
+def read_satisfiability(json_obj, min_solving_option):
     try:
         satisfiability = int(json_obj[min_solving_option.replace("solvingTime", "satisfiability")][0])
     except:
         try:
             satisfiability = int(json_obj["satisfiability"][0])
         except:
-            satisfiability=-1
+            satisfiability = -1
     return satisfiability
-
-
 
 
 def read_graph_info_from_json_file(file_list, statistic_dict):
@@ -56,7 +80,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                      "solvable_option_list"]
     assign_dict_key_empty_list(statistic_dict, record_fields)
     for json_obj in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
-        if len(json_obj) > 1 :  # has solvability file
+        if len(json_obj) > 1:  # has solvability file
             solving_time_dict = {}
             solvable_option_dict = {}
             for k in json_obj:
@@ -65,25 +89,24 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     if int(json_obj[k][0]) != 10800000:
                         solvable_option_dict[k] = int(json_obj[k][0])
             if len(solving_time_dict) != 0:  # solvable with solvability file
-                min_solving_option=get_min_max_solving_time(solving_time_dict,statistic_dict,json_obj,min)
-                max_solving_option=get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, max)
+                min_solving_option = get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, min)
+                max_solving_option = get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, max)
 
                 satisfiability = get_satisfiability(json_obj, min_solving_option)
-
 
                 statistic_dict["satisfiability"].append(satisfiability)
                 statistic_dict["solvable_option_list"].append(
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))
 
             else:  # unsolvable with solvability file
-                assign_values_to_unsolvable_problem(statistic_dict,record_fields)
+                assign_values_to_unsolvable_problem(statistic_dict, record_fields)
 
         else:  # no solvability file
-            assign_values_to_unsolvable_problem(statistic_dict,record_fields)
+            assign_values_to_unsolvable_problem(statistic_dict, record_fields)
 
 
 #
-def assign_values_to_unsolvable_problem(statistic_dict,record_fields):
+def assign_values_to_unsolvable_problem(statistic_dict, record_fields):
     for rf in record_fields:
         if rf != "satisfiability":
             statistic_dict[rf].append(10800000)
@@ -91,10 +114,8 @@ def assign_values_to_unsolvable_problem(statistic_dict,record_fields):
             statistic_dict[rf].append("unknown")
 
 
-
-
 def get_satisfiability(json_obj, min_solving_option):
-    satisfiability=read_satisfiability(json_obj, min_solving_option)
+    satisfiability = read_satisfiability(json_obj, min_solving_option)
 
     if satisfiability == 1:
         return "safe"
@@ -112,16 +133,15 @@ def get_fixed_filed_from_json_file(file_list, field):
             yield 10800000
 
 
-
 def get_category_summary(data_dict):
     basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number"]
-    #could add any number fields corresponding to category column
-    target_column_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification","min_solving_time (s)"]
-    category_summary_columns=[]
-    for x in ["min","max","mean"]:
-        for t in target_column_list:
-            category_summary_columns.append(x+"_"+camel_to_snake(t))
-    columns=basic_info_columns+category_summary_columns
+    # could add any number fields corresponding to category column
+    target_column_list = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification", "min_solving_time (s)"]
+    category_summary_columns = []
+    for t in target_column_list:
+        for x in ["min", "max", "mean"]:
+            category_summary_columns.append(x + "_" + camel_to_snake(t))
+    columns = basic_info_columns + category_summary_columns
 
     category_dict = {}
     assign_dict_key_empty_list(category_dict, columns)
@@ -135,37 +155,38 @@ def get_category_summary(data_dict):
         category_dict["unknown_number"].append(satisfiability_in_one_category.count("unknown"))
         category_dict["total_number"].append(len(satisfiability_in_one_category))
 
-        min_max_mean_one_column_by_row(data_dict,category_dict,"category",c,"clauseNumberBeforeSimplification")
+        min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberBeforeSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "min_solving_time (s)")
 
-
     # add verification sum at last row
-    category_dict["category_name"].append("verification_sum")
-    category_dict["safe_number"].append(sum(category_dict["safe_number"]))
-    category_dict["unsafe_number"].append(sum(category_dict["unsafe_number"]))
-    category_dict["unknown_number"].append(sum(category_dict["unknown_number"]))
-    category_dict["total_number"].append(sum(category_dict["total_number"]))
-    for x in category_summary_columns:
-        category_dict[x].append(-1)
-
+    # category_dict["category_name"].append("verification_sum")
+    # category_dict["safe_number"].append(sum(category_dict["safe_number"]))
+    # category_dict["unsafe_number"].append(sum(category_dict["unsafe_number"]))
+    # category_dict["unknown_number"].append(sum(category_dict["unknown_number"]))
+    # category_dict["total_number"].append(sum(category_dict["total_number"]))
+    # for x in category_summary_columns:
+    #     category_dict[x].append(-1)
 
     return category_dict
 
 
-def min_max_mean_one_column_by_row(data_dict,target_dict,column,one_row,terget_column):
+def min_max_mean_one_column_by_row(data_dict, target_dict, column, one_row, terget_column):
     clause_number_before_simplification_in_one_category = get_target_row_by_condition(data_dict, column, one_row,
                                                                                       terget_column)
-    clause_number_before_simplification_in_one_category=[float(x) for x in clause_number_before_simplification_in_one_category]
+    clause_number_before_simplification_in_one_category = [float(x) for x in
+                                                           clause_number_before_simplification_in_one_category]
     for func in [min, max, mean]:
-        target_dict[func.__name__+"_"+camel_to_snake(terget_column)].append(
+        target_dict[func.__name__ + "_" + camel_to_snake(terget_column)].append(
             func(clause_number_before_simplification_in_one_category))
+
+    #todo sorted mid
 
 
 def get_statistic_summary(data_dict):
     summary = {"statistic_name": [], "statistic_value": []}
     summary_dict = {}
-    satisfiability_list=get_dict_value(data_dict["satisfiability"])
+    satisfiability_list = get_dict_value(data_dict["satisfiability"])
     summary_dict["safe_number"] = sum([1 if x == "safe" else 0 for x in satisfiability_list])
     summary_dict["unsafe_number"] = sum([1 if x == "unsafe" else 0 for x in satisfiability_list])
     summary_dict["unknown_number"] = sum([1 if x == "unknown" else 0 for x in satisfiability_list])
@@ -197,12 +218,12 @@ def get_statistic_summary(data_dict):
 
 def write_min_max_mean_to_dict(summary_dict, target_list, prefix, suffix):
     suffix = camel_to_snake(suffix)
-    target_list=[0] if len(target_list)==0 else target_list
-    target_list=[float(x) for x in target_list]
+    target_list = [0] if len(target_list) == 0 else target_list
+    target_list = [float(x) for x in target_list]
     summary_dict[prefix + "_min_" + suffix] = min(target_list)
     summary_dict[prefix + "_max_" + suffix] = max(target_list)
     summary_dict[prefix + "_mean_" + suffix] = mean(target_list)
-    summary_dict[prefix + "_sorted_mid_" + suffix] = sorted(target_list)[int(len(target_list)/2)]
+    summary_dict[prefix + "_sorted_mid_" + suffix] = sorted(target_list)[int(len(target_list) / 2)]
 
 
 def get_target_row_by_condition(data_dict, condition_column, condition, target_column):
@@ -211,6 +232,7 @@ def get_target_row_by_condition(data_dict, condition_column, condition, target_c
         if x == condition:
             index.append(i)
     return [get_dict_value(data_dict[target_column])[i] for i in index]
+
 
 def get_dict_value(d):
     try:
