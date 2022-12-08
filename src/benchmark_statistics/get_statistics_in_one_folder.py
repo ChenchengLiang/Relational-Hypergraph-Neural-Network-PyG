@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append("../..")
-from utils import get_fixed_filed_from_json_file,read_solving_time_from_json_file,read_graph_info_from_json_file
+from utils import get_fixed_filed_from_json_file,read_solving_time_from_json_file,read_graph_info_from_json_file,get_category_summary,get_statistic_summary
 from src.utils import get_file_list
 import os
 import pandas as pd
@@ -43,11 +43,18 @@ def main():
     # get graph info
     read_graph_info_from_json_file(file_list, data_dict)
 
+
+    category_summary = get_category_summary(data_dict)
+
+    statistic_summary = get_statistic_summary(data_dict)
+
     # write to excel
     benchmark_folder = os.path.dirname(folder)
     with pd.ExcelWriter(benchmark_folder + "/"+folder_basename+"_statistics_split_clauses_1.xlsx") as writer:
-        data = pd.DataFrame(pd.DataFrame(data_dict))
-        data.to_excel(writer, sheet_name=folder_basename)
+        pd.DataFrame(pd.DataFrame(data_dict)).to_excel(writer, sheet_name=folder_basename)
+        pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
+        pd.DataFrame(pd.DataFrame(statistic_summary)).to_excel(writer, sheet_name="statistic_summary")
+
 
 if __name__ == '__main__':
     main()

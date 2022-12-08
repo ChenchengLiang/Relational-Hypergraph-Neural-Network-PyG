@@ -1,6 +1,8 @@
 from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
+from statistics import mean
+from src.utils import camel_to_snake
 
 def read_satisfiability(json_obj,min_solving_option):
     try:
@@ -108,3 +110,110 @@ def get_fixed_filed_from_json_file(file_list, field):
             yield x[field][0]
         except:
             yield 10800000
+
+
+
+def get_category_summary(data_dict):
+    basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number"]
+    #could add any number fields corresponding to category column
+    target_column_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification","min_solving_time (s)"]
+    category_summary_columns=[]
+    for x in ["min","max","mean"]:
+        for t in target_column_list:
+            category_summary_columns.append(x+"_"+camel_to_snake(t))
+    columns=basic_info_columns+category_summary_columns
+
+    category_dict = {}
+    assign_dict_key_empty_list(category_dict, columns)
+
+    category_list = sorted(list(set(data_dict["category"])))
+    for c in category_list:
+        satisfiability_in_one_category = get_target_row_by_condition(data_dict, "category", c, "satisfiability")
+        category_dict["category_name"].append(c)
+        category_dict["safe_number"].append(satisfiability_in_one_category.count("safe"))
+        category_dict["unsafe_number"].append(satisfiability_in_one_category.count("unsafe"))
+        category_dict["unknown_number"].append(satisfiability_in_one_category.count("unknown"))
+        category_dict["total_number"].append(len(satisfiability_in_one_category))
+
+        min_max_mean_one_column_by_row(data_dict,category_dict,"category",c,"clauseNumberBeforeSimplification")
+        min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
+        min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "min_solving_time (s)")
+
+
+    # add verification sum at last row
+    category_dict["category_name"].append("verification_sum")
+    category_dict["safe_number"].append(sum(category_dict["safe_number"]))
+    category_dict["unsafe_number"].append(sum(category_dict["unsafe_number"]))
+    category_dict["unknown_number"].append(sum(category_dict["unknown_number"]))
+    category_dict["total_number"].append(sum(category_dict["total_number"]))
+    for x in category_summary_columns:
+        category_dict[x].append(-1)
+
+
+    return category_dict
+
+
+def min_max_mean_one_column_by_row(data_dict,target_dict,column,one_row,terget_column):
+    clause_number_before_simplification_in_one_category = get_target_row_by_condition(data_dict, column, one_row,
+                                                                                      terget_column)
+    clause_number_before_simplification_in_one_category=[float(x) for x in clause_number_before_simplification_in_one_category]
+    for func in [min, max, mean]:
+        target_dict[func.__name__+"_"+camel_to_snake(terget_column)].append(
+            func(clause_number_before_simplification_in_one_category))
+
+
+def get_statistic_summary(data_dict):
+    summary = {"statistic_name": [], "statistic_value": []}
+    summary_dict = {}
+    satisfiability_list=get_dict_value(data_dict["satisfiability"])
+    summary_dict["safe_number"] = sum([1 if x == "safe" else 0 for x in satisfiability_list])
+    summary_dict["unsafe_number"] = sum([1 if x == "unsafe" else 0 for x in satisfiability_list])
+    summary_dict["unknown_number"] = sum([1 if x == "unknown" else 0 for x in satisfiability_list])
+    summary_dict["category_number"] = len(set(get_dict_value(data_dict["category"])))
+
+    safe_category = get_target_row_by_condition(data_dict, "satisfiability", "safe", "category")
+    summary_dict["safe_category_number"] = len(set(safe_category))
+    unsafe_category = get_target_row_by_condition(data_dict, "satisfiability", "unsafe", "category")
+    summary_dict["unsafe_category_number"] = len(set(unsafe_category))
+    unknown_category = get_target_row_by_condition(data_dict, "satisfiability", "unknown", "category")
+    summary_dict["unknown_category_number"] = len(set(unknown_category))
+
+    for cond in ["safe", "unsafe", "unknown"]:
+        for target_coloumn in ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
+                               "min_solving_time (s)", "min_solving_time_cegar_interation_number",
+                               "min_solving_time_generated_predicate_number", "min_solving_time_average_predicate_size",
+                               "min_solving_time_predicate_generator_time"]:
+            write_min_max_mean_to_dict(summary_dict,
+                                       target_list=get_target_row_by_condition(data_dict, "satisfiability", cond,
+                                                                               target_coloumn), prefix=cond,
+                                       suffix=target_coloumn)
+
+    for k in summary_dict:
+        summary["statistic_name"].append(k)
+        summary["statistic_value"].append(summary_dict[k])
+
+    return summary
+
+
+def write_min_max_mean_to_dict(summary_dict, target_list, prefix, suffix):
+    suffix = camel_to_snake(suffix)
+    target_list=[0] if len(target_list)==0 else target_list
+    target_list=[float(x) for x in target_list]
+    summary_dict[prefix + "_min_" + suffix] = min(target_list)
+    summary_dict[prefix + "_max_" + suffix] = max(target_list)
+    summary_dict[prefix + "_mean_" + suffix] = mean(target_list)
+    summary_dict[prefix + "_sorted_mid_" + suffix] = sorted(target_list)[int(len(target_list)/2)]
+
+
+def get_target_row_by_condition(data_dict, condition_column, condition, target_column):
+    index = []
+    for i, x in enumerate(get_dict_value(data_dict[condition_column])):
+        if x == condition:
+            index.append(i)
+    return [get_dict_value(data_dict[target_column])[i] for i in index]
+
+def get_dict_value(d):
+    try:
+        return d.values
+    except:
+        return d
