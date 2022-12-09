@@ -27,6 +27,7 @@ def main():
                 if predicted_label_by_logit == d["labelList"]:
                     statistic_dict[graph_type[g]]["correctly_predicted_problem_list"+"_"+str(threshold)].append(os.path.basename(d["file_name"]))
 
+    #todo collect CEGAR ineration number
 
 
     #print results

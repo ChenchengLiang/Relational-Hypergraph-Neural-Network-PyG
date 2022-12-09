@@ -52,7 +52,7 @@ def get_data(params, reload_data=True):
     draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in train_data), "train-data")
     draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in valid_data), "valid-data")
     draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in test_data), "test-data")
-    class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values]
+    class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values] if params["use_class_weight"]== True else [1 for v in dataset_distribution_values]
     print("class_weight", class_weight)
     params["class_weight"] = class_weight
     params["edge_arity_dict"] = edge_arity_dict

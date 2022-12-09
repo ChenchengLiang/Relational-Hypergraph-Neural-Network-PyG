@@ -17,7 +17,7 @@ from torch_geometric.profile.utils import byte_to_megabyte
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
                        _epochs, _file_name="", _reload_data=True,
                        _self_loop=False, _add_backward_edges=False,_add_global_edges=False, _fix_random_seeds=True,
-                       _experiment_date=True,_drop_out_rate={"gnn_dropout_rate":0,"mlp_dropout_rate":0},_num_linear_layer=4) -> object:
+                       _experiment_date=True,_drop_out_rate={"gnn_dropout_rate":0,"mlp_dropout_rate":0},_num_linear_layer=4,_use_class_weight=True) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
@@ -56,6 +56,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results
     params["file_name"] = _file_name
     params["gradient_clip"] = True
+    params["use_class_weight"]=_use_class_weight
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,

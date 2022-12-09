@@ -20,17 +20,18 @@ def main():
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
-    num_gnn_layers = [2]
+    num_gnn_layers = [4]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
     drop_out_rate = {"gnn_dropout_rate": 0.1, "mlp_dropout_rate": 0}
-    num_linear_layer = 8
+    num_linear_layer = 4
     epochs = 100
     reload_data = False
-    fix_random_seed = True
+    fix_random_seed = False
     self_loop = [False]
     add_backward_edges = [False]
     add_global_edges = [False]
+    use_class_weight = False
 
     for bench in benchmarks:
         for model in models:
@@ -45,7 +46,8 @@ def main():
                                                        _self_loop=False, _add_backward_edges=False,
                                                        _add_global_edges=True,
                                                        _file_name=fix_random_seed, _drop_out_rate=drop_out_rate,
-                                                       _num_linear_layer=num_linear_layer)
+                                                       _num_linear_layer=num_linear_layer,
+                                                       _use_class_weight=use_class_weight)
                             else:
                                 for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                     for _add_backward_edge in add_backward_edges:
@@ -56,7 +58,8 @@ def main():
                                                                _add_backward_edges=_add_backward_edge,
                                                                _add_global_edges=_add_global_edges,
                                                                _file_name=fix_random_seed, _drop_out_rate=drop_out_rate,
-                                                               _num_linear_layer=num_linear_layer)
+                                                               _num_linear_layer=num_linear_layer,
+                                                               _use_class_weight=use_class_weight)
 
 
 # send_email("train finished")
