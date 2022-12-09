@@ -7,7 +7,7 @@ import os
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category
 def main():
-    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/solvability-splitClauses-1/train_data_separate_summary/SAT-4630/has-simplified-clauses-2532"
+    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/solvability-splitClauses-1/train_data_separate_summary/UNSAT-UNKNOWN"
     folder_basename=os.path.basename(folder)
 
     file_list = get_file_list(folder, "smt2")

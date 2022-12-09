@@ -8,11 +8,11 @@ def main():
                   "../benchmarks/unsatcore_pipeline_small-overfitting-CG"]
 
     # load data
-    task = "unsat_core_binary_classification"
-    for _benchmark in benchmarks:
-        run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
-                           data_shuffle=False, _gnn=HyperConv, _use_intermediate_gnn_results=True, _epochs=1,
-                           _reload_data=True, _self_loop=False, _add_global_edges=False, _file_name=True)
+    # task = "unsat_core_binary_classification"
+    # for _benchmark in benchmarks:
+    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
+    #                        data_shuffle=False, _gnn=HyperConv, _use_intermediate_gnn_results=True, _epochs=1,
+    #                        _reload_data=True, _self_loop=False, _add_global_edges=False, _file_name=True)
 
     # train
     # models = ["hyper_GCN", "GNN"]
@@ -24,13 +24,13 @@ def main():
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
     drop_out_rate = {"gnn_dropout_rate": 0.1, "mlp_dropout_rate": 0}
-    num_linear_layer = 4
-    epochs = 500
+    num_linear_layer = 8
+    epochs = 100
     reload_data = False
     fix_random_seed = True
-    self_loop = [True]
+    self_loop = [False]
     add_backward_edges = [False]
-    add_global_edges = [True]
+    add_global_edges = [False]
 
     for bench in benchmarks:
         for model in models:
