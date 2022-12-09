@@ -128,7 +128,7 @@ def get_satisfiability(json_obj, min_solving_option):
 def get_fixed_filed_from_json_file(file_list, field):
     for x in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
         try:
-            yield x[field][0]
+            yield int(x[field][0])
         except:
             yield 10800000
 
