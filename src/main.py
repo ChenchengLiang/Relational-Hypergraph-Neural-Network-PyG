@@ -20,18 +20,18 @@ def main():
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
-    num_gnn_layers = [4]
+    num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    drop_out_rate = {"gnn_dropout_rate": 0.1, "mlp_dropout_rate": 0}
-    num_linear_layer = 4
+    dropout_rate = {"gnn_dropout_rate": 0.2, "mlp_dropout_rate": 0.2}
+    num_linear_layer = 2
     epochs = 100
     reload_data = False
     fix_random_seed = False
     self_loop = [False]
     add_backward_edges = [False]
     add_global_edges = [False]
-    use_class_weight = False
+    use_class_weight = True #todo this may interact (collapse) with gradient clip
 
     for bench in benchmarks:
         for model in models:
@@ -45,7 +45,7 @@ def main():
                                                        _gnn, False, epochs, _reload_data=reload_data,
                                                        _self_loop=False, _add_backward_edges=False,
                                                        _add_global_edges=True,
-                                                       _file_name=fix_random_seed, _drop_out_rate=drop_out_rate,
+                                                       _fix_random_seed=fix_random_seed, _dropout_rate=dropout_rate,
                                                        _num_linear_layer=num_linear_layer,
                                                        _use_class_weight=use_class_weight)
                             else:
@@ -57,7 +57,7 @@ def main():
                                                                _reload_data=reload_data, _self_loop=_self_loop,
                                                                _add_backward_edges=_add_backward_edge,
                                                                _add_global_edges=_add_global_edges,
-                                                               _file_name=fix_random_seed, _drop_out_rate=drop_out_rate,
+                                                               _fix_random_seed=fix_random_seed, _dropout_rate=dropout_rate,
                                                                _num_linear_layer=num_linear_layer,
                                                                _use_class_weight=use_class_weight)
 

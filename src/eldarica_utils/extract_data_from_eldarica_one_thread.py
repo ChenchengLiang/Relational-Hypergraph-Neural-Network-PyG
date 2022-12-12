@@ -24,11 +24,11 @@ def main():
     #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) )
 
     # unsatcore: get labeled data # 3 hours
-    parameters_pipeline.append(" -mineCounterExample:union ")
+    #parameters_pipeline.append(" -mineCounterExample:union ")
 
     # unsatcore: construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -log ")
-    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -log ")
+    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -log ")
+    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -log ")
 
     # unsatcore: check solvability differernt threshold # 36 hours
     #for g in [CDHG,CG]:
