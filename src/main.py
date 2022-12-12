@@ -42,7 +42,7 @@ def main():
                             if model == "GNN":
                                 for _gnn in gnns:
                                     run_one_experiment(model, task, _num_gnn_layer, bench, data_shuffle,
-                                                       _gnn, False, epochs, _reload_data=reload_data,
+                                                       _gnn.__name__, False, epochs, _reload_data=reload_data,
                                                        _self_loop=False, _add_backward_edges=False,
                                                        _add_global_edges=True,
                                                        _fix_random_seed=fix_random_seed, _dropout_rate=dropout_rate,
@@ -53,7 +53,7 @@ def main():
                                     for _add_backward_edge in add_backward_edges:
                                         for _add_global_edges in add_global_edges:
                                             run_one_experiment(model, task, _num_gnn_layer, bench, data_shuffle,
-                                                               HyperConv, _use_intermediate_gnn_results, epochs,
+                                                               HyperConv.__name__, _use_intermediate_gnn_results, epochs,
                                                                _reload_data=reload_data, _self_loop=_self_loop,
                                                                _add_backward_edges=_add_backward_edge,
                                                                _add_global_edges=_add_global_edges,

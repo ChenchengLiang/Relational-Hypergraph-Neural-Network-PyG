@@ -6,8 +6,7 @@ import re
 
 def write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, task_type,
                                        root="../data/test_data"):
-    predicted_dir = os.path.join(root, "predicted")
-    make_dirct(predicted_dir)
+    predicted_dir=make_dirct(os.path.join(root, "predicted"))
     for f, p, rp in zip(file_name_list, predicted_list, raw_predicted_list):
         zip_name = f[0]
         file_name = zip_name[:-len(".zip")]

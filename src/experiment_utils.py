@@ -5,6 +5,7 @@ import mlflow
 import numpy as np
 import torch
 from torch_geometric.nn import GCNConv, SAGEConv, FiLMConv
+from src.layers import HyperConv
 from src.models import Hyper_classification, Full_connected_model, GNN_classification
 from src.predict import predict
 from src.data_utils.read_data import get_data
@@ -32,6 +33,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "unsat_core_binary_classification": 2,
                            "template_multi_classification": 5}
+    gnn_name_map={"GCNConv":GCNConv,"SAGEConv":SAGEConv,"FiLMConv":FiLMConv,"HyperConv":HyperConv}
 
     params = {}
     params["benchmark"] = _benchmark
@@ -52,7 +54,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = _dropout_rate
     params["learning_rate"] = 0.001
-    params["gnn"] = _gnn
+    params["gnn"] = gnn_name_map[_gnn]
     params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results
     params["file_name"] = _file_name
     params["gradient_clip"] = True
