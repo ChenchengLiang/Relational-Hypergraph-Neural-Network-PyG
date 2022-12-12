@@ -1,15 +1,16 @@
-import os.path
 import sys
-sys.path.append("../..")
-#sys.path.append("/cephyr/users/liangch/Alvis/training_code")
+#sys.path.append("/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG")
+sys.path.append("/cephyr/users/liangch/Alvis/training_code")
 from src.experiment_utils import run_one_experiment
 import json
+import os
 
 
 
 def main():
-    hyper_parameter_folder="/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/hyper-parameters"
-    json_file_name=hyper_parameter_folder + "/hyper-paprameter_"+str(0)+".JSON"
+    hyper_parameter_folder = "/cephyr/users/liangch/Alvis/training_code/hyper-parameters"
+    #hyper_parameter_folder="/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/hyper-parameters"
+    json_file_name=hyper_parameter_folder + "/hyper-paprameter_"+str(sys.argv[1])+".JSON"
     if os.path.exists(json_file_name):
         with open(json_file_name) as f:
             parameter_dict=json.load(f)

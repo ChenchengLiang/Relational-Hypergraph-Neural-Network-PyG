@@ -1,21 +1,29 @@
 import sys
-sys.path.append("../..")
+sys.path.append("/cephyr/users/liangch/Alvis/training_code")
+#sys.path.append("../..")
 from src.layers import HyperConv
+from src.utils import make_dirct
 from torch_geometric.nn import GCNConv, SAGEConv, FiLMConv
 import json
-
+from shutil import rmtree
 def main():
-    #benchmarks = [sys.argv[1], sys.argv[2]]
-    benchmarks=["/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore_data_one-CDHG",
-                "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore_data_one-CG"]
-    parameter_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/hyper-parameters"
-    experiment_date = True
 
-    # train
+    benchmarks = [sys.argv[1], sys.argv[2]]
+    parameter_folder = "/cephyr/users/liangch/Alvis/training_code/hyper-parameters"
+    # benchmarks=["/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore_data_one-CDHG",
+    #             "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore_data_one-CG"]
+    # parameter_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/hyper-parameters"
+
+
+    parameter_folder = make_dirct(parameter_folder)
+    rmtree(parameter_folder)
+    parameter_folder= make_dirct(parameter_folder)
+
+    experiment_date = True
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
-    tasks = ["template_binary_classification"]
+    tasks = ["unsat_core_binary_classification"]
     num_gnn_layers = [2]
     dropout_rate = {"gnn_dropout_rate": 0.2, "mlp_dropout_rate": 0.1}
     num_linear_layers = [4]
