@@ -19,7 +19,10 @@ def run_one_epoch(model, data_loader, optimizer, ls_func, device, train=True, ta
         if type(batch) is list:
             batch = batch[0]
         batch.to(device)  # Use GPU
-        pred = model(batch)
+        try:
+            pred = model(batch)
+        except:
+            print("bug",batch["file_name"])
         if task_type == "binary_classification":
             sigmoid_pred = torch.sigmoid(pred)
             raw_predicted_list.append(sigmoid_pred.cpu().detach().numpy())
