@@ -100,17 +100,18 @@ def separate_no_labeled_template_cases(g, file_name, target_folder, exception_fo
 def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_name, separate_function):
     target_folder = make_dirct(os.path.dirname(folder) + "/" + target_folder_name)
     exception_folder = make_dirct(os.path.dirname(folder) + "/" + exception_folder_name)
-    graph_dict_list = read_files(get_file_list(folder, "smt2"), file_type="hyperEdgeGraph.JSON",
-                                 read_function=read_json_file)
-    try:
-        for g in tqdm(graph_dict_list,desc=separate_function.__name__):
-            file_name = g["file_name"][:g["file_name"].find(".hyperEdgeGraph.JSON")]
-            if len(g)>3:
-                separate_function(g, file_name, target_folder, exception_folder)
-            else:
-                print("error: no graph file",file_name)
-    except:
-        print("file existed")
+    for graph_type in ["hyperEdgeGraph.JSON","monoDirectionLayerGraph.JSON"]:
+        graph_dict_list = read_files(get_file_list(folder, "smt2"), file_type=graph_type,
+                                     read_function=read_json_file)
+        try:
+            for g in tqdm(graph_dict_list,desc=separate_function.__name__):
+                file_name = g["file_name"][:g["file_name"].find("."+graph_type)]
+                if len(g)>3:
+                    separate_function(g, file_name, target_folder, exception_folder)
+                else:
+                    print("error: no graph file",file_name)
+        except:
+            print("file existed")
 
 
     print(os.path.basename(target_folder), len(get_file_list(target_folder, file_type="smt2")))
