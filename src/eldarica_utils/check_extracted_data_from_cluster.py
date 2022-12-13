@@ -61,10 +61,12 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
                                                                        separate_no_simplified_clauses)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "2-has_template",
                                                                        "2-no_labels", separate_no_label_cases)
-    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-has-positive-labels",
-                                                                       "3-no-positive-labels",
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-labels_indices_match",
+                                                                       "3-labels_indices_mismatch", separate_mismatch_indices_and_label_cases)
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "4-has-positive-labels",
+                                                                       "4-no-positive-labels",
                                                                        separate_no_labeled_template_cases)
-    ready_for_train_folder=make_dirct(os.path.join(folder,"4-ready-for-training"))
+    ready_for_train_folder=make_dirct(os.path.join(folder,"5-ready-for-training"))
     for file in glob.glob(separated_folder+"/*") + glob.glob(exception_folder+"/*"):
         copy(file,ready_for_train_folder)
 
@@ -77,6 +79,12 @@ def separate_no_simplified_clauses(g, file_name, target_folder, exception_folder
 
 def separate_no_label_cases(g, file_name, target_folder, exception_folder):
     if g["labelNumber"][0] == 0:
+        copy_relative_files(file_name, exception_folder)
+    else:
+        copy_relative_files(file_name, target_folder)
+
+def separate_mismatch_indices_and_label_cases(g, file_name, target_folder, exception_folder):
+    if g["labelNumber"][0] != g["labelIndicesNumber"][0]:
         copy_relative_files(file_name, exception_folder)
     else:
         copy_relative_files(file_name, target_folder)

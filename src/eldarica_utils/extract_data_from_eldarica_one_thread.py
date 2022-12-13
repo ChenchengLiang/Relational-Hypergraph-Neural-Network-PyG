@@ -27,8 +27,8 @@ def main():
     #parameters_pipeline.append(" -mineCounterExample:union ")
 
     # unsatcore: construct graphs # 6 hours
-    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -log ")
-    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -log ")
+    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -log ")
+    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -log ")
 
     # unsatcore: check solvability differernt threshold # 36 hours
     #for g in [CDHG,CG]:
@@ -36,7 +36,7 @@ def main():
             #parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:"+str(threshold)+" -hornGraphType:"+g+" -log ")
 
     # template_selection: get labeled templates # 3 hours
-    #parameters_pipeline.append(" -mineTemplates -log ")
+    parameters_pipeline.append(" -mineTemplates -log ")
 
 
     # template_selection: for unsolvable set get unlabeled templates # 3 hours
