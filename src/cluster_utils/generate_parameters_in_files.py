@@ -19,20 +19,20 @@ def main():
     rmtree(parameter_folder)
     parameter_folder= make_dirct(parameter_folder)
 
-    experiment_date = True
+    experiment_date = False
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
-    num_gnn_layers = [2,4,8]
+    num_gnn_layers = [2]
     dropout_rate = {"gnn_dropout_rate": 0.2, "mlp_dropout_rate": 0.1}
     num_linear_layers = [4]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [True, False]
     add_backward_edges = [False]
     add_global_edges = [False]
-    self_loop = [False]
-    epochs = 1
+    self_loop = [True,False]
+    epochs = 2
     reload_data = False
     fix_random_seed = False
     use_class_weight = True

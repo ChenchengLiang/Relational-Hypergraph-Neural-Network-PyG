@@ -18,16 +18,19 @@ from torch_geometric.profile.utils import byte_to_megabyte
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
                        _epochs, _file_name="", _reload_data=True,
                        _self_loop=False, _add_backward_edges=False,_add_global_edges=False, _fix_random_seeds=True,
-                       _experiment_date=True,_dropout_rate={"gnn_dropout_rate":0,"mlp_dropout_rate":0},_num_linear_layer=4,_use_class_weight=True) -> object:
+                       _experiment_date=True,_dropout_rate={"gnn_dropout_rate":0,"mlp_dropout_rate":0},_num_linear_layer=4,_use_class_weight=True,_experiment_name="") -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
         torch.cuda.manual_seed_all(42)
 
+    #set experiment name
     today = datetime.today().strftime('%Y-%m-%d')
+    experiment_name= _benchmark if _experiment_name=="" else _experiment_name
     mlflow_experiment_name = today + "-" + os.path.basename(
-        _benchmark) if _experiment_date == True else os.path.basename(_benchmark)
+        experiment_name) if _experiment_date == True else os.path.basename(experiment_name)
     print("mlflow_experiment_name:", mlflow_experiment_name)
+
     mlflow.set_experiment(mlflow_experiment_name)
     mlflow.set_tracking_uri("http://localhost:5000")  # Specify tracking server
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,

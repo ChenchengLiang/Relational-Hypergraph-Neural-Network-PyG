@@ -4,8 +4,8 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore-linear-shuffled-CDHG",
-                  "../benchmarks/unsatcore-linear-shuffled-CG"]
+    benchmarks = ["../benchmarks/unsatcore-non-linear-shuffled-CDHG",
+                  "../benchmarks/unsatcore-non-linear-shuffled-CG"]
 
     # load data
     task = "unsat_core_binary_classification"
