@@ -21,25 +21,26 @@ def run_one_epoch(model, data_loader, optimizer, ls_func, device, train=True, ta
         batch.to(device)  # Use GPU
         try:
             pred = model(batch)
-        except:
+            if task_type == "binary_classification":
+                sigmoid_pred = torch.sigmoid(pred)
+                raw_predicted_list.append(sigmoid_pred.cpu().detach().numpy())
+                predicted_list.append(np.rint(sigmoid_pred.cpu().detach().numpy()))
+                loss = ls_func(torch.squeeze(sigmoid_pred), batch.y.float())
+            elif task_type == "multi_classification":
+                softmax_value = torch.softmax(pred, dim=1).cpu().detach().numpy()
+                raw_predicted_list.append(softmax_value)
+                predicted_list.append(np.array([np.argmax(v) for v in softmax_value]))
+                loss = ls_func(pred, batch.y)
+                # print("softmax_value",softmax_value)
+                # print([np.argmax(v) for v in softmax_value])
+            else:
+                pred = torch.squeeze(pred)
+                raw_predicted_list.append(pred.cpu().detach().numpy())
+                predicted_list.append(np.rint(pred.cpu().detach().numpy()))
+                loss = ls_func(pred, batch.y)
+        except Exception as e:
+            print(e)
             print("bug",batch["file_name"])
-        if task_type == "binary_classification":
-            sigmoid_pred = torch.sigmoid(pred)
-            raw_predicted_list.append(sigmoid_pred.cpu().detach().numpy())
-            predicted_list.append(np.rint(sigmoid_pred.cpu().detach().numpy()))
-            loss = ls_func(torch.squeeze(sigmoid_pred), batch.y.float())
-        elif task_type == "multi_classification":
-            softmax_value = torch.softmax(pred, dim=1).cpu().detach().numpy()
-            raw_predicted_list.append(softmax_value)
-            predicted_list.append(np.array([np.argmax(v) for v in softmax_value]))
-            loss = ls_func(pred, batch.y)
-            # print("softmax_value",softmax_value)
-            # print([np.argmax(v) for v in softmax_value])
-        else:
-            pred = torch.squeeze(pred)
-            raw_predicted_list.append(pred.cpu().detach().numpy())
-            predicted_list.append(np.rint(pred.cpu().detach().numpy()))
-            loss = ls_func(pred, batch.y)
 
         label_list.append(batch.y.cpu().detach().numpy())
         file_name_list.append(batch.file_name)
