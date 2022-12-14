@@ -3,11 +3,13 @@ import sys
 sys.path.append("../..")
 from utils import *
 from src.utils import get_file_list
+from src.plots import scatter_plot
 import os
 import pandas as pd
-from src.collect_results.utils import read_files, read_smt2_category
+from src.collect_results.utils import read_files, read_smt2_category,get_sumary_folder
 def main():
-    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-non-Liner-dateset-new/tempalte-selection-data/train+unknown"
+    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/unsatcore-data/mined-unsatcore-graphs-1229/5-ready-for-training"
+    summary_folder = get_sumary_folder(folder)
     folder_basename=os.path.basename(folder)
 
     file_list = get_file_list(folder, "smt2")
@@ -42,6 +44,10 @@ def main():
     # get graph info
     read_graph_info_from_json_file(file_list, data_dict)
 
+    get_scatters(summary_folder, data_dict)
+
+    #get summaries
+
     category_summary = get_category_summary(data_dict)
 
     statistic_summary = get_statistic_summary(data_dict)
@@ -53,8 +59,7 @@ def main():
 
 
     # write to excel
-    benchmark_folder = os.path.dirname(folder)
-    with pd.ExcelWriter(benchmark_folder + "/"+folder_basename+"_statistics_split_clauses_1.xlsx") as writer:
+    with pd.ExcelWriter(summary_folder + "/"+folder_basename+"_statistics_split_clauses_1.xlsx") as writer:
         pd.DataFrame(pd.DataFrame(data_dict)).to_excel(writer, sheet_name=folder_basename)
         pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
         pd.DataFrame(pd.DataFrame(statistic_summary)).to_excel(writer, sheet_name="statistic_summary")

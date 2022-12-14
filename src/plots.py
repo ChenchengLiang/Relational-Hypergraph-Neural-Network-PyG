@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append("../..")
 import matplotlib.pyplot as plt
@@ -10,6 +11,19 @@ import numpy as np
 from src.utils import count_generator
 plt.style.use("ggplot")
 
+def scatter_plot(x_data,y_data,x_axis,y_axis,folder,name):
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x_data, y=y_data,
+                             mode='markers',
+                             name='markers'))
+    fig.update_layout(
+        title='',
+        xaxis_title=x_axis,
+        yaxis_title=y_axis)
+    plot_name = name
+    save_file_name = os.path.join(folder,plot_name + ".html")
+    # fig.update_yaxes(type="linear")
+    fig.write_html(save_file_name)
 
 def loss_plot(train_loss_floats, valid_loss_floats):
     fig = go.Figure()

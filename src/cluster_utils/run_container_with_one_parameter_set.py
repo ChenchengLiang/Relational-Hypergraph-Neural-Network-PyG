@@ -21,12 +21,14 @@ def main():
         print("file",json_file_name,"not existed")
 
     print("parameter_dict",parameter_dict)
-    
+
     #create temp folder and set experiment name for each run
     experiment_name=os.path.basename(parameter_dict["benchmark"])
     temp_folder_path=parameter_dict["benchmark"]+"_"+str(parameter_index)
     shutil.copytree(parameter_dict["benchmark"],temp_folder_path)
     parameter_dict["benchmark"]=temp_folder_path
+
+    #todo also need to set figure and model storage path for each run
 
     run_one_experiment(parameter_dict["model"], parameter_dict["task"], parameter_dict["num_gnn_layer"],
                        parameter_dict["benchmark"], parameter_dict["data_shuffle"], parameter_dict["gnn"],
