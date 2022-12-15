@@ -67,6 +67,8 @@ def train(train_loader, valid_loader, model, device, params):
 
     optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"])
     # optimizer = torch.optim.SGD(model.parameters(), lr=params["learning_rate"])
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
 
     train_loss_list = []
     valid_loss_list = []
@@ -85,6 +87,8 @@ def train(train_loader, valid_loader, model, device, params):
                                                                                                        "gradient_clip"])
         train_loss_list.append(train_loss)
         mlflow.log_metric("train_loss", train_loss, epoch)
+
+        scheduler.step()
 
         # validating
         model.eval()
