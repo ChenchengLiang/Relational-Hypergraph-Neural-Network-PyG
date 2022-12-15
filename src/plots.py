@@ -19,12 +19,16 @@ def scatter_plot(x_data, y_data, x_axis, y_axis, folder, name):
     fig.add_trace(go.Scatter(x=x_data, y=y_data,
                              mode='markers',
                              name='markers'))
+    # Add a diagonal line
+    max_value=max(x_data+y_data)
+    fig.add_trace(go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal",line=dict(color="gray")))
+
     fig.update_layout(
-        title='',
+        title=name,
         xaxis_title=x_axis,
         yaxis_title=y_axis)
-    plot_name = name
-    save_file_name = os.path.join(folder, plot_name + ".html")
+    plot_file_name = name
+    save_file_name = os.path.join(folder, plot_file_name + ".html")
     # fig.update_yaxes(type="linear")
     fig.write_html(save_file_name)
 

@@ -23,8 +23,11 @@ def get_scatters(summary_folder,data_dict):
     for pairs in combinations_pairs:
         x_key = pairs[0]
         y_key = pairs[1]
-        scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key],
-                     x_axis=x_key, y_axis=y_key, folder=scatter_folder, name=x_key + "-" + y_key)
+        try:
+            scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key],
+                         x_axis=x_key, y_axis=y_key, folder=scatter_folder, name=x_key + "-" + y_key)
+        except:
+            print("no field", pairs)
 
 def filter_rows(data_dict, column):
     index_list = []

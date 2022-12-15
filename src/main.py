@@ -23,7 +23,7 @@ def main():
     num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0}
+    dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
     num_linear_layer = 8
     epochs = 100
     reload_data = False
