@@ -2,13 +2,13 @@ from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean
-from src.utils import camel_to_snake
+from src.utils import camel_to_snake,make_dirct
 from src.plots import scatter_plot
 
 
 def get_scatters(summary_folder,data_dict):
     # todo draw scatter plot
-    scatter_folder = summary_folder + "/scatters"
+    scatter_folder = make_dirct(summary_folder + "/scatters")
     x_key = "clauseNumberBeforeSimplification"
     y_key = "clauseNumberAfterSimplification"
     scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key],

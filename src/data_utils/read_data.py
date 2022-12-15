@@ -47,12 +47,15 @@ def get_data(params, reload_data=True):
     edge_arity_dict = train_data[0].edge_arity_dict
 
     dataset_distribution_values = draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in dataset),
+                                                       params["benchmark"],
                                                        "all-data")
 
-    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in train_data), "train-data")
-    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in valid_data), "valid-data")
-    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in test_data), "test-data")
-    class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values] if params["use_class_weight"]== True else [1 for v in dataset_distribution_values]
+    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in train_data), params["benchmark"], "train-data")
+    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in valid_data), params["benchmark"], "valid-data")
+    draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in test_data), params["benchmark"], "test-data")
+    class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values] if params[
+                                                                                                            "use_class_weight"] == True else [
+        1 for v in dataset_distribution_values]
     print("class_weight", class_weight)
     params["class_weight"] = class_weight
     params["edge_arity_dict"] = edge_arity_dict
@@ -62,15 +65,16 @@ def get_data(params, reload_data=True):
 
 
 def build_fixed_vocabulary(params):
-    fixed_symbol=[ "initial_0", "false_0", "dummy_0", "unknown", "empty"]
-    canonical_symbol_key=["relationSymbol","relationSymbolArgument", "variable","operator", "constant", "guard",
-    "clause", "clauseHead", "clauseBody", "clauseArgument","templateBool", "templateEq", "templateIneq"]
+    fixed_symbol = ["initial_0", "false_0", "dummy_0", "unknown", "empty"]
+    canonical_symbol_key = ["relationSymbol", "relationSymbolArgument", "variable", "operator", "constant", "guard",
+                            "clause", "clauseHead", "clauseBody", "clauseArgument", "templateBool", "templateEq",
+                            "templateIneq"]
     canonical_symbol = []
     for x in canonical_symbol_key:
-        for i in range(0,1000000):
-            canonical_symbol.append(x+"_"+str(i))
+        for i in range(0, 1000000):
+            canonical_symbol.append(x + "_" + str(i))
 
-    vocabulary_set=fixed_symbol+canonical_symbol
+    vocabulary_set = fixed_symbol + canonical_symbol
 
     token_map = {}
     token_id = 0

@@ -40,11 +40,11 @@ def main():
 
 
     # template_selection: for unsolvable set get unlabeled templates # 3 hours
-    #parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
+    parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
 
     # template_selection: construct graphs # 6 hours
-    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:template -log ")
-    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:template -log ")
+    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:template -log ")
+    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:template -log ")
 
 
 

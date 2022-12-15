@@ -5,27 +5,29 @@ from src.torch_utils import get_accuracy
 from src.train_utils import get_loss_function
 import torch
 
-def predict(trained_model, test_loader,device, params):
+
+def predict(trained_model, test_loader, device, params):
     optimizer = torch.optim.Adam(trained_model.parameters(), lr=params["learning_rate"])
     ls_func = get_loss_function(params).to(device)
     trained_model.eval()
     test_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(trained_model,
                                                                                               test_loader, optimizer,
-                                                                                              ls_func,device,
+                                                                                              ls_func, device,
                                                                                               train=False,
-                                                                                              task_type=params["task_type"])
+                                                                                              task_type=params[
+                                                                                                  "task_type"])
 
     print("test_loss:", test_loss)
     # print("raw_predicted_list", raw_predicted_list)
     # print("predicted_list[0]:", predicted_list[0])
     # print("label_list[0]:", label_list[0])
     mlflow.log_metric("test_loss", test_loss)
-    draw_label_pie_chart(params["num_classes"], lambda : (t for t in predicted_list), "predicted-data")
+    draw_label_pie_chart(params["num_classes"], lambda: (t for t in predicted_list), "predicted-data")
 
     print("-" * 10)
     acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
 
-    draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"])
+    draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["benchmark"], name=params["num_classes"])
 
     # correct = (flatten_predicted_list == flatten_label_list).sum()
     # acc = int(correct) / len(flatten_label_list)

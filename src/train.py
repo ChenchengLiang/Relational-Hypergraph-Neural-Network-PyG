@@ -9,7 +9,7 @@ from src.train_utils import get_loss_function
 
 
 def run_one_epoch(model, data_loader, optimizer, ls_func, device, train=True, task_type="binary_classification",
-                  gradient_clip=True):
+                  gradient_clip=False):
     running_loss = 0.0
     raw_predicted_list = []
     predicted_list = []
@@ -40,7 +40,7 @@ def run_one_epoch(model, data_loader, optimizer, ls_func, device, train=True, ta
                 loss = ls_func(pred, batch.y)
         except Exception as e:
             print(e)
-            print("bug",batch["file_name"])
+            print("bug", batch["file_name"])
 
         label_list.append(batch.y.cpu().detach().numpy())
         file_name_list.append(batch.file_name)
@@ -85,7 +85,8 @@ def train(train_loader, valid_loader, model, device, params):
         # validating
         model.eval()
         valid_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(model, valid_loader,
-                                                                                                   optimizer, ls_func,device,
+                                                                                                   optimizer, ls_func,
+                                                                                                   device,
                                                                                                    train=False,
                                                                                                    task_type=params[
                                                                                                        "task_type"],
@@ -103,7 +104,7 @@ def train(train_loader, valid_loader, model, device, params):
 
         if valid_acc == 1:
             torch.save(model, '../models/best_model.pth')
-            loss_plot(train_loss_list, valid_loss_list)
+            loss_plot(train_loss_list, valid_loss_list, params["benchmark"])
             mlflow.log_metric("early stop epoch", epoch)
             return model
 
@@ -111,5 +112,5 @@ def train(train_loader, valid_loader, model, device, params):
             print("epoch:", epoch, "train_loss:", train_loss, "valid_loss:", valid_loss)
 
     print("best_epoch", best_epoch, "best_loss", best_loss)
-    loss_plot(train_loss_list, valid_loss_list)
+    loss_plot(train_loss_list, valid_loss_list, params["benchmark"])
     return model

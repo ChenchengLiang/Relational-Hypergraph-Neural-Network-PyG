@@ -60,7 +60,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["gnn"] = gnn_name_map[_gnn]
     params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results
     params["file_name"] = _file_name
-    params["gradient_clip"] = True
+    params["gradient_clip"] = False
     params["use_class_weight"]=_use_class_weight
 
     with mlflow.start_run(description=""):
