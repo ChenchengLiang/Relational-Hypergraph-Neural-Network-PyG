@@ -8,11 +8,11 @@ def main():
                   "../benchmarks/unsatcore-linear-shuffled-CG"]
 
     # load data
-    task = "unsat_core_binary_classification"
-    for _benchmark in benchmarks:
-        run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
-                           data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=True, _epochs=1,
-                           _reload_data=True, _self_loop=False, _add_global_edges=False, _file_name=True)
+    # task = "unsat_core_binary_classification"
+    # for _benchmark in benchmarks:
+    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
+    #                        data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=True, _epochs=1,
+    #                        _reload_data=True, _self_loop=False, _add_global_edges=False, _file_name=True)
 
     # train
     # models = ["hyper_GCN", "GNN"]
@@ -31,7 +31,8 @@ def main():
     self_loop = [False]
     add_backward_edges = [False]
     add_global_edges = [False]
-    use_class_weight = True #todo this may interact (collapse) with gradient clip
+    use_class_weight = True  # todo this may interact (collapse) with gradient clip
+    gradient_clip = False
 
     for bench in benchmarks:
         for model in models:
@@ -45,21 +46,26 @@ def main():
                                                        _gnn.__name__, False, epochs, _reload_data=reload_data,
                                                        _self_loop=False, _add_backward_edges=False,
                                                        _add_global_edges=True,
-                                                       _fix_random_seed=fix_random_seed, _dropout_rate=dropout_rate,
+                                                       _fix_random_seeds=fix_random_seed, _experiment_date=False,
+                                                       _dropout_rate=dropout_rate,
                                                        _num_linear_layer=num_linear_layer,
-                                                       _use_class_weight=use_class_weight)
+                                                       _use_class_weight=use_class_weight, _gradient_clip=gradient_clip)
                             else:
                                 for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                     for _add_backward_edge in add_backward_edges:
                                         for _add_global_edges in add_global_edges:
                                             run_one_experiment(model, task, _num_gnn_layer, bench, data_shuffle,
-                                                               HyperConv.__name__, _use_intermediate_gnn_results, epochs,
+                                                               HyperConv.__name__, _use_intermediate_gnn_results,
+                                                               epochs,
                                                                _reload_data=reload_data, _self_loop=_self_loop,
                                                                _add_backward_edges=_add_backward_edge,
                                                                _add_global_edges=_add_global_edges,
-                                                               _fix_random_seed=fix_random_seed, _dropout_rate=dropout_rate,
+                                                               _fix_random_seeds=fix_random_seed,
+                                                               _experiment_date=False,
+                                                               _dropout_rate=dropout_rate,
                                                                _num_linear_layer=num_linear_layer,
-                                                               _use_class_weight=use_class_weight)
+                                                               _use_class_weight=use_class_weight,
+                                                               _gradient_clip=gradient_clip)
 
 
 # send_email("train finished")
