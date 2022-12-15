@@ -1,6 +1,9 @@
+import os
+
 import torch
 import numpy as np
 from src.plots import loss_plot
+from src.utils import make_dirct
 import mlflow.pytorch
 from tqdm import tqdm
 import mlflow
@@ -60,6 +63,7 @@ def run_one_epoch(model, data_loader, optimizer, ls_func, device, train=True, ta
 
 def train(train_loader, valid_loader, model, device, params):
     ls_func = get_loss_function(params).to(device)
+    model_folder=make_dirct(os.path.join(params["benchmark"],"model"))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"])
     # optimizer = torch.optim.SGD(model.parameters(), lr=params["learning_rate"])
@@ -100,10 +104,10 @@ def train(train_loader, valid_loader, model, device, params):
         if valid_loss < best_loss:
             best_loss = valid_loss
             best_epoch = epoch
-            torch.save(model, '../models/best_model.pth')
+            torch.save(model, os.path.join(model_folder,"best_model.pth"))
 
         if valid_acc == 1:
-            torch.save(model, '../models/best_model.pth')
+            torch.save(model, os.path.join(model_folder,"best_model.pth"))
             loss_plot(train_loss_list, valid_loss_list, params["benchmark"])
             mlflow.log_metric("early stop epoch", epoch)
             return model

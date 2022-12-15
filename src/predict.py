@@ -22,12 +22,13 @@ def predict(trained_model, test_loader, device, params):
     # print("predicted_list[0]:", predicted_list[0])
     # print("label_list[0]:", label_list[0])
     mlflow.log_metric("test_loss", test_loss)
-    draw_label_pie_chart(params["num_classes"], lambda: (t for t in predicted_list), "predicted-data")
+    draw_label_pie_chart(params["num_classes"], lambda: (t for t in predicted_list), params["benchmark"],
+                         name="predicted-data")
 
     print("-" * 10)
     acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
 
-    draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["benchmark"], name=params["num_classes"])
+    draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"],params["benchmark"], name=params["task_type"])
 
     # correct = (flatten_predicted_list == flatten_label_list).sum()
     # acc = int(correct) / len(flatten_label_list)

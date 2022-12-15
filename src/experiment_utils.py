@@ -105,7 +105,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         # predict(trained_model, test_loader, optimizer, ls_func,params["num_classes"], task_type=params["task_type"])
 
         print("-" * 10 + "best_model" + "-" * 10)
-        model_path = "../models/best_model.pth"
+        model_path = params["benchmark"]+"/model/best_model.pth"
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, "model")
         predicted_list, raw_predicted_list, file_name_list, predicted_accuracy = predict(trained_model=best_model,
