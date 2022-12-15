@@ -65,13 +65,15 @@ class GNN_classification(torch.nn.Module):
         x = torch.index_select(x, dim=0, index=target_indices)
 
         # linear layers
-        x=forward_linear_layers(x, self.linear_list, self.linear_ln_list, self.linear_act_list, self.linear_dropout_list, self.linear_out,self.training)
+        x = forward_linear_layers(x, self.linear_list, self.linear_ln_list, self.linear_act_list,
+                                  self.linear_dropout_list, self.linear_out, self.training)
         return x
 
 
 class Hyper_classification(torch.nn.Module):
     def __init__(self, label_size, vocabulary_size, edge_arity_dict, embedding_size, num_gnn_layers,
-                 num_linear_layer, activation, feature_size=1, dropout_probability={"gnn_dropout_rate":0,"mlp_dropout_rate":0},
+                 num_linear_layer, activation, feature_size=1,
+                 dropout_probability={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0},
                  use_intermediate_gnn_results=False):
         super().__init__()
         self.use_intermediate_gnn_results = use_intermediate_gnn_results
@@ -84,13 +86,14 @@ class Hyper_classification(torch.nn.Module):
 
         # initialize conv layers
         self.hyper_conv_list = ModuleList()
-        self.conv_ln_list = ModuleList()
+        self.conv_norm_list = ModuleList()
         self.conv_act_list = ModuleList()
         self.conv_drop_list = ModuleList()
         for i in range(num_gnn_layers):
             self.hyper_conv_list.append(
-                HyperConv(embedding_size, embedding_size, edge_arity_dict=edge_arity_dict, activation=self.activation))
-            self.conv_ln_list.append(LayerNorm(embedding_size))
+                HyperConv(embedding_size, embedding_size, edge_arity_dict=edge_arity_dict, activation=self.activation,
+                          inner_layer_dropout_rate=self.dropout_probability["gnn_inner_layer_dropout_rate"]))
+            self.conv_norm_list.append(LayerNorm(embedding_size))
             self.conv_act_list.append(get_activation(self.activation))
             self.conv_drop_list.append(Dropout(p=self.dropout_probability["gnn_dropout_rate"]))
 
@@ -99,12 +102,12 @@ class Hyper_classification(torch.nn.Module):
                                                                      embedding_size)
 
         # initialize linear layers
-        self.linear_list, self.linear_ln_list, self.linear_act_list, self.linear_dropout_list = initialize_linear_layers(
+        self.linear_list, self.linear_lin_norm_list, self.linear_act_list, self.linear_dropout_list = initialize_linear_layers(
             num_linear_layer=num_linear_layer, embedding_size=embedding_size, activation=activation,
             dropout_probability=self.dropout_probability["mlp_dropout_rate"])
 
         output_size = 1 if label_size == 2 else label_size
-        self.linear_out = Linear(embedding_size, output_size)
+        self.linear_out = Linear(embedding_size, output_size, bias=True)
 
     def forward(self, data):
         x, edge_index, target_indices, edge_list = \
@@ -118,27 +121,28 @@ class Hyper_classification(torch.nn.Module):
         else:
             x = self.linear_in(x)
 
-        #output from each layer (including embedding layer) and concatenate them in the end
+        # output from each layer (including embedding layer) and concatenate them in the end
         intermediate_layer_results = [x]
         # GNN layers
-        for i, (conv, ln, act, drop) in enumerate(
-                zip(self.hyper_conv_list, self.conv_ln_list, self.conv_act_list, self.conv_drop_list)):
+        for i, (conv, conv_norm, conv_act, conv_drop) in enumerate(
+                zip(self.hyper_conv_list, self.conv_norm_list, self.conv_act_list, self.conv_drop_list)):
             x = conv(x, edge_index, edge_list)
-            x = ln(x)
-            x = act(x)
+            x = conv_norm(x)
+            x = conv_act(x)
             if self.training == True and i < len(self.hyper_conv_list) - 1:  # don't dropout at last conv layer
-                x = drop(x)
+                x = conv_drop(x)
             intermediate_layer_results.append(x)
 
         if self.use_intermediate_gnn_results == True:
             x = torch.concat(intermediate_layer_results, dim=1)
-            x = torch.index_select(x, dim=0, index=target_indices) # gather label node
+            x = torch.index_select(x, dim=0, index=target_indices)  # gather label node
             x = self.linear_transformation_for_intermediate_results(x)
         else:
-            x = torch.index_select(x, dim=0, index=target_indices) # gather label node
+            x = torch.index_select(x, dim=0, index=target_indices)  # gather label node
 
         # linear layers
-        x=forward_linear_layers(x, self.linear_list, self.linear_ln_list, self.linear_act_list, self.linear_dropout_list, self.linear_out,self.training)
+        x = forward_linear_layers(x, self.linear_list, self.linear_lin_norm_list, self.linear_act_list,
+                                  self.linear_dropout_list, self.linear_out, self.training)
         return x
 
 

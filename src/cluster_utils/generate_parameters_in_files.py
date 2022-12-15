@@ -26,10 +26,10 @@ def main():
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
     num_gnn_layers = [2]
-    dropout_rate = {"gnn_dropout_rate": 0.2, "mlp_dropout_rate": 0.1}
-    num_linear_layers = [2, 4, 8, 16]
+    dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
+    num_linear_layers = [2,4,8,16]
     data_loader_shuffle = [False]
-    use_intermediate_gnn_results = [True, False]
+    use_intermediate_gnn_results = [False]
     add_backward_edges = [False]
     add_global_edges = [False]
     self_loop = [False]

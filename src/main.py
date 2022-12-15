@@ -23,15 +23,15 @@ def main():
     num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    dropout_rate = {"gnn_dropout_rate": 0.2, "mlp_dropout_rate": 0.2}
-    num_linear_layer = 2
-    epochs = 5
+    dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0}
+    num_linear_layer = 8
+    epochs = 100
     reload_data = False
     fix_random_seed = False
     self_loop = [False]
     add_backward_edges = [False]
     add_global_edges = [False]
-    use_class_weight = True  # todo this may interact (collapse) with gradient clip
+    use_class_weight = True  # this may interact (collapse) with gradient clip
     gradient_clip = False
 
     for bench in benchmarks:

@@ -44,7 +44,7 @@ def main():
     # get graph info
     read_graph_info_from_json_file(file_list, data_dict)
 
-    get_scatters(summary_folder, data_dict)
+    get_scatters(summary_folder=summary_folder, data_dict=data_dict)
 
     #get summaries
 

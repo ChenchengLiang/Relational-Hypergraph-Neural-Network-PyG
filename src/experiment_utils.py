@@ -17,17 +17,19 @@ from torch_geometric.profile.utils import byte_to_megabyte
 
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
                        _epochs, _file_name="", _reload_data=True,
-                       _self_loop=False, _add_backward_edges=False,_add_global_edges=False, _fix_random_seeds=True,
-                       _experiment_date=True,_dropout_rate={"gnn_dropout_rate":0,"mlp_dropout_rate":0},
-                       _num_linear_layer=4,_use_class_weight=True,_experiment_name="",_gradient_clip=False) -> object:
+                       _self_loop=False, _add_backward_edges=False, _add_global_edges=False, _fix_random_seeds=True,
+                       _experiment_date=True,
+                       _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
+                       _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
+                       _gradient_clip=False) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
         torch.cuda.manual_seed_all(42)
 
-    #set experiment name
+    # set experiment name
     today = datetime.today().strftime('%Y-%m-%d')
-    experiment_name= _benchmark if _experiment_name=="" else _experiment_name
+    experiment_name = _benchmark if _experiment_name == "" else _experiment_name
     mlflow_experiment_name = today + "-" + os.path.basename(
         experiment_name) if _experiment_date == True else os.path.basename(experiment_name)
     print("mlflow_experiment_name:", mlflow_experiment_name)
@@ -37,7 +39,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
                            "unsat_core_binary_classification": 2,
                            "template_multi_classification": 5}
-    gnn_name_map={"GCNConv":GCNConv,"SAGEConv":SAGEConv,"FiLMConv":FiLMConv,"HyperConv":HyperConv}
+    gnn_name_map = {"GCNConv": GCNConv, "SAGEConv": SAGEConv, "FiLMConv": FiLMConv, "HyperConv": HyperConv}
 
     params = {}
     params["benchmark"] = _benchmark
@@ -62,7 +64,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results
     params["file_name"] = _file_name
     params["gradient_clip"] = _gradient_clip
-    params["use_class_weight"]=_use_class_weight
+    params["use_class_weight"] = _use_class_weight
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,
@@ -106,7 +108,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         # predict(trained_model, test_loader, optimizer, ls_func,params["num_classes"], task_type=params["task_type"])
 
         print("-" * 10 + "best_model" + "-" * 10)
-        model_path = params["benchmark"]+"/model/best_model.pth"
+        model_path = params["benchmark"] + "/model/best_model.pth"
         best_model = torch.load(model_path)
         mlflow.pytorch.log_model(best_model, "model")
         predicted_list, raw_predicted_list, file_name_list, predicted_accuracy = predict(trained_model=best_model,

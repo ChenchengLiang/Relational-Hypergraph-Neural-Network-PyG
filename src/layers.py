@@ -6,7 +6,7 @@ from torch import Tensor
 import torch.nn.functional as F
 from src.torch_utils import get_activation
 class HyperConv(MessagePassing):
-    def __init__(self, in_channels, out_channels, edge_arity_dict,activation="relu"):
+    def __init__(self, in_channels, out_channels, edge_arity_dict,activation="relu",inner_layer_dropout_rate=0):
         super().__init__()
         self.embedding_size=in_channels
         self.edge_arity_dict=edge_arity_dict
@@ -14,7 +14,7 @@ class HyperConv(MessagePassing):
         self.negative_slope: float = 0.2
 
 
-        self.linear_layers, self.linear_layers_ln,self.linear_layers_act= self._get_linear_layers()
+        self.linear_layers, self.linear_layers_norm,self.linear_layers_act= self._get_linear_layers()
 
         self.final_update_func=get_activation(self.activation)
 
@@ -48,9 +48,9 @@ class HyperConv(MessagePassing):
                 #compute messages
                 message_per_position = self.linear_layers[linear_layer_counter](concatednated_node_features) #[E, embedding_size]
                 #normalization
-                message_per_position=self.linear_layers_ln[linear_layer_counter](message_per_position)
-                message_per_position = self.linear_layers_act[linear_layer_counter](message_per_position)
-                # message_per_position = F.dropout(message_per_position, p=0.8, training=self.training)
+                # message_per_position=self.linear_layers_norm[linear_layer_counter](message_per_position)
+                # message_per_position = self.linear_layers_act[linear_layer_counter](message_per_position)
+                # message_per_position = F.dropout(message_per_position, p=inner_layer_dropout_rate, training=self.training)
 
 
                 #add messages to every target node position
@@ -69,14 +69,14 @@ class HyperConv(MessagePassing):
 
     def _get_linear_layers(self):
         linear_layers=ModuleList()
-        linear_layers_ln=ModuleList()
+        linear_layers_norm=ModuleList()
         linear_layers_act=ModuleList()
         for k in self.edge_arity_dict:
             for _ in range(self.edge_arity_dict[k]):
                 linear_layers.append(Linear(self.embedding_size * self.edge_arity_dict[k], self.embedding_size,bias=False))
-                linear_layers_ln.append(LayerNorm(self.embedding_size))
+                linear_layers_norm.append(LayerNorm(self.embedding_size))
                 linear_layers_act.append(get_activation(self.activation))
-        return linear_layers,linear_layers_ln,linear_layers_act
+        return linear_layers,linear_layers_norm,linear_layers_act
 
 
     # def message(self, x_i,x_j,message):

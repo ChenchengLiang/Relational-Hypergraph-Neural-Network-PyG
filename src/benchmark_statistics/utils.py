@@ -4,15 +4,27 @@ from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean
 from src.utils import camel_to_snake,make_dirct
 from src.plots import scatter_plot
-
+import itertools
 
 def get_scatters(summary_folder,data_dict):
-    # todo draw scatter plot
     scatter_folder = make_dirct(summary_folder + "/scatters")
-    x_key = "clauseNumberBeforeSimplification"
-    y_key = "clauseNumberAfterSimplification"
-    scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key],
-                 x_axis=x_key, y_axis=y_key, folder=scatter_folder, name=x_key + "-" + y_key)
+    # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
+    # combinations_pairs=itertools.combinations(combinations_list,2)
+    combinations_pairs=[["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"],
+                        ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification"],
+                        ["clauseNumberBeforeSimplification", "relationSymbolNumberBeforeSimplification"],
+                        ["clauseNumberAfterSimplification", "relationSymbolNumberAfterSimplification"],
+                        ["clauseNumberAfterSimplification","min_solving_time_cegar_interation_number"],
+                        ["clauseNumberAfterSimplification","CDHG_node_number"],
+                        ["clauseNumberAfterSimplification", "CDHG_label_number"],
+                        ["clauseNumberAfterSimplification", "CG_node_number"],
+                        ["CDHG_node_number", "CG_node_number"],
+                        ]
+    for pairs in combinations_pairs:
+        x_key = pairs[0]
+        y_key = pairs[1]
+        scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key],
+                     x_axis=x_key, y_axis=y_key, folder=scatter_folder, name=x_key + "-" + y_key)
 
 def filter_rows(data_dict, column):
     index_list = []
