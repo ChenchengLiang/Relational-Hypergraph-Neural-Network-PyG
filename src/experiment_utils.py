@@ -59,7 +59,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["activation"] = "relu"  # leak_relu, tanh
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = _dropout_rate
-    params["learning_rate"] = 0.001
+    params["learning_rate"] = 0.01
     params["gnn"] = gnn_name_map[_gnn]
     params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results
     params["file_name"] = _file_name

@@ -63,10 +63,13 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
                                                                        "2-no_labels", separate_no_label_cases)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-labels_indices_match",
                                                                        "3-labels_indices_mismatch", separate_mismatch_indices_and_label_cases)
-    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "4-has-positive-labels",
-                                                                       "4-no-positive-labels",
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "4-clause_number_match",
+                                                                       "4-clause_number_mismatch",
+                                                                       separate_mismatch_label_number_and_clauses_number)
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "5-has-positive-labels",
+                                                                       "5-no-positive-labels",
                                                                        separate_no_labeled_template_cases)
-    ready_for_train_folder=make_dirct(os.path.join(folder,"5-ready-for-training"))
+    ready_for_train_folder=make_dirct(os.path.join(folder,"6-ready-for-training"))
     for file in glob.glob(separated_folder+"/*") + glob.glob(exception_folder+"/*"):
         copy(file,ready_for_train_folder)
 
@@ -89,6 +92,12 @@ def separate_mismatch_indices_and_label_cases(cdhg,cg, file_name, target_folder,
     else:
         copy_relative_files(file_name, target_folder)
 
+def separate_mismatch_label_number_and_clauses_number(cdhg,cg, file_name, target_folder, exception_folder):
+    if cdhg["guardIndicesNumber"][0] < int(cdhg["clauseNumberAfterSimplification"][0]) or cg["clauseIndicesNumber"][0] != int(cg["clauseNumberAfterSimplification"][0]):
+        copy_relative_files(file_name, exception_folder)
+    else:
+        copy_relative_files(file_name, target_folder)
+
 
 def separate_no_labeled_template_cases(cdhg,cg, file_name, target_folder, exception_folder):
     if sum(cdhg["labelList"]) == 0 or sum(cg["labelList"]) == 0:
@@ -105,11 +114,16 @@ def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_n
                                  read_function=read_json_file)
     cg_graph_dict_list = read_files(get_file_list(folder, "smt2"), file_type="monoDirectionLayerGraph.JSON",
                                       read_function=read_json_file)
+    solvability_dict_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
+                                      read_function=read_json_file)
     try:
-        for cdhg,cg in tqdm(zip(cdhg_graph_dict_list,cg_graph_dict_list),desc=separate_function.__name__):
+        for cdhg,cg,solv in tqdm(zip(cdhg_graph_dict_list,cg_graph_dict_list,solvability_dict_list),desc=separate_function.__name__):
             file_name_cdhg = cdhg["file_name"][:cdhg["file_name"].find(".hyperEdgeGraph.JSON")]
             if len(cdhg)>3:
-                separate_function(cdhg,cg, file_name_cdhg, target_folder, exception_folder)
+                merged_cdhg={**cdhg,**solv}
+                merged_cg = {**cg, **solv}
+                separate_function(merged_cdhg,merged_cg, file_name_cdhg, target_folder, exception_folder)
+                #separate_function(cdhg, cg, file_name_cdhg, target_folder, exception_folder)
             else:
                 print("error: no graph file",file_name_cdhg)
     except:
