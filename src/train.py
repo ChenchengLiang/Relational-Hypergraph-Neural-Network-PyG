@@ -89,6 +89,7 @@ def train(train_loader, valid_loader, model, device, params):
         train_loss_list.append(train_loss)
         mlflow.log_metric("train_loss", train_loss, epoch)
 
+
         scheduler.step()
 
         # validating
@@ -105,6 +106,7 @@ def train(train_loader, valid_loader, model, device, params):
         mlflow.log_metric("valid_loss", valid_loss, epoch)
         valid_acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
         mlflow.log_metric("valid accuracy", valid_acc, epoch)
+        mlflow.log_metric("epoch", epoch, epoch)
 
         if valid_loss < best_loss:
             best_loss = valid_loss

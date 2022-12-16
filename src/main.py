@@ -16,7 +16,7 @@ def main():
 
     # train
     # models = ["hyper_GCN", "GNN"]
-    models = ["hyper_GCN"]
+    models = ["GNN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
@@ -25,12 +25,12 @@ def main():
     use_intermediate_gnn_results = [False]
     dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
     num_linear_layer = 2
-    epochs = 5
+    epochs = 10
     reload_data = False
     fix_random_seed = False
     self_loop = [False]
     add_backward_edges = [False]
-    add_global_edges = [False]
+    add_global_edges = [True]
     use_class_weight = True  # this may interact (collapse) with gradient clip
     gradient_clip = False
 

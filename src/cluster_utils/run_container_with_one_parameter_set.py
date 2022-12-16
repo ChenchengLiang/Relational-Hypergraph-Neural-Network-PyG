@@ -28,8 +28,6 @@ def main():
     shutil.copytree(parameter_dict["benchmark"], temp_folder_path)
     parameter_dict["benchmark"] = temp_folder_path
 
-    # todo also need to set figure and model storage path for each run
-
     run_one_experiment(parameter_dict["model"], parameter_dict["task"], parameter_dict["num_gnn_layer"],
                        parameter_dict["benchmark"], parameter_dict["data_shuffle"], parameter_dict["gnn"],
                        parameter_dict["use_intermediate_gnn_results"],
@@ -41,7 +39,8 @@ def main():
                        _experiment_date=parameter_dict["experiment_date"], _dropout_rate=parameter_dict["dropout_rate"],
                        _num_linear_layer=parameter_dict["num_linear_layer"],
                        _use_class_weight=parameter_dict["use_class_weight"],
-                       _experiment_name=experiment_name, _gradient_clip=parameter_dict["gradient_clip"])
+                       _experiment_name=experiment_name, _gradient_clip=parameter_dict["gradient_clip"],
+                       _learning_rate=parameter_dict["learning_rate"],_activation=parameter_dict["activation"])
 
     shutil.rmtree(temp_folder_path)
 

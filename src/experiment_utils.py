@@ -22,7 +22,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
                        _experiment_date=True,
                        _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
                        _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
-                       _gradient_clip=False) -> object:
+                       _gradient_clip=False,_learning_rate=0.001,_activation="relu") -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
@@ -61,10 +61,10 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["add_self_loop_edges"] = _self_loop
     params["add_backward_edges"] = _add_backward_edges
     params["add_global_edges"] = _add_global_edges
-    params["activation"] = "relu"  # leak_relu, tanh
+    params["activation"] = _activation  # relu,leak_relu, tanh
     params["data_loader_shuffle"] = data_shuffle
     params["drop_out_rate"] = _dropout_rate
-    params["learning_rate"] = 0.01
+    params["learning_rate"] = _learning_rate
     params["gnn"] = gnn_name_map[_gnn]
     params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results
     params["file_name"] = _file_name
