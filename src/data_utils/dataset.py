@@ -101,7 +101,7 @@ class HornGraphDataset(Dataset):
         return data
 
     def _process_edge_list(self, data):
-        # todo:control all edge type here
+        #control all edge type by parameters
         temp_edge_list=[]
         temp_edge_arity_dict={}
         for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
@@ -136,31 +136,6 @@ class HornGraphDataset(Dataset):
         data["edge_list"]=temp_edge_list
         data["edge_arity_dict"]=temp_edge_arity_dict
 
-
-        # if self._add_self_loop == True:
-        #     slef_loop_edges = [[i, i] for i in range(len(data["x"]))]
-        #     data["edge_list"].append(slef_loop_edges)
-        #     data["edge_arity_dict"]["selfLoopEdges"] = len(slef_loop_edges[0])
-        # if self._add_backward_edges == True:
-        #     # todo could add backward edge as new edge type
-        #     for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
-        #         if len(edges[0]) == 2 and edge_dict_key != "selfLoopEdges":
-        #             backward_edges = [[edge[1], edge[0]] for edge in edges]
-        #             data["edge_list"][i] = edges + backward_edges
-        # if self._add_global_edges == True:
-        #     binary_global_edges = []
-        #     ternary_global_edges = []
-        #     for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
-        #         if len(edges[0]) == 2:
-        #             binary_global_edges.extend(edges)
-        #         if len(edges[0]) == 3:
-        #             ternary_global_edges.extend(edges)
-        #     data["edge_list"].append(binary_global_edges)
-        #     data["edge_arity_dict"]["binaryEdge"] = len(binary_global_edges[0])
-        #     if len(ternary_global_edges) != 0:
-        #         data["edge_list"].append(ternary_global_edges)
-        #         data["edge_arity_dict"]["ternaryHyperEdge"] = len(ternary_global_edges[0])
-
         data["edge_list"] = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in data["edge_list"]]
 
     def _construct_learning_label_and_edges(self, json_file_name, graph_edge_list, node_indices):
@@ -171,7 +146,7 @@ class HornGraphDataset(Dataset):
             graph_edge_list = graph_edge_list + ["templateASTEdge"]
         elif self.learning_task == "argument_binary_classification":
             target_indices = node_indices
-            argument_indices = read_one_filed(json_file_name, "argumentIndices")
+            argument_indices = read_one_filed(json_file_name, "relationSymbolArgumentIndices")
             target_label = [1 if i in argument_indices else 0 for i in node_indices]
         elif self.learning_task in ["unsat_core_binary_classification"]:
             target_indices = read_one_filed(json_file_name, "labelIndices")
