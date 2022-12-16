@@ -4,8 +4,8 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore-linear-shuffled-CDHG",
-                  #"../benchmarks/unsatcore_data_one-CG"
+    benchmarks = ["../benchmarks/unsatcore_data_one-CDHG",
+                  "../benchmarks/unsatcore_data_one-CG"
                   ]
 
     # load data
@@ -17,7 +17,7 @@ def main():
 
     # train
     # models = ["hyper_GCN", "GNN"]
-    models = ["GNN"]
+    models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     tasks = ["unsat_core_binary_classification"]
@@ -26,7 +26,7 @@ def main():
     use_intermediate_gnn_results = [False]
     dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
     num_linear_layer = 2
-    epochs = 10
+    epochs = 1
     reload_data = False
     fix_random_seed = False
     self_loop = [False]
@@ -34,6 +34,16 @@ def main():
     add_global_edges = [True]
     use_class_weight = True  # this may interact (collapse) with gradient clip
     gradient_clip = False
+    cdhg_edge_types = ["relationSymbolArgumentEdge", "ASTLeftEdge", "ASTRightEdge", "guardEdge",
+                       "ASTEdge",
+                       "quantifierEdge",
+                       "controlFlowHyperEdge", "dataFlowHyperEdge"]
+    cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
+                     "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge", "ASTLeftEdge",
+                     "ASTRightEdge", "guardEdge", "dataEdge",
+                     "ASTEdge",
+                     "quantifierEdge"
+                     ]
 
     for bench in benchmarks:
         for model in models:
@@ -50,7 +60,8 @@ def main():
                                                        _fix_random_seeds=fix_random_seed, _experiment_date=False,
                                                        _dropout_rate=dropout_rate,
                                                        _num_linear_layer=num_linear_layer,
-                                                       _use_class_weight=use_class_weight, _gradient_clip=gradient_clip)
+                                                       _use_class_weight=use_class_weight, _gradient_clip=gradient_clip,
+                                                       _cdhg_edge_types=cdhg_edge_types, _cg_edge_types=cg_edge_types)
                             else:
                                 for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                     for _add_backward_edge in add_backward_edges:
@@ -66,7 +77,9 @@ def main():
                                                                _dropout_rate=dropout_rate,
                                                                _num_linear_layer=num_linear_layer,
                                                                _use_class_weight=use_class_weight,
-                                                               _gradient_clip=gradient_clip)
+                                                               _gradient_clip=gradient_clip,
+                                                               _cdhg_edge_types=cdhg_edge_types,
+                                                               _cg_edge_types=cg_edge_types)
 
 
 # send_email("train finished")

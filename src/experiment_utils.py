@@ -13,7 +13,9 @@ from src.train import train
 from src.utils import write_predicted_label_to_JSON_file, send_email
 from torch_geometric.profile import get_model_size, count_parameters, get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
-#import wandb
+
+
+# import wandb
 
 
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
@@ -22,13 +24,11 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
                        _experiment_date=True,
                        _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
                        _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
-                       _gradient_clip=False,_learning_rate=0.001,_activation="relu") -> object:
+                       _gradient_clip=False, _learning_rate=0.001, _activation="relu",_cdhg_edge_types=[],_cg_edge_types=[]) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
         torch.cuda.manual_seed_all(42)
-
-
 
     # set experiment name
     today = datetime.today().strftime('%Y-%m-%d')
@@ -37,7 +37,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         experiment_name) if _experiment_date == True else os.path.basename(experiment_name)
     print("mlflow_experiment_name:", mlflow_experiment_name)
 
-    #wandb_run = wandb.init(project=mlflow_experiment_name,reinit=True)
+    # wandb_run = wandb.init(project=mlflow_experiment_name,reinit=True)
 
     mlflow.set_experiment(mlflow_experiment_name)
     mlflow.set_tracking_uri("http://localhost:5000")  # Specify tracking server
@@ -57,6 +57,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["num_gnn_layers"] = _num_gnn_layers
     params["num_linear_layer"] = _num_linear_layer
     params["graph_type"] = "hyperEdgeGraph" if "CDHG" in _benchmark else "monoDirectionLayerGraph"
+    params["edge_types"] = _cdhg_edge_types if "CDHG" in _benchmark else _cg_edge_types
     params["batch_size"] = 1
     params["add_self_loop_edges"] = _self_loop
     params["add_backward_edges"] = _add_backward_edges

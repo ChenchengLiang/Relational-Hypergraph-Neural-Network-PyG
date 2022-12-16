@@ -10,6 +10,17 @@ import os
 
 
 def get_data(params, reload_data=True):
+    cdhg_edge_type=["relationSymbolArgumentEdge", "ASTLeftEdge", "ASTRightEdge", "ASTEdge", "guardEdge",
+     "quantifierEdge",
+     "controlFlowHyperEdge", "dataFlowHyperEdge"]
+    cg_edge_type=["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
+     "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge", "ASTLeftEdge",
+     "ASTRightEdge", "ASTEdge", "guardEdge", "dataEdge",
+     "quantifierEdge"
+     ]
+    if reload_data==True:
+        params["edge_types"] =  cdhg_edge_type if params["graph_type"]=="hyperEdgeGraph" else cg_edge_type
+
     vocabulary, token_map = build_vocabulary(params)
     mlflow.log_dict(token_map, "token_map.json")
 

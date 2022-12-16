@@ -18,6 +18,7 @@ class HornGraphDataset(Dataset):
         self._add_self_loop = params["add_self_loop_edges"]
         self._add_backward_edges = params["add_backward_edges"]
         self._add_global_edges = params["add_global_edges"]
+        self._edge_types = params["edge_types"]
         super().__init__(root, transform, pre_transform, pre_filter)
 
     @property
@@ -100,29 +101,65 @@ class HornGraphDataset(Dataset):
         return data
 
     def _process_edge_list(self, data):
+        # todo:control all edge type here
+        temp_edge_list=[]
+        temp_edge_arity_dict={}
+        for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
+            if edge_dict_key in self._edge_types:
+                temp_edge_list.append(edges)
+                temp_edge_arity_dict[edge_dict_key]=data["edge_arity_dict"][edge_dict_key]
+
         if self._add_self_loop == True:
             slef_loop_edges = [[i, i] for i in range(len(data["x"]))]
-            data["edge_list"].append(slef_loop_edges)
-            data["edge_arity_dict"]["selfLoopEdges"] = len(slef_loop_edges[0])
+            temp_edge_list.append(slef_loop_edges)
+            temp_edge_arity_dict["selfLoopEdges"] = len(slef_loop_edges[0])
         if self._add_backward_edges == True:
             # todo could add backward edge as new edge type
-            for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
+            for i, (edges, edge_dict_key) in enumerate(zip(temp_edge_list, temp_edge_arity_dict)):
                 if len(edges[0]) == 2 and edge_dict_key != "selfLoopEdges":
                     backward_edges = [[edge[1], edge[0]] for edge in edges]
-                    data["edge_list"][i] = edges + backward_edges
+                    temp_edge_list[i] = edges + backward_edges
         if self._add_global_edges == True:
             binary_global_edges = []
             ternary_global_edges = []
-            for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
+            for i, (edges, edge_dict_key) in enumerate(zip(temp_edge_list, temp_edge_arity_dict)):
                 if len(edges[0]) == 2:
                     binary_global_edges.extend(edges)
                 if len(edges[0]) == 3:
                     ternary_global_edges.extend(edges)
-            data["edge_list"].append(binary_global_edges)
-            data["edge_arity_dict"]["binaryEdge"] = len(binary_global_edges[0])
+            temp_edge_list.append(binary_global_edges)
+            temp_edge_arity_dict["binaryEdge"] = len(binary_global_edges[0])
             if len(ternary_global_edges) != 0:
-                data["edge_list"].append(ternary_global_edges)
-                data["edge_arity_dict"]["ternaryHyperEdge"] = len(ternary_global_edges[0])
+                temp_edge_list.append(ternary_global_edges)
+                temp_edge_arity_dict["ternaryHyperEdge"] = len(ternary_global_edges[0])
+
+        data["edge_list"]=temp_edge_list
+        data["edge_arity_dict"]=temp_edge_arity_dict
+
+
+        # if self._add_self_loop == True:
+        #     slef_loop_edges = [[i, i] for i in range(len(data["x"]))]
+        #     data["edge_list"].append(slef_loop_edges)
+        #     data["edge_arity_dict"]["selfLoopEdges"] = len(slef_loop_edges[0])
+        # if self._add_backward_edges == True:
+        #     # todo could add backward edge as new edge type
+        #     for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
+        #         if len(edges[0]) == 2 and edge_dict_key != "selfLoopEdges":
+        #             backward_edges = [[edge[1], edge[0]] for edge in edges]
+        #             data["edge_list"][i] = edges + backward_edges
+        # if self._add_global_edges == True:
+        #     binary_global_edges = []
+        #     ternary_global_edges = []
+        #     for i, (edges, edge_dict_key) in enumerate(zip(data["edge_list"], data["edge_arity_dict"])):
+        #         if len(edges[0]) == 2:
+        #             binary_global_edges.extend(edges)
+        #         if len(edges[0]) == 3:
+        #             ternary_global_edges.extend(edges)
+        #     data["edge_list"].append(binary_global_edges)
+        #     data["edge_arity_dict"]["binaryEdge"] = len(binary_global_edges[0])
+        #     if len(ternary_global_edges) != 0:
+        #         data["edge_list"].append(ternary_global_edges)
+        #         data["edge_arity_dict"]["ternaryHyperEdge"] = len(ternary_global_edges[0])
 
         data["edge_list"] = [torch.tensor(edges, dtype=torch.long).t().contiguous() for edges in data["edge_list"]]
 
@@ -166,7 +203,7 @@ class HornGraphDataset(Dataset):
         canonical_symbol_key = ["relationSymbol", "relationSymbolArgument", "variable", "operator", "constant", "guard",
                                 "clause", "clauseHead", "clauseBody", "clauseArgument", "templateBool", "templateEq",
                                 "templateIneq"]
-        unknown_node_map={x:"unknown_"+x for x in canonical_symbol_key}
+        unknown_node_map = {x: "unknown_" + x for x in canonical_symbol_key}
 
         converted_node_symbols = [convert_constant_to_category(word) for word in node_symbols]
         # node tokenization
@@ -194,8 +231,7 @@ class HornGraphDataset(Dataset):
                         # print(k)
                         tokenized_node_label_ids.append(token_map[unknown_node_map[k]])
                 if temp_flag == 0:
-                    #print("node_symbols",symbol)
+                    # print("node_symbols",symbol)
                     tokenized_node_label_ids.append(token_map["unknown_0"])
-
 
         return tokenized_node_label_ids
