@@ -8,7 +8,7 @@ import os
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category,get_sumary_folder
 def main():
-    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Template-selection-Liner-dateset-new/unsatcore-data/mined-unsatcore-graphs-1229/6-ready-for-training"
+    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-linear-SAT-graphs-2179/test"
     summary_folder = get_sumary_folder(folder)
     folder_basename=os.path.basename(folder)
 
@@ -53,7 +53,7 @@ def main():
     statistic_summary = get_statistic_summary(data_dict)
 
     #filter list that has the same value
-    filter_columns(data_dict)
+    #filter_columns(data_dict)
     filter_columns(category_summary)
     statistic_summary=filter_rows(statistic_summary, "statistic_value")
 

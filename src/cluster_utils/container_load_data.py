@@ -7,12 +7,12 @@ from src.layers import HyperConv
 
 
 def main():
-    benchmarks = [sys.argv[1], sys.argv[2]]
+    benchmarks = [sys.argv[1]]
     # benchmarks = [
     #     "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore_data_one-CDHG",
     #     "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore_data_one-CG"]
-    # task="template_binary_classification"
-    task = "unsat_core_binary_classification"
+    task="template_binary_classification"
+    #task = "unsat_core_binary_classification"
     experiment_date = True
     # load data
     for _benchmark in benchmarks:

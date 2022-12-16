@@ -54,7 +54,9 @@ class HornGraphDataset(Dataset):
             else:
                 graph_edge_list = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
                                    "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge", "ASTLeftEdge",
-                                   "ASTRightEdge", "ASTEdge", "guardEdge", "dataEdge", "quantifierEdge"]
+                                   "ASTRightEdge", "ASTEdge", "guardEdge", "dataEdge",
+                                   "quantifierEdge"
+                                   ]
 
             # form learning label according to the task
             target_indices, target_label, graph_edge_list = self._construct_learning_label_and_edges(json_file_name,
