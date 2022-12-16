@@ -18,6 +18,7 @@ def get_scatters(summary_folder,data_dict):
                         ["clauseNumberAfterSimplification","CDHG_node_number"],
                         ["clauseNumberAfterSimplification", "CDHG_label_number"],
                         ["clauseNumberAfterSimplification", "CG_node_number"],
+                        ["clauseNumberAfterSimplification", "CG_label_number"],
                         ["CDHG_node_number", "CG_node_number"],
                         ]
     for pairs in combinations_pairs:

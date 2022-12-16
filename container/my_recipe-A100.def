@@ -15,6 +15,8 @@ From: continuumio/miniconda3
 
     conda install pip
     pip install -r requirement/requirements.txt
+    pip install wandb
+    wandb login 1d9254bc5f0f0feb47f136b8541e4e79ea1fb56f
     conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
     conda install pyg -c pyg
 

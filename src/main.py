@@ -4,8 +4,8 @@ from experiment_utils import run_one_experiment
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore-linear-shuffled-CDHG",
-                  "../benchmarks/unsatcore-linear-shuffled-CG"]
+    benchmarks = ["../benchmarks/unsatcore_data_one-CDHG",
+                  "../benchmarks/unsatcore_data_one-CG"]
 
     # load data
     # task = "unsat_core_binary_classification"
@@ -24,8 +24,8 @@ def main():
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
     dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
-    num_linear_layer = 8
-    epochs = 100
+    num_linear_layer = 2
+    epochs = 5
     reload_data = False
     fix_random_seed = False
     self_loop = [False]

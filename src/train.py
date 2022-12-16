@@ -9,6 +9,7 @@ from tqdm import tqdm
 import mlflow
 from src.torch_utils import get_accuracy
 from src.train_utils import get_loss_function
+#import wandb
 
 
 def run_one_epoch(model, data_loader, optimizer, ls_func, device, train=True, task_type="binary_classification",
@@ -119,6 +120,7 @@ def train(train_loader, valid_loader, model, device, params):
         if epoch % 50 == 0 or epoch == params["epochs"] - 1:
             print("epoch:", epoch, "train_loss:", train_loss, "valid_loss:", valid_loss)
 
+    #wandb.log({"train_loss": train_loss,"valid_loss":valid_loss,"valid_acc":valid_acc,"early stop epoch":epoch,"epoch":epoch})
     print("best_epoch", best_epoch, "best_loss", best_loss)
     loss_plot(train_loss_list, valid_loss_list, params["benchmark"])
     return model

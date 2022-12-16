@@ -13,6 +13,7 @@ from src.train import train
 from src.utils import write_predicted_label_to_JSON_file, send_email
 from torch_geometric.profile import get_model_size, count_parameters, get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
+#import wandb
 
 
 def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
@@ -27,12 +28,16 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         torch.manual_seed(42)
         torch.cuda.manual_seed_all(42)
 
+
+
     # set experiment name
     today = datetime.today().strftime('%Y-%m-%d')
     experiment_name = _benchmark if _experiment_name == "" else _experiment_name
     mlflow_experiment_name = today + "-" + os.path.basename(
         experiment_name) if _experiment_date == True else os.path.basename(experiment_name)
     print("mlflow_experiment_name:", mlflow_experiment_name)
+
+    #wandb_run = wandb.init(project=mlflow_experiment_name,reinit=True)
 
     mlflow.set_experiment(mlflow_experiment_name)
     mlflow.set_tracking_uri("http://localhost:5000")  # Specify tracking server
@@ -101,6 +106,10 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
         params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".") + 1:-2]
         mlflow.log_params(params)
         mlflow.log_dict(params, "params.json")
+
+        # wandb.config=params
+        # wandb.log(params)
+        # wandb.watch(model)
 
         trained_model = train(train_loader, valid_loader, model, device, params)
 
