@@ -24,11 +24,12 @@ def get_scatters(summary_folder,data_dict):
                         ["clauseNumberAfterSimplification", "CG_label_number"],
                         ["CDHG_node_number", "CG_node_number"],
                         ]
+    z_data= data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"])!=10800 else []
     for pairs in combinations_pairs:
         x_key = pairs[0]
         y_key = pairs[1]
         try:
-            scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key],
+            scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key],z_data=z_data,
                          x_axis=x_key, y_axis=y_key, folder=scatter_folder, name=x_key + "-" + y_key)
         except:
             print("no field", pairs)

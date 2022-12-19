@@ -14,14 +14,26 @@ from src.utils import count_generator, make_dirct
 plt.style.use("ggplot")
 
 
-def scatter_plot(x_data, y_data, x_axis, y_axis, folder, name):
+def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, name):
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_data, y=y_data,
-                             mode='markers',
-                             name='markers'))
+    if len(z_data)!=0:
+        x_data_1,y_data_1, x_data_2,y_data_2=[],[],[],[]
+        for x,y,z in zip(x_data,y_data,z_data):
+            if z==10800:
+                x_data_1.append(x)
+                y_data_1.append(y)
+            else:
+                x_data_2.append(x)
+                y_data_2.append(y)
+        fig.add_trace(go.Scatter(x=x_data_1, y=y_data_1, marker=dict(color='blue'),mode = 'markers',name = 'solvable'))
+        fig.add_trace(go.Scatter(x=x_data_2, y=y_data_2, marker=dict(color='red'), mode='markers', name='unsolvable'))
+    else:
+        fig.add_trace(go.Scatter(x=x_data, y=y_data, marker=dict(color='blue'), mode='markers', name='marker'))
+
     # Add a diagonal line
-    max_value=max(x_data+y_data)
-    fig.add_trace(go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal",line=dict(color="gray")))
+    max_value = max(x_data + y_data)
+    fig.add_trace(
+        go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal", line=dict(color="gray")))
 
     fig.update_layout(
         title=name,
