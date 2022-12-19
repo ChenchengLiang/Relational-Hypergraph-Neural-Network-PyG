@@ -11,8 +11,8 @@ from utils import get_task_by_folder_name
 
 
 def main():
-    folder_1=sys.argv[1]
-    folder_2=sys.argv[2]
+    folder_1 = sys.argv[1]
+    folder_2 = sys.argv[2]
     benchmarks = [folder_1, folder_2]
     parameter_folder = "/cephyr/users/liangch/Alvis/training_code/hyper-parameters"
     # benchmarks=["/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore_data_one-CDHG",
@@ -29,18 +29,18 @@ def main():
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     task = get_task_by_folder_name(folder_1)
-    num_gnn_layers = [2, 4, 8]
+    num_gnn_layers = [2]
     dropout_rate = [
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
         # {"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
-        {"gnn_dropout_rate": 0.4, "mlp_dropout_rate": 0.2, "gnn_inner_layer_dropout_rate": 0.0}
+        # {"gnn_dropout_rate": 0.4, "mlp_dropout_rate": 0.2, "gnn_inner_layer_dropout_rate": 0.0}
     ]
-    num_linear_layers = [8]
+    num_linear_layers = [1024,2048,10000] # 2 works
     data_loader_shuffle = [False]
-    use_intermediate_gnn_results = [True, False]
+    use_intermediate_gnn_results = [False]
     add_backward_edges = [False]
-    add_global_edges = [True]
-    self_loop = [True]
+    add_global_edges = [False]
+    self_loop = [False]
     gradient_clip = [False]
     epochs = 100
     reload_data = False
@@ -48,13 +48,17 @@ def main():
     use_class_weight = True
     learning_rate = [0.001]
     activation = ["relu"]  # ["relu","leak_relu", "tanh"]
-    cdhg_edge_types = ["relationSymbolArgumentEdge", "ASTLeftEdge", "ASTRightEdge", "ASTEdge", "guardEdge",
-                       "quantifierEdge",
+    cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
+                       #"ASTLeftEdge", "ASTRightEdge",
+                       "ASTEdge",
+                       # "quantifierEdge",
                        "controlFlowHyperEdge", "dataFlowHyperEdge"]
     cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
-                     "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge", "ASTLeftEdge",
-                     "ASTRightEdge", "ASTEdge", "guardEdge", "dataEdge",
-                     "quantifierEdge"
+                     "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge",
+                     #"ASTLeftEdge", "ASTRightEdge",
+                     "ASTEdge",
+                     # "quantifierEdge",
+                     "guardEdge", "dataEdge",
                      ]
 
     parameter_dict_list = []
