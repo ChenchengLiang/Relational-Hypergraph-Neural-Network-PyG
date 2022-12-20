@@ -19,7 +19,7 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, name):
     if len(z_data)!=0:
         x_data_1,y_data_1, x_data_2,y_data_2=[],[],[],[]
         for x,y,z in zip(x_data,y_data,z_data):
-            if z==10800:
+            if z!=10800:
                 x_data_1.append(x)
                 y_data_1.append(y)
             else:
