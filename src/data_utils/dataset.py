@@ -148,7 +148,7 @@ class HornGraphDataset(Dataset):
             target_indices = node_indices
             argument_indices = read_one_filed(json_file_name, "relationSymbolArgumentIndices")
             target_label = [1 if i in argument_indices else 0 for i in node_indices]
-        elif self.learning_task in ["unsat_core_binary_classification"]:
+        elif self.learning_task in ["unsatcore_binary_classification"]:
             target_indices = read_one_filed(json_file_name, "labelIndices")
             target_label = read_one_filed(json_file_name, "labelList")
         else:
@@ -175,9 +175,14 @@ class HornGraphDataset(Dataset):
         return edge_list, edge_arity_dict
 
     def tokenize_symbols(self, token_map, node_symbols, graph_type):
+        canonical_symbol_key_old_data = ["CONTROL", "guard", "predicateArgument", "template", "symbolicConstant",
+                                         "predicateName",
+                                         "clause"]
         canonical_symbol_key = ["relationSymbol", "relationSymbolArgument", "variable", "operator", "constant", "guard",
                                 "clause", "clauseHead", "clauseBody", "clauseArgument", "templateBool", "templateEq",
-                                "templateIneq"]
+                                "templateIneq"] + canonical_symbol_key_old_data
+
+
         unknown_node_map = {x: "unknown_" + x for x in canonical_symbol_key}
 
         converted_node_symbols = [convert_constant_to_category(word) for word in node_symbols]

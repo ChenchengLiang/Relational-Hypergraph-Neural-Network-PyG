@@ -30,8 +30,7 @@ def predict(trained_model, test_loader, device, params):
 
     draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"],params["benchmark"], name=params["task_type"])
 
-    # correct = (flatten_predicted_list == flatten_label_list).sum()
-    # acc = int(correct) / len(flatten_label_list)
+
     mlflow.log_metric("Predicted Accuracy", acc)
     print(f'Predicted Accuracy: {acc:.4f}')
 
