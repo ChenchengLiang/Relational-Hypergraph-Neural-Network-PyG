@@ -31,7 +31,7 @@ def main():
     task = get_task_by_folder_name(folder_1)
     #todo add inner layer control to graph conv operator
     num_gnn_layers = [4] # 8 works best
-    dropout_rate = [
+    dropout_rate = [ #all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
         #{"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
         #{"gnn_dropout_rate": 0.4, "mlp_dropout_rate": 0.2, "gnn_inner_layer_dropout_rate": 0.0}
@@ -45,20 +45,20 @@ def main():
     gradient_clip = [False]
     epochs = 100
     reload_data = False
-    fix_random_seed = False
-    use_class_weight = True
+    fix_random_seed = True
+    use_class_weight = False
     learning_rate = [0.001]
     activation = ["relu"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
                        #"ASTLeftEdge", "ASTRightEdge",
                        "ASTEdge",
-                       # "quantifierEdge",
+                       #"quantifierEdge",
                        "controlFlowHyperEdge", "dataFlowHyperEdge"]
     cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
                      "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge",
                      #"ASTLeftEdge", "ASTRightEdge",
                      "ASTEdge",
-                     # "quantifierEdge",
+                     #"quantifierEdge",
                      "guardEdge", "dataEdge",
                      ]
 

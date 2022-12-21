@@ -113,7 +113,7 @@ def train(train_loader, valid_loader, model, device, params):
             best_epoch = epoch
             torch.save(model, os.path.join(model_folder,"best_model.pth"))
 
-        if valid_acc == 1:
+        if valid_acc == 1.0:
             torch.save(model, os.path.join(model_folder,"best_model.pth"))
             loss_plot(train_loss_list, valid_loss_list, params["benchmark"])
             mlflow.log_metric("early stop epoch", epoch)
