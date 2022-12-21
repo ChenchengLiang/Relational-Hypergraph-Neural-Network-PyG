@@ -165,7 +165,7 @@ class HornGraphDataset(Dataset):
             edges = read_one_filed(json_file_name, feild)
             # add dummy edge when the read edge is empty
             if len(edges) == 0:
-                if feild in ["controlFlowHyperEdges", "dataFlowHyperEdges", "ternaryAdjacencyList"]:
+                if feild in ["controlFlowHyperEdge", "dataFlowHyperEdge", "ternaryHyperEdge"]:
                     edges = [tenary_dummy_edge]
                 else:
                     edges = [binary_dummy_edge]

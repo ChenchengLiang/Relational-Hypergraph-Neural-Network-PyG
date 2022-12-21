@@ -13,7 +13,8 @@ def main():
     for _benchmark in benchmarks:
         run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
                            data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=False, _epochs=1,
-                           _reload_data=True, _self_loop=False, _add_global_edges=False, _file_name="",_experiment_name="load_data")
+                           _reload_data=True, _self_loop=False, _add_global_edges=False,_add_backward_edges=False,
+                           _file_name="",_experiment_name="load_data")
 
     # train
     # models = ["hyper_GCN", "GNN"]
