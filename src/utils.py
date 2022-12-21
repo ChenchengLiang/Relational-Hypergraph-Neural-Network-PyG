@@ -138,3 +138,9 @@ def send_email(subject="python finished"):
 def camel_to_snake(name):
     name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).lower()
+
+def common_files(folder1,folder2):
+    file_list_1= get_file_list(folder1,"smt2")
+    file_list_2 = get_file_list(folder2, "smt2")
+    common_file=set(file_list_1).intersection(file_list_2)
+    return list(common_file)

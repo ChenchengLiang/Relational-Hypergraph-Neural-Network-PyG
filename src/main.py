@@ -4,16 +4,16 @@ from experiment_utils import run_one_experiment
 from cluster_utils.utils import get_task_by_folder_name
 
 def main():
-    benchmarks = ["../benchmarks/argument-identification-linear-shuffled-CDHG",
-                  "../benchmarks/argument-identification-linear-shuffled-CG"
+    benchmarks = ["../benchmarks/unsatcore-old-data-CDHG",
+                  "../benchmarks/unsatcore-old-data-CG"
                   ]
 
     # load data
-    # task = get_task_by_folder_name(benchmarks[0])
-    # for _benchmark in benchmarks:
-    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
-    #                        data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=True, _epochs=1,
-    #                        _reload_data=True, _self_loop=False, _add_global_edges=False, _file_name=True)
+    task = get_task_by_folder_name(benchmarks[0])
+    for _benchmark in benchmarks:
+        run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
+                           data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=True, _epochs=1,
+                           _reload_data=True, _self_loop=False, _add_global_edges=False, _file_name="",_experiment_name="load_data")
 
     # train
     # models = ["hyper_GCN", "GNN"]
@@ -31,12 +31,12 @@ def main():
     fix_random_seed = False
     self_loop = [False]
     add_backward_edges = [False]
-    add_global_edges = [False]
+    add_global_edges = [True]
     use_class_weight = True  # this may interact (collapse) with gradient clip
     gradient_clip = False
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
-                       # "ASTLeftEdge", "ASTRightEdge",
-                       "ASTEdge",
+                       "ASTLeftEdge", "ASTRightEdge",
+                       #"ASTEdge",
                        # "quantifierEdge",
                        "controlFlowHyperEdge", "dataFlowHyperEdge"]
     cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
