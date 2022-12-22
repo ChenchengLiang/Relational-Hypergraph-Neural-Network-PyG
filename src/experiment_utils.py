@@ -24,7 +24,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
                        _experiment_date=True,
                        _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
                        _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
-                       _gradient_clip=False, _learning_rate=0.001, _activation="relu",_cdhg_edge_types=[],_cg_edge_types=[]) -> object:
+                       _gradient_clip=False, _learning_rate=0.001, _activation="relu",_cdhg_edge_types=[],_cg_edge_types=[],_embedding_size=32) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
@@ -53,7 +53,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["epochs"] = _epochs
     params["num_classes"] = task_num_class_dict[params["learning_task"]]
     params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
-    params["embedding_size"] = 32
+    params["embedding_size"] = _embedding_size
     params["num_gnn_layers"] = _num_gnn_layers
     params["num_linear_layer"] = _num_linear_layer
     params["graph_type"] = "hyperEdgeGraph" if "CDHG" in _benchmark else "monoDirectionLayerGraph"

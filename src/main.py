@@ -4,10 +4,8 @@ from experiment_utils import run_one_experiment
 from cluster_utils.utils import get_task_by_folder_name
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore-old-data-union-CDHG",
-                  "../benchmarks/unsatcore-old-data-union-CG",
-                  "../benchmarks/unsatcore-old-data-common-CDHG",
-                  "../benchmarks/unsatcore-old-data-common-CG"
+    benchmarks = ["../benchmarks/argument-identification-linear-shuffled-CDHG",
+                  "../benchmarks/argument-identification-linear-shuffled-CG",
                   ]
 
     # load data
@@ -30,22 +28,22 @@ def _train(benchmarks):
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsatcore_binary_classification"]
     task = get_task_by_folder_name(benchmarks[0])
-    num_gnn_layers = [4]
+    num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [True]
     dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
-    num_linear_layer = 4
-    epochs = 300
+    num_linear_layer = 2
+    epochs = 100
     reload_data = False
     fix_random_seed = False
     self_loop = [False]
     add_backward_edges = [False]
-    add_global_edges = [True]
-    use_class_weight = True  # this may interact (collapse) with gradient clip
+    add_global_edges = [False]
+    use_class_weight = False  # this may interact (collapse) with gradient clip
     gradient_clip = False
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
-                       "ASTLeftEdge", "ASTRightEdge",
-                       # "ASTEdge",
+                       #"ASTLeftEdge", "ASTRightEdge",
+                       "ASTEdge",
                        # "quantifierEdge",
                        "controlFlowHyperEdge", "dataFlowHyperEdge"]
     cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",

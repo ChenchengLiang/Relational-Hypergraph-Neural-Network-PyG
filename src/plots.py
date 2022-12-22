@@ -92,12 +92,12 @@ def draw_label_pie_chart(num_label, learning_label_generator, folder, name=""):
     return values
 
 
-def draw_confusion_matrix(predicted_y, true_y, num_classes, folder, name=""):
+def draw_confusion_matrix(predicted_y, true_y, num_classes, folder, name="",acc=""):
     label_list = list(range(num_classes))
     cm = confusion_matrix(true_y, predicted_y, labels=label_list)
     fig = px.imshow(cm, x=label_list, y=label_list, text_auto=True)
     fig.update_layout(
-        title='confusion matrix',
+        title='confusion matrix, '+"accuracy: " + str(acc),
         xaxis_title='predicted_y',
         yaxis_title='true_y')
     figure_folder = make_dirct(os.path.join(folder, "figures"))

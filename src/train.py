@@ -105,7 +105,7 @@ def train(train_loader, valid_loader, model, device, params):
         valid_loss_list.append(valid_loss)
         mlflow.log_metric("valid_loss", valid_loss, epoch)
         valid_acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
-        mlflow.log_metric("valid accuracy", valid_acc, epoch)
+        mlflow.log_metric("valid accuracy", '{:e}'.format(valid_acc), epoch)
         mlflow.log_metric("epoch", epoch, epoch)
 
         if valid_loss < best_loss:
@@ -113,7 +113,7 @@ def train(train_loader, valid_loader, model, device, params):
             best_epoch = epoch
             torch.save(model, os.path.join(model_folder,"best_model.pth"))
             draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"],
-                                  params["benchmark"], name="best-valid-" + params["task_type"])
+                                  params["benchmark"], name="best-valid-" + params["task_type"],acc=valid_acc)
 
         if valid_acc == 1.0:
             torch.save(model, os.path.join(model_folder,"best_model.pth"))
