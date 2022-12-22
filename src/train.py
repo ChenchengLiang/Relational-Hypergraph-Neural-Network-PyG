@@ -2,7 +2,7 @@ import os
 
 import torch
 import numpy as np
-from src.plots import loss_plot
+from src.plots import loss_plot,draw_confusion_matrix
 from src.utils import make_dirct
 import mlflow.pytorch
 from tqdm import tqdm
@@ -112,6 +112,8 @@ def train(train_loader, valid_loader, model, device, params):
             best_loss = valid_loss
             best_epoch = epoch
             torch.save(model, os.path.join(model_folder,"best_model.pth"))
+            draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"],
+                                  params["benchmark"], name="best-valid-" + params["task_type"])
 
         if valid_acc == 1.0:
             torch.save(model, os.path.join(model_folder,"best_model.pth"))

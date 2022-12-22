@@ -4,30 +4,38 @@ from experiment_utils import run_one_experiment
 from cluster_utils.utils import get_task_by_folder_name
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore-old-data-CDHG",
-                  "../benchmarks/unsatcore-old-data-CG"
+    benchmarks = ["../benchmarks/unsatcore-old-data-union-CDHG",
+                  "../benchmarks/unsatcore-old-data-union-CG",
+                  "../benchmarks/unsatcore-old-data-common-CDHG",
+                  "../benchmarks/unsatcore-old-data-common-CG"
                   ]
 
     # load data
-    task = get_task_by_folder_name(benchmarks[0])
-    for _benchmark in benchmarks:
-        run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
-                           data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=False, _epochs=1,
-                           _reload_data=True, _self_loop=False, _add_global_edges=False,_add_backward_edges=False,
-                           _file_name="",_experiment_name="load_data")
+    # task = get_task_by_folder_name(benchmarks[0])
+    # for _benchmark in benchmarks:
+    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
+    #                        data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=False, _epochs=1,
+    #                        _reload_data=True, _self_loop=False, _add_global_edges=False,_add_backward_edges=False,
+    #                        _file_name="",_experiment_name="load_data")
 
     # train
+    _train(benchmarks)
+
+
+# send_email("train finished")
+
+def _train(benchmarks):
     # models = ["hyper_GCN", "GNN"]
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsatcore_binary_classification"]
     task = get_task_by_folder_name(benchmarks[0])
-    num_gnn_layers = [2]
+    num_gnn_layers = [4]
     data_loader_shuffle = [False]
-    use_intermediate_gnn_results = [False]
+    use_intermediate_gnn_results = [True]
     dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
-    num_linear_layer = 2
-    epochs = 100
+    num_linear_layer = 4
+    epochs = 300
     reload_data = False
     fix_random_seed = False
     self_loop = [False]
@@ -37,7 +45,7 @@ def main():
     gradient_clip = False
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
                        "ASTLeftEdge", "ASTRightEdge",
-                       #"ASTEdge",
+                       # "ASTEdge",
                        # "quantifierEdge",
                        "controlFlowHyperEdge", "dataFlowHyperEdge"]
     cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
@@ -82,10 +90,5 @@ def main():
                                                            _gradient_clip=gradient_clip,
                                                            _cdhg_edge_types=cdhg_edge_types,
                                                            _cg_edge_types=cg_edge_types)
-
-
-# send_email("train finished")
-
-
 if __name__ == '__main__':
     main()
