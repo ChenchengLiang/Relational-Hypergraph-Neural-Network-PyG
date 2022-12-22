@@ -89,6 +89,7 @@ def draw_label_pie_chart(num_label, learning_label_generator, folder, name=""):
     save_file_name = os.path.join(figure_folder, name + "-distribution.html")
     fig.write_html(save_file_name)
     mlflow.log_artifact(save_file_name)
+    mlflow.set_tag(name+" dominate distribution",max(values)/sum(values))
     return values
 
 
