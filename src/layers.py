@@ -20,7 +20,7 @@ class HyperConv(MessagePassing):
         self.linear_layers, self.linear_layers_norm, self.linear_layers_act = self._get_linear_layers()
 
         self.final_update_func = get_activation(self.activation)
-        self.message_normalization=message_normalization
+        self.message_normalization = message_normalization
 
         self.reset_parameters()
 
@@ -53,11 +53,11 @@ class HyperConv(MessagePassing):
                 message_per_position = self.linear_layers[linear_layer_counter](
                     concatednated_node_features)  # [E, embedding_size]
                 # normalization
-                if self.message_normalization==True:
+                if self.message_normalization == True:
                     message_per_position = self.linear_layers_norm[linear_layer_counter](message_per_position)
                     message_per_position = self.linear_layers_act[linear_layer_counter](message_per_position)
-                    message_per_position = F.dropout(message_per_position, p=self.inner_layer_dropout_rate,
-                                                     training=self.training)
+                message_per_position = F.dropout(message_per_position, p=self.inner_layer_dropout_rate,
+                                                 training=self.training)
 
                 # add messages to every target node position
                 target_node_index = edges[position, :]  # [E]

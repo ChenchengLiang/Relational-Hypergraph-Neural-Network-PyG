@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv, SAGEConv, FiLMConv
-from torch.nn import Linear, BatchNorm1d, Embedding, ModuleList, LayerNorm, Dropout, ReLU, LeakyReLU, Identity
+from torch.nn import Linear, BatchNorm1d, Embedding, ModuleList, LayerNorm, Dropout, ReLU, LeakyReLU, Identity,Tanh
 from src.torch_utils import get_activation, initialize_linear_layers, forward_linear_layers
 from src.layers import HyperConv
 
@@ -74,7 +74,7 @@ class Hyper_classification(torch.nn.Module):
     def __init__(self, label_size, vocabulary_size, edge_arity_dict, embedding_size, num_gnn_layers,
                  num_linear_layer, activation, feature_size=1,
                  dropout_probability={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0},
-                 use_intermediate_gnn_results=False,message_normalization=False):
+                 use_intermediate_gnn_results=False, message_normalization=False):
         super().__init__()
         self.use_intermediate_gnn_results = use_intermediate_gnn_results
         self.feature_size = feature_size
@@ -84,19 +84,27 @@ class Hyper_classification(torch.nn.Module):
         self.activation = activation
         self.dropout_probability = dropout_probability
         self.message_normalization = message_normalization
+        self._residual_every_num_layers = 2
+        self._dense_every_num_layers = 2
+        self._dense_intermediate_layer_activation_fn=Tanh()
 
         # initialize conv layers
         self.hyper_conv_list = ModuleList()
         self.conv_norm_list = ModuleList()
         self.conv_act_list = ModuleList()
         self.conv_drop_list = ModuleList()
-        for i in range(num_gnn_layers):
+        self._dense_layer_list = ModuleList()
+        for layer_idx in range(num_gnn_layers):
             self.hyper_conv_list.append(
                 HyperConv(embedding_size, embedding_size, edge_arity_dict=edge_arity_dict, activation=self.activation,
-                          inner_layer_dropout_rate=self.dropout_probability["gnn_inner_layer_dropout_rate"],message_normalization=self.message_normalization))
+                          inner_layer_dropout_rate=self.dropout_probability["gnn_inner_layer_dropout_rate"],
+                          message_normalization=self.message_normalization))
             self.conv_norm_list.append(LayerNorm(embedding_size))
             self.conv_act_list.append(get_activation(self.activation))
             self.conv_drop_list.append(Dropout(p=self.dropout_probability["gnn_dropout_rate"]))
+            if layer_idx % self._dense_every_num_layers == 0:
+                self._dense_layer_list.append(Linear(embedding_size,embedding_size,bias=False))
+
 
         # transform concatenated intermediate layer to linear layer size, +1 means include embeddeding layer
         self.linear_transformation_for_intermediate_results = Linear(embedding_size * (num_gnn_layers + 1),
@@ -124,14 +132,39 @@ class Hyper_classification(torch.nn.Module):
 
         # output from each layer (including embedding layer) and concatenate them in the end
         intermediate_layer_results = [x]
+        last_node_representations = x
         # GNN layers
-        for i, (conv, conv_norm, conv_act, conv_drop) in enumerate(
+        for layer_idx, (conv, conv_norm, conv_act, conv_drop) in enumerate(
                 zip(self.hyper_conv_list, self.conv_norm_list, self.conv_act_list, self.conv_drop_list)):
+
+            # Pass residuals through:
+            if layer_idx % self._residual_every_num_layers == 0:
+                tmp = x
+                if layer_idx > 0:
+                    x += last_node_representations
+                    x /= 2
+                last_node_representations = tmp
+
+            # Message passing
             x = conv(x, edge_index, edge_list)
+
+            # Layer normalize
             x = conv_norm(x)
-            x = conv_act(x)
-            if self.training == True and i < len(self.hyper_conv_list) - 1:  # don't dropout at last conv layer
+            # x = conv_act(x)
+            # Dropout
+            if self.training == True and layer_idx < len(self.hyper_conv_list) - 1:  # don't dropout at last conv layer
                 x = conv_drop(x)
+
+            # _global_exchange_every_num_layers
+
+            # Apply dense layer, if needed.
+            if layer_idx % self._dense_every_num_layers == 0:
+                x = self._dense_layer_list[layer_idx](x)
+                x = self._dense_intermediate_layer_activation_fn(x)
+                # if self.training == True:
+                #     x = Dropout(x)
+
+
             intermediate_layer_results.append(x)
 
         if self.use_intermediate_gnn_results == True:
