@@ -74,7 +74,7 @@ class Hyper_classification(torch.nn.Module):
     def __init__(self, label_size, vocabulary_size, edge_arity_dict, embedding_size, num_gnn_layers,
                  num_linear_layer, activation, feature_size=1,
                  dropout_probability={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0},
-                 use_intermediate_gnn_results=False):
+                 use_intermediate_gnn_results=False,message_normalization=False):
         super().__init__()
         self.use_intermediate_gnn_results = use_intermediate_gnn_results
         self.feature_size = feature_size
@@ -83,6 +83,7 @@ class Hyper_classification(torch.nn.Module):
         self.embedding = Embedding(vocabulary_size, embedding_size)
         self.activation = activation
         self.dropout_probability = dropout_probability
+        self.message_normalization = message_normalization
 
         # initialize conv layers
         self.hyper_conv_list = ModuleList()
@@ -92,7 +93,7 @@ class Hyper_classification(torch.nn.Module):
         for i in range(num_gnn_layers):
             self.hyper_conv_list.append(
                 HyperConv(embedding_size, embedding_size, edge_arity_dict=edge_arity_dict, activation=self.activation,
-                          inner_layer_dropout_rate=self.dropout_probability["gnn_inner_layer_dropout_rate"]))
+                          inner_layer_dropout_rate=self.dropout_probability["gnn_inner_layer_dropout_rate"],message_normalization=self.message_normalization))
             self.conv_norm_list.append(LayerNorm(embedding_size))
             self.conv_act_list.append(get_activation(self.activation))
             self.conv_drop_list.append(Dropout(p=self.dropout_probability["gnn_dropout_rate"]))

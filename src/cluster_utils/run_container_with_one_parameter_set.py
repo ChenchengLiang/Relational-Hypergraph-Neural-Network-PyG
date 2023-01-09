@@ -42,7 +42,7 @@ def main():
                        _experiment_name=experiment_name, _gradient_clip=parameter_dict["gradient_clip"],
                        _learning_rate=parameter_dict["learning_rate"], _activation=parameter_dict["activation"],
                        _cdhg_edge_types=parameter_dict["cdhg_edge_types"]
-                       , _cg_edge_types=parameter_dict["cg_edge_types"])
+                       , _cg_edge_types=parameter_dict["cg_edge_types"],_message_normalization=parameter_dict["message_normalization"])
 
     shutil.rmtree(temp_folder_path)
 

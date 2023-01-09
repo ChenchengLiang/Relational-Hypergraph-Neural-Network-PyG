@@ -24,7 +24,8 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
                        _experiment_date=True,
                        _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
                        _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
-                       _gradient_clip=False, _learning_rate=0.001, _activation="relu",_cdhg_edge_types=[],_cg_edge_types=[],_embedding_size=32) -> object:
+                       _gradient_clip=False, _learning_rate=0.001, _activation="relu", _cdhg_edge_types=[],
+                       _cg_edge_types=[], _embedding_size=32, _message_normalization=False) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         torch.manual_seed(42)
@@ -71,6 +72,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["file_name"] = _file_name
     params["gradient_clip"] = _gradient_clip
     params["use_class_weight"] = _use_class_weight
+    params["message_normalization"] = _message_normalization
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,
@@ -96,7 +98,8 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
                                          num_linear_layer=params["num_linear_layer"],
                                          activation=params["activation"],
                                          dropout_probability=params["drop_out_rate"],
-                                         use_intermediate_gnn_results=params["use_intermediate_gnn_results"]).to(device)
+                                         use_intermediate_gnn_results=params["use_intermediate_gnn_results"],
+                                         message_normalization=params["message_normalization"]).to(device)
         else:
             model = Full_connected_model(params["num_classes"], vocabulary_size,
                                          embedding_size=params["embedding_size"]).to(device)
