@@ -42,7 +42,7 @@ def main():
     use_intermediate_gnn_results = [False]
     message_normalization = [False]
     add_backward_edges = [False]
-    add_global_edges = [True]
+    add_global_edges = [False]
     self_loop = [False]
     gradient_clip = [True]
     inter_layer_norm = [True]
@@ -50,6 +50,7 @@ def main():
     epochs = 200
     GPU = [True,False]
     reload_data = False
+    regression_layer_norm=False
     fix_random_seed = True
     use_class_weight = False
     learning_rate = [0.001]
@@ -103,7 +104,7 @@ def main():
                                                                      "activation": _activation,
                                                                      "cdhg_edge_types": cdhg_edge_types,
                                                                      "cg_edge_types": cg_edge_types,
-                                                                     "embedding_size": _embedding_size, "GPU": _GPU})
+                                                                     "embedding_size": _embedding_size, "GPU": _GPU,"regression_layer_norm":regression_layer_norm})
 
 
                                                         else:
@@ -136,7 +137,7 @@ def main():
                                                                                  "embedding_size": _embedding_size,
                                                                                  "message_normalization": _message_normalization,
                                                                                  "inter_layer_norm": _inter_layer_norm,
-                                                                                 "GPU": _GPU})
+                                                                                 "GPU": _GPU,"regression_layer_norm":regression_layer_norm})
 
     for i, parameter_dict in enumerate(parameter_dict_list):
         with open(parameter_folder + "/hyper-paprameter_" + str(i) + ".JSON", 'w') as f:

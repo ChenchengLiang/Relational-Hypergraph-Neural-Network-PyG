@@ -21,23 +21,25 @@ def get_activation(activation):
         return Identity()
 
 
-def initialize_linear_layers(num_linear_layer, embedding_size, activation, dropout_probability):
+def initialize_linear_layers(num_linear_layer, embedding_size, activation, dropout_probability,norm=True):
     linear_list = ModuleList()
     linear_lin_norm_list = ModuleList()
     linear_act_list = ModuleList()
     linear_dropout_list = ModuleList()
     for i in range(num_linear_layer):
         linear_list.append(Linear(embedding_size, embedding_size,bias=True))
-        linear_lin_norm_list.append(LayerNorm(embedding_size))
+        if norm== True:
+            linear_lin_norm_list.append(LayerNorm(embedding_size))
         linear_act_list.append(get_activation(activation))
         linear_dropout_list.append(Dropout(p=dropout_probability))
     return linear_list, linear_lin_norm_list, linear_act_list,linear_dropout_list
 
-def forward_linear_layers(x,linear_list,linear_ln_list,linear_act_list,linear_dropout_list,linear_out,training):
+def forward_linear_layers(x,linear_list,linear_ln_list,linear_act_list,linear_dropout_list,linear_out,training,norm=True):
     for i, (lin, lin_norm, act, drop) in enumerate(
             zip(linear_list, linear_ln_list, linear_act_list, linear_dropout_list)):
         x = lin(x)
-        x = lin_norm(x)
+        if norm ==  True:
+            x = lin_norm(x)
         if training == True and i < len(linear_list) - 1:  # don't dropout at last conv layer
             x = drop(x)  # x = F.dropout(x, p=0.8, training=self.training)
         x = act(x)

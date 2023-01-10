@@ -86,7 +86,8 @@ class Hyper_classification(torch.nn.Module):
             "dense_intermediate_layer_activation_fn": Tanh(),
             "initial_node_representation_activation_fn": Tanh(),
             "linear_transformation_activation_fn":Tanh(),
-            "inter_layer_norm": True
+            "inter_layer_norm": True,
+            "regression_layer_norm":True
         }
 
     def __init__(self, label_size, vocabulary_size, edge_arity_dict, input_params):
@@ -109,6 +110,7 @@ class Hyper_classification(torch.nn.Module):
         self._dense_intermediate_layer_activation_fn = hyper_parameters["dense_intermediate_layer_activation_fn"]
         self._initial_node_representation_activation_fn = hyper_parameters["initial_node_representation_activation_fn"]
         self._inter_layer_norm = hyper_parameters["inter_layer_norm"]
+        self._regression_layer_norm = hyper_parameters["regression_layer_norm"]
 
         self.initial_node_representation=Linear(self._embedding_size,self._embedding_size,bias=False)
         self.initial_node_representation_activation_fn=hyper_parameters["initial_node_representation_activation_fn"]
@@ -139,7 +141,7 @@ class Hyper_classification(torch.nn.Module):
         # initialize linear layers
         self.linear_list, self.linear_lin_norm_list, self.linear_act_list, self.linear_dropout_list = initialize_linear_layers(
             num_linear_layer=self._num_linear_layer, embedding_size=self._embedding_size, activation=self._activation,
-            dropout_probability=self._dropout_probability["mlp_dropout_rate"])
+            dropout_probability=self._dropout_probability["mlp_dropout_rate"], norm=self._regression_layer_norm)
 
         output_size = 1 if label_size == 2 else label_size
         self.linear_out = Linear(self._embedding_size, output_size, bias=True)
@@ -163,7 +165,7 @@ class Hyper_classification(torch.nn.Module):
 
         # output from each layer (including initial layer) and concatenate them in the end
         intermediate_layer_results = [x]
-        
+
         #layer loop begins
         last_node_representations = x
         dense_layer_index = 0
@@ -213,7 +215,7 @@ class Hyper_classification(torch.nn.Module):
 
         # linear layers
         x = forward_linear_layers(x, self.linear_list, self.linear_lin_norm_list, self.linear_act_list,
-                                  self.linear_dropout_list, self.linear_out, self.training)
+                                  self.linear_dropout_list, self.linear_out, self.training, norm=self._regression_layer_norm)
         return x
 
 

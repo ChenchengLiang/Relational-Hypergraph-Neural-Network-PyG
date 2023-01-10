@@ -89,7 +89,7 @@ def train(train_loader, valid_loader, model, device, params):
         train_loss_list.append(train_loss)
         mlflow.log_metric("train_loss", train_loss, epoch)
         train_acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
-        mlflow.log_metric("train_acc accuracy", '{:e}'.format(train_acc), epoch)
+        mlflow.log_metric("train accuracy", '{:e}'.format(train_acc), epoch)
 
 
         #scheduler.step()

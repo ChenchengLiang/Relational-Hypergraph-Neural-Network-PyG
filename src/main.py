@@ -3,6 +3,7 @@ from src.layers import HyperConv
 from experiment_utils import run_one_experiment
 from cluster_utils.utils import get_task_by_folder_name
 
+
 def main():
     benchmarks = ["../benchmarks/unsatcore-old-data-union-CDHG",
                   "../benchmarks/unsatcore-old-data-union-CG",
@@ -36,15 +37,17 @@ def _train(benchmarks):
     epochs = 10
     reload_data = False
     fix_random_seed = True
-    GPU=False
+    GPU = False
+    message_normalization = False
     self_loop = [False]
     add_backward_edges = [False]
-    add_global_edges = [True]
+    add_global_edges = [False]
     use_class_weight = False  # this may interact (collapse) with gradient clip
     gradient_clip = False
+    regression_layer_norm = False
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
                        "ASTLeftEdge", "ASTRightEdge",
-                       #"ASTEdge",
+                       # "ASTEdge",
                        # "quantifierEdge",
                        "controlFlowHyperEdge", "dataFlowHyperEdge"]
     cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
@@ -70,7 +73,8 @@ def _train(benchmarks):
                                                    _dropout_rate=dropout_rate,
                                                    _num_linear_layer=num_linear_layer,
                                                    _use_class_weight=use_class_weight, _gradient_clip=gradient_clip,
-                                                   _cdhg_edge_types=cdhg_edge_types, _cg_edge_types=cg_edge_types,_GPU=GPU)
+                                                   _cdhg_edge_types=cdhg_edge_types, _cg_edge_types=cg_edge_types,_message_normalization=message_normalization,
+                                                   _GPU=GPU, _regression_layer_norm=regression_layer_norm)
                         else:
                             for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                 for _add_backward_edge in add_backward_edges:
@@ -88,6 +92,9 @@ def _train(benchmarks):
                                                            _use_class_weight=use_class_weight,
                                                            _gradient_clip=gradient_clip,
                                                            _cdhg_edge_types=cdhg_edge_types,
-                                                           _cg_edge_types=cg_edge_types,_GPU=GPU)
+                                                           _cg_edge_types=cg_edge_types, _GPU=GPU,_message_normalization=message_normalization,
+                                                           _regression_layer_norm=regression_layer_norm)
+
+
 if __name__ == '__main__':
     main()

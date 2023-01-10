@@ -16,11 +16,11 @@ class HyperConv(MessagePassing):
         self.activation = activation
         self.negative_slope: float = 0.2
         self.inner_layer_dropout_rate = inner_layer_dropout_rate
-
-        self.linear_layers, self.linear_layers_norm, self.linear_layers_act = self._get_linear_layers()
+        self._message_normalization = message_normalization
+        self.linear_layers, self.linear_layers_norm, self.linear_layers_act = self._get_linear_layers(self._message_normalization)
 
         self.final_update_func = get_activation(self.activation)
-        self.message_normalization = message_normalization
+
 
         self.reset_parameters()
 
@@ -55,7 +55,7 @@ class HyperConv(MessagePassing):
                 message_per_position = self.linear_layers[linear_layer_counter](
                     concatednated_node_features)  # [E, embedding_size]
                 # normalization
-                if self.message_normalization == True:
+                if self._message_normalization == True:
                     message_per_position = self.linear_layers_norm[linear_layer_counter](message_per_position)
                 message_per_position = F.dropout(message_per_position, p=self.inner_layer_dropout_rate,
                                                  training=self.training)
@@ -81,7 +81,7 @@ class HyperConv(MessagePassing):
         out = aggregated_messages
         return out
 
-    def _get_linear_layers(self):
+    def _get_linear_layers(self,norm=True):
         linear_layers = ModuleList()
         linear_layers_norm = ModuleList()
         linear_layers_act = ModuleList()
@@ -89,7 +89,8 @@ class HyperConv(MessagePassing):
             for _ in range(self.edge_arity_dict[k]):
                 linear_layers.append(
                     Linear(self.embedding_size * self.edge_arity_dict[k], self.embedding_size, bias=False))
-                linear_layers_norm.append(LayerNorm(self.embedding_size))
+                if norm==True:
+                    linear_layers_norm.append(LayerNorm(self.embedding_size))
                 linear_layers_act.append(get_activation(self.activation))
         return linear_layers, linear_layers_norm, linear_layers_act
 

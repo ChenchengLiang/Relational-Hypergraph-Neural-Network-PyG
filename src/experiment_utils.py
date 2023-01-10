@@ -12,6 +12,7 @@ from src.predict import predict
 from src.data_utils.read_data import get_data
 from src.train import train
 from src.utils import write_predicted_label_to_JSON_file, send_email
+from src.train_utils import get_parameter_summary
 from torch_geometric.profile import get_model_size, count_parameters, get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
 
@@ -26,7 +27,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
                        _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
                        _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
                        _gradient_clip=False, _learning_rate=0.001, _activation="relu", _cdhg_edge_types=[],
-                       _cg_edge_types=[], _embedding_size=64, _message_normalization=False,_inter_layer_norm=True,_GPU=True) -> object:
+                       _cg_edge_types=[], _embedding_size=64, _message_normalization=False,_inter_layer_norm=True,_GPU=True,_regression_layer_norm=True) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
         random.seed(42)
@@ -76,6 +77,7 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["use_class_weight"] = _use_class_weight
     params["message_normalization"] = _message_normalization
     params["inter_layer_norm"]=_inter_layer_norm
+    params["regression_layer_norm"]=_regression_layer_norm
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,
@@ -103,8 +105,8 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
             model = Full_connected_model(params["num_classes"], vocabulary_size,
                                          embedding_size=params["embedding_size"]).to(device)
         # print("_benchmark",_benchmark)
-        print("total parameters",sum(p.numel() for p in model.parameters()))
-        print("trainable parameters", count_parameters(model))
+
+        get_parameter_summary(model)
         print("get_model_size", byte_to_megabyte(get_model_size(model)), "MB\n")
 
         params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".") + 1:-2]
