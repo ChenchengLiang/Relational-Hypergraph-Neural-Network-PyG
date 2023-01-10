@@ -55,9 +55,10 @@ class HyperConv(MessagePassing):
                 # normalization
                 if self.message_normalization == True:
                     message_per_position = self.linear_layers_norm[linear_layer_counter](message_per_position)
-                    message_per_position = self.linear_layers_act[linear_layer_counter](message_per_position)
                 message_per_position = F.dropout(message_per_position, p=self.inner_layer_dropout_rate,
                                                  training=self.training)
+                message_per_position = self.linear_layers_act[linear_layer_counter](message_per_position)
+
 
                 # add messages to every target node position
                 target_node_index = edges[position, :]  # [E]

@@ -44,7 +44,7 @@ def main():
                        _cdhg_edge_types=parameter_dict["cdhg_edge_types"]
                        , _cg_edge_types=parameter_dict["cg_edge_types"],
                        _message_normalization=parameter_dict["message_normalization"],
-                       _inter_layer_norm=parameter_dict["parameter_dict"])
+                       _inter_layer_norm=parameter_dict["inter_layer_norm"])
 
     shutil.rmtree(temp_folder_path)
 
