@@ -45,6 +45,7 @@ def main():
     add_global_edges = [True]
     self_loop = [True]
     gradient_clip = [True]
+    inter_layer_norm = [True]
     embedding_size = [64]
     epochs = 200
     reload_data = False
@@ -54,7 +55,7 @@ def main():
     activation = ["relu"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
                        "ASTLeftEdge", "ASTRightEdge",
-                       #"ASTEdge",
+                       # "ASTEdge",
                        # "quantifierEdge",
                        "controlFlowHyperEdge", "dataFlowHyperEdge"]
     cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
@@ -107,30 +108,32 @@ def main():
                                                         for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                                             for _add_backward_edge in add_backward_edges:
                                                                 for _message_normalization in message_normalization:
-                                                                    parameter_dict_list.append(
-                                                                        {"model": model, "task": task,
-                                                                         "num_gnn_layer": num_gnn_layer,
-                                                                         "benchmark": benchmark,
-                                                                         "data_shuffle": data_shuffle,
-                                                                         "gnn": HyperConv.__name__,
-                                                                         "use_intermediate_gnn_results": _use_intermediate_gnn_results,
-                                                                         "epochs": epochs, "file_name": "",
-                                                                         "reload_data": reload_data,
-                                                                         "self_loop": _self_loop,
-                                                                         "add_backward_edges": _add_backward_edge,
-                                                                         "add_global_edges": _add_global_edge,
-                                                                         "fix_random_seeds": fix_random_seed,
-                                                                         "experiment_date": experiment_date,
-                                                                         "dropout_rate": _dropout_rate,
-                                                                         "num_linear_layer": num_linear_layer,
-                                                                         "use_class_weight": use_class_weight,
-                                                                         "gradient_clip": _gradient_clip,
-                                                                         "learning_rate": _learning_rate,
-                                                                         "activation": _activation,
-                                                                         "cdhg_edge_types": cdhg_edge_types,
-                                                                         "cg_edge_types": cg_edge_types,
-                                                                         "embedding_size": _embedding_size,
-                                                                         "message_normalization": _message_normalization})
+                                                                    for _inter_layer_norm in inter_layer_norm:
+                                                                        parameter_dict_list.append(
+                                                                            {"model": model, "task": task,
+                                                                             "num_gnn_layer": num_gnn_layer,
+                                                                             "benchmark": benchmark,
+                                                                             "data_shuffle": data_shuffle,
+                                                                             "gnn": HyperConv.__name__,
+                                                                             "use_intermediate_gnn_results": _use_intermediate_gnn_results,
+                                                                             "epochs": epochs, "file_name": "",
+                                                                             "reload_data": reload_data,
+                                                                             "self_loop": _self_loop,
+                                                                             "add_backward_edges": _add_backward_edge,
+                                                                             "add_global_edges": _add_global_edge,
+                                                                             "fix_random_seeds": fix_random_seed,
+                                                                             "experiment_date": experiment_date,
+                                                                             "dropout_rate": _dropout_rate,
+                                                                             "num_linear_layer": num_linear_layer,
+                                                                             "use_class_weight": use_class_weight,
+                                                                             "gradient_clip": _gradient_clip,
+                                                                             "learning_rate": _learning_rate,
+                                                                             "activation": _activation,
+                                                                             "cdhg_edge_types": cdhg_edge_types,
+                                                                             "cg_edge_types": cg_edge_types,
+                                                                             "embedding_size": _embedding_size,
+                                                                             "message_normalization": _message_normalization,
+                                                                             "inter_layer_norm": _inter_layer_norm})
 
     for i, parameter_dict in enumerate(parameter_dict_list):
         with open(parameter_folder + "/hyper-paprameter_" + str(i) + ".JSON", 'w') as f:
