@@ -1,4 +1,5 @@
 import os
+import random
 from datetime import datetime
 from os.path import join as opj
 import mlflow
@@ -25,9 +26,10 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
                        _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
                        _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
                        _gradient_clip=False, _learning_rate=0.001, _activation="relu", _cdhg_edge_types=[],
-                       _cg_edge_types=[], _embedding_size=32, _message_normalization=False,_inter_layer_norm=True) -> object:
+                       _cg_edge_types=[], _embedding_size=64, _message_normalization=False,_inter_layer_norm=True,_GPU=True) -> object:
     if _fix_random_seeds == True:
         np.random.seed(42)
+        random.seed(42)
         torch.manual_seed(42)
         torch.cuda.manual_seed_all(42)
 
@@ -81,8 +83,10 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
 
         # todo: fix embedding layer outside of the training, otherwise random seed will affect them.
 
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        # device = torch.device('cpu')
+        if _GPU==True:
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            device = torch.device('cpu')
 
         if params["model"] == "GNN":
             model = GNN_classification(params["num_classes"], vocabulary_size=vocabulary_size,
@@ -99,7 +103,8 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
             model = Full_connected_model(params["num_classes"], vocabulary_size,
                                          embedding_size=params["embedding_size"]).to(device)
         # print("_benchmark",_benchmark)
-        print("count_parameters", count_parameters(model))
+        print("total parameters",sum(p.numel() for p in model.parameters()))
+        print("trainable parameters", count_parameters(model))
         print("get_model_size", byte_to_megabyte(get_model_size(model)), "MB\n")
 
         params["gnn"] = str(params["gnn"])[str(params["gnn"]).rfind(".") + 1:-2]
