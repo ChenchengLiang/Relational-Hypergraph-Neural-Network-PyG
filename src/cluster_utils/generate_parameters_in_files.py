@@ -53,8 +53,8 @@ def main():
     learning_rate = [0.001]
     activation = ["relu"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
-                       # "ASTLeftEdge", "ASTRightEdge",
-                       "ASTEdge",
+                       "ASTLeftEdge", "ASTRightEdge",
+                       #"ASTEdge",
                        # "quantifierEdge",
                        "controlFlowHyperEdge", "dataFlowHyperEdge"]
     cg_edge_types = ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",

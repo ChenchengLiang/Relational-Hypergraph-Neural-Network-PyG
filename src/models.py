@@ -133,6 +133,7 @@ class Hyper_classification(torch.nn.Module):
         # output from each layer (including embedding layer) and concatenate them in the end
         intermediate_layer_results = [x]
         last_node_representations = x
+        dense_layer_idx=0
         # GNN layers
         for layer_idx, (conv, conv_norm, conv_act, conv_drop) in enumerate(
                 zip(self.hyper_conv_list, self.conv_norm_list, self.conv_act_list, self.conv_drop_list)):
@@ -159,10 +160,11 @@ class Hyper_classification(torch.nn.Module):
 
             # Apply dense layer, if needed.
             if layer_idx % self._dense_every_num_layers == 0:
-                x = self._dense_layer_list[layer_idx](x)
+                x = self._dense_layer_list[dense_layer_idx](x)
                 x = self._dense_intermediate_layer_activation_fn(x)
-                # if self.training == True:
-                #     x = Dropout(x)
+                x=F.dropout(x,p=0,training=self.training)
+                dense_layer_idx+=1
+
 
 
             intermediate_layer_results.append(x)

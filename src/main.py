@@ -4,8 +4,8 @@ from experiment_utils import run_one_experiment
 from cluster_utils.utils import get_task_by_folder_name
 
 def main():
-    benchmarks = ["../benchmarks/argument-identification-linear-shuffled-CDHG",
-                  "../benchmarks/argument-identification-linear-shuffled-CG",
+    benchmarks = ["../benchmarks/unsatcore_pipeline_small-overfitting-CDHG",
+                  "../benchmarks/unsatcore_pipeline_small-overfitting-CG",
                   ]
 
     # load data
@@ -33,7 +33,7 @@ def _train(benchmarks):
     use_intermediate_gnn_results = [True]
     dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
     num_linear_layer = 2
-    epochs = 100
+    epochs = 2
     reload_data = False
     fix_random_seed = False
     self_loop = [False]
