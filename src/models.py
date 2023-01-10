@@ -83,7 +83,9 @@ class Hyper_classification(torch.nn.Module):
             "message_normalization": False,
             "residual_every_num_layers": 2,
             "dense_every_num_layers": 2,
-            "_dense_intermediate_layer_activation_fn": Tanh(),
+            "dense_intermediate_layer_activation_fn": Tanh(),
+            "initial_node_representation_activation_fn": Tanh(),
+            "linear_transformation_activation_fn":Tanh(),
             "inter_layer_norm": True
         }
 
@@ -104,8 +106,12 @@ class Hyper_classification(torch.nn.Module):
         self._message_normalization = hyper_parameters["message_normalization"]
         self._residual_every_num_layers = hyper_parameters["residual_every_num_layers"]
         self._dense_every_num_layers = hyper_parameters["dense_every_num_layers"]
-        self._dense_intermediate_layer_activation_fn = hyper_parameters["_dense_intermediate_layer_activation_fn"]
+        self._dense_intermediate_layer_activation_fn = hyper_parameters["dense_intermediate_layer_activation_fn"]
+        self._initial_node_representation_activation_fn = hyper_parameters["initial_node_representation_activation_fn"]
         self._inter_layer_norm = hyper_parameters["inter_layer_norm"]
+
+        self.initial_node_representation=Linear(self._embedding_size,self._embedding_size,bias=False)
+        self.initial_node_representation_activation_fn=hyper_parameters["initial_node_representation_activation_fn"]
 
         # initialize conv layers
         self.hyper_conv_list = ModuleList()
@@ -128,6 +134,7 @@ class Hyper_classification(torch.nn.Module):
         # transform concatenated intermediate layer to linear layer size, +1 means include embeddeding layer
         self.linear_transformation_for_intermediate_results = Linear(self._embedding_size * (self._num_gnn_layers + 1),
                                                                      self._embedding_size)
+        self.linear_transformation_activation_fn= hyper_parameters["linear_transformation_activation_fn"]
 
         # initialize linear layers
         self.linear_list, self.linear_lin_norm_list, self.linear_act_list, self.linear_dropout_list = initialize_linear_layers(
@@ -149,13 +156,21 @@ class Hyper_classification(torch.nn.Module):
         else:
             x = self.linear_in(x)
 
-        # output from each layer (including embedding layer) and concatenate them in the end
+
+        # initial representation
+        x = self.initial_node_representation(x)
+        x = self.initial_node_representation_activation_fn(x)
+
+        # output from each layer (including initial layer) and concatenate them in the end
         intermediate_layer_results = [x]
+        
+        #layer loop begins
         last_node_representations = x
         dense_layer_index = 0
         # GNN layers
         for layer_idx, (conv, conv_norm, conv_act, conv_drop) in enumerate(
                 zip(self.hyper_conv_list, self.conv_norm_list, self.conv_act_list, self.conv_drop_list)):
+
 
             # Pass residuals through:
             if layer_idx % self._residual_every_num_layers == 0:
@@ -192,6 +207,7 @@ class Hyper_classification(torch.nn.Module):
             x = torch.concat(intermediate_layer_results, dim=1)
             x = torch.index_select(x, dim=0, index=target_indices)  # gather label node
             x = self.linear_transformation_for_intermediate_results(x)
+
         else:
             x = torch.index_select(x, dim=0, index=target_indices)  # gather label node
 

@@ -4,17 +4,17 @@ from experiment_utils import run_one_experiment
 from cluster_utils.utils import get_task_by_folder_name
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore_pipeline_small-shuffled-CDHG",
-                  "../benchmarks/unsatcore_pipeline_small-shuffled-CG",
+    benchmarks = ["../benchmarks/unsatcore-old-data-union-CDHG",
+                  "../benchmarks/unsatcore-old-data-union-CG",
                   ]
 
     # load data
-    task = get_task_by_folder_name(benchmarks[0])
-    for _benchmark in benchmarks:
-        run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
-                           data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=False, _epochs=1,
-                           _reload_data=True, _self_loop=False, _add_global_edges=False,_add_backward_edges=False,
-                           _file_name="",_experiment_name="load_data")
+    # task = get_task_by_folder_name(benchmarks[0])
+    # for _benchmark in benchmarks:
+    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
+    #                        data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=False, _epochs=1,
+    #                        _reload_data=True, _self_loop=False, _add_global_edges=False,_add_backward_edges=False,
+    #                        _file_name="",_experiment_name="load_data")
 
     # train
     _train(benchmarks)

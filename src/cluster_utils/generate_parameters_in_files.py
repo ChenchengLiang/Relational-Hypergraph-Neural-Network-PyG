@@ -48,6 +48,7 @@ def main():
     inter_layer_norm = [True]
     embedding_size = [64]
     epochs = 200
+    GPU = [True,False]
     reload_data = False
     fix_random_seed = True
     use_class_weight = False
@@ -70,70 +71,72 @@ def main():
 
     for benchmark in benchmarks:
         for model in models:
-            for num_gnn_layer in num_gnn_layers:
-                for data_shuffle in data_loader_shuffle:
-                    for _self_loop in self_loop:
-                        for _gradient_clip in gradient_clip:
-                            for _dropout_rate in dropout_rate:
-                                for _learning_rate in learning_rate:
-                                    for _activation in activation:
-                                        for _add_global_edge in add_global_edges:
-                                            for num_linear_layer in num_linear_layers:
-                                                for _embedding_size in embedding_size:
-                                                    if model == "GNN":
-                                                        for gnn in gnns:
-                                                            parameter_dict_list.append(
-                                                                {"model": model, "task": task,
-                                                                 "num_gnn_layer": num_gnn_layer,
-                                                                 "benchmark": benchmark, "data_shuffle": data_shuffle,
-                                                                 "gnn": gnn.__name__,
-                                                                 "use_intermediate_gnn_results": False,
-                                                                 "epochs": epochs, "file_name": "", "reload_data": True,
-                                                                 "self_loop": True, "add_backward_edges": False,
-                                                                 "add_global_edges": False,
-                                                                 "fix_random_seeds": fix_random_seed,
-                                                                 "experiment_date": experiment_date,
-                                                                 "dropout_rate": _dropout_rate, "num_linear_layer": 4,
-                                                                 "use_class_weight": True,
-                                                                 "gradient_clip": _gradient_clip,
-                                                                 "add_global_edges": _add_global_edge,
-                                                                 "learning_rate": _learning_rate,
-                                                                 "activation": _activation,
-                                                                 "cdhg_edge_types": cdhg_edge_types,
-                                                                 "cg_edge_types": cg_edge_types,
-                                                                 "embedding_size": _embedding_size})
+            for _GPU in GPU:
+                for num_gnn_layer in num_gnn_layers:
+                    for data_shuffle in data_loader_shuffle:
+                        for _self_loop in self_loop:
+                            for _gradient_clip in gradient_clip:
+                                for _dropout_rate in dropout_rate:
+                                    for _learning_rate in learning_rate:
+                                        for _activation in activation:
+                                            for _add_global_edge in add_global_edges:
+                                                for num_linear_layer in num_linear_layers:
+                                                    for _embedding_size in embedding_size:
+                                                        if model == "GNN":
+                                                            for gnn in gnns:
+                                                                parameter_dict_list.append(
+                                                                    {"model": model, "task": task,
+                                                                     "num_gnn_layer": num_gnn_layer,
+                                                                     "benchmark": benchmark, "data_shuffle": data_shuffle,
+                                                                     "gnn": gnn.__name__,
+                                                                     "use_intermediate_gnn_results": False,
+                                                                     "epochs": epochs, "file_name": "", "reload_data": True,
+                                                                     "self_loop": True, "add_backward_edges": False,
+                                                                     "add_global_edges": False,
+                                                                     "fix_random_seeds": fix_random_seed,
+                                                                     "experiment_date": experiment_date,
+                                                                     "dropout_rate": _dropout_rate, "num_linear_layer": 4,
+                                                                     "use_class_weight": True,
+                                                                     "gradient_clip": _gradient_clip,
+                                                                     "add_global_edges": _add_global_edge,
+                                                                     "learning_rate": _learning_rate,
+                                                                     "activation": _activation,
+                                                                     "cdhg_edge_types": cdhg_edge_types,
+                                                                     "cg_edge_types": cg_edge_types,
+                                                                     "embedding_size": _embedding_size, "GPU": _GPU})
 
 
-                                                    else:
-                                                        for _use_intermediate_gnn_results in use_intermediate_gnn_results:
-                                                            for _add_backward_edge in add_backward_edges:
-                                                                for _message_normalization in message_normalization:
-                                                                    for _inter_layer_norm in inter_layer_norm:
-                                                                        parameter_dict_list.append(
-                                                                            {"model": model, "task": task,
-                                                                             "num_gnn_layer": num_gnn_layer,
-                                                                             "benchmark": benchmark,
-                                                                             "data_shuffle": data_shuffle,
-                                                                             "gnn": HyperConv.__name__,
-                                                                             "use_intermediate_gnn_results": _use_intermediate_gnn_results,
-                                                                             "epochs": epochs, "file_name": "",
-                                                                             "reload_data": reload_data,
-                                                                             "self_loop": _self_loop,
-                                                                             "add_backward_edges": _add_backward_edge,
-                                                                             "add_global_edges": _add_global_edge,
-                                                                             "fix_random_seeds": fix_random_seed,
-                                                                             "experiment_date": experiment_date,
-                                                                             "dropout_rate": _dropout_rate,
-                                                                             "num_linear_layer": num_linear_layer,
-                                                                             "use_class_weight": use_class_weight,
-                                                                             "gradient_clip": _gradient_clip,
-                                                                             "learning_rate": _learning_rate,
-                                                                             "activation": _activation,
-                                                                             "cdhg_edge_types": cdhg_edge_types,
-                                                                             "cg_edge_types": cg_edge_types,
-                                                                             "embedding_size": _embedding_size,
-                                                                             "message_normalization": _message_normalization,
-                                                                             "inter_layer_norm": _inter_layer_norm})
+                                                        else:
+                                                            for _use_intermediate_gnn_results in use_intermediate_gnn_results:
+                                                                for _add_backward_edge in add_backward_edges:
+                                                                    for _message_normalization in message_normalization:
+                                                                        for _inter_layer_norm in inter_layer_norm:
+                                                                            parameter_dict_list.append(
+                                                                                {"model": model, "task": task,
+                                                                                 "num_gnn_layer": num_gnn_layer,
+                                                                                 "benchmark": benchmark,
+                                                                                 "data_shuffle": data_shuffle,
+                                                                                 "gnn": HyperConv.__name__,
+                                                                                 "use_intermediate_gnn_results": _use_intermediate_gnn_results,
+                                                                                 "epochs": epochs, "file_name": "",
+                                                                                 "reload_data": reload_data,
+                                                                                 "self_loop": _self_loop,
+                                                                                 "add_backward_edges": _add_backward_edge,
+                                                                                 "add_global_edges": _add_global_edge,
+                                                                                 "fix_random_seeds": fix_random_seed,
+                                                                                 "experiment_date": experiment_date,
+                                                                                 "dropout_rate": _dropout_rate,
+                                                                                 "num_linear_layer": num_linear_layer,
+                                                                                 "use_class_weight": use_class_weight,
+                                                                                 "gradient_clip": _gradient_clip,
+                                                                                 "learning_rate": _learning_rate,
+                                                                                 "activation": _activation,
+                                                                                 "cdhg_edge_types": cdhg_edge_types,
+                                                                                 "cg_edge_types": cg_edge_types,
+                                                                                 "embedding_size": _embedding_size,
+                                                                                 "message_normalization": _message_normalization,
+                                                                                 "inter_layer_norm": _inter_layer_norm,
+                                                                                 "GPU": _GPU})
 
     for i, parameter_dict in enumerate(parameter_dict_list):
         with open(parameter_folder + "/hyper-paprameter_" + str(i) + ".JSON", 'w') as f:

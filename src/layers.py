@@ -35,8 +35,8 @@ class HyperConv(MessagePassing):
         aggregated_messages = torch.zeros(len(x), self.embedding_size,
                                           device=x.device)  # .to(device)#[N, embedding_size]
         linear_layer_counter = 0
-        target_node_index_list=[]
-        message_per_position_list=[]
+        messages=[]
+        messages_targets=[]
         for edges in edge_list:
             edge_arity = len(edges)
             # Step 1: concatenate neighbors
@@ -61,18 +61,18 @@ class HyperConv(MessagePassing):
                                                  training=self.training)
                 message_per_position = self.linear_layers_act[linear_layer_counter](message_per_position)
 
-                message_per_position_list.append(message_per_position)
+                messages.append(message_per_position)
                 # add messages to every target node position
                 target_node_index = edges[position, :]  # [E]
-                target_node_index_list.append(target_node_index)
+                messages_targets.append(target_node_index)
                 # aggregated_messages = aggregated_messages.index_add_(0, target_node_index,
                 #                                                      message_per_position)  # [N,embedding_size]
 
                 linear_layer_counter +=  1
 
-        target_node_index_list=torch.concat(target_node_index_list,dim=0)
-        message_per_position_list=torch.concat(message_per_position_list,dim=0)
-        aggregated_messages = aggregated_messages.index_add_(0, target_node_index_list,message_per_position_list)  # [N,embedding_size]
+        messages_targets=torch.concat(messages_targets,dim=0)
+        messages=torch.concat(messages,dim=0)
+        aggregated_messages = aggregated_messages.index_add_(dim=0, index=messages_targets,source=messages)  # [N,embedding_size]
         aggregated_messages = F.relu(aggregated_messages)  # [N,embedding_size]
         # aggregated_messages = self.final_update_func(aggregated_messages)
 
