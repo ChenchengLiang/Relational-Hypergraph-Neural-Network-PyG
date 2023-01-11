@@ -4,9 +4,10 @@ import json
 import subprocess
 import re
 
+
 def write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, task_type,
                                        root="../data/test_data"):
-    predicted_dir=make_dirct(os.path.join(root, "predicted"))
+    predicted_dir = make_dirct(os.path.join(root, "predicted"))
     for f, p, rp in zip(file_name_list, predicted_list, raw_predicted_list):
         zip_name = f[0]
         file_name = zip_name[:-len(".zip")]
@@ -84,13 +85,13 @@ def read_one_filed(file_name, field_name):
     return loaded_graph[field_name]
 
 
-def unzip_file(zip_file,verbose=False):
+def unzip_file(zip_file, verbose=False):
     if os.path.exists(zip_file):
         import zipfile
         with zipfile.ZipFile(zip_file, 'r') as zip_ref:
             zip_ref.extractall(os.path.dirname(zip_file))
     else:
-        if verbose==True:
+        if verbose == True:
             print("zip file " + zip_file + " not existed")
 
 
@@ -110,8 +111,10 @@ def make_dirct(d):
         print(str(d), "folder existed")
         return d
 
+
 def count_generator(iter):
     return sum(1 for _ in iter)
+
 
 # calculate file size in KB, MB, GB
 def convert_bytes(size):
@@ -121,26 +124,33 @@ def convert_bytes(size):
             return "%3.1f %s" % (size, x)
         size /= 1024.0
 
-def select_key_with_value_condition(d,f):
+
+def select_key_with_value_condition(d, f):
     v = list(d.values())
     k = list(d.keys())
-    return k[v.index(f(v))],f(v)
+    return k[v.index(f(v))], f(v)
 
-def assign_dict_key_empty_list(d,keys):
+
+def assign_dict_key_empty_list(d, keys):
     for k in keys:
-        d[k]=[]
+        d[k] = []
+
 
 def send_email(subject="python finished"):
     print("send email to chencheng.liang@it.uu.se")
     shell_command = " echo \"Subject:" + subject + " \" | sendmail -F \"chencheng\" chencheng.liang@it.uu.se "
     subprocess.Popen(shell_command, shell=True)
 
+
 def camel_to_snake(name):
     name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).lower()
 
-def common_files(folder1,folder2):
-    file_list_1= get_file_list(folder1,"smt2")
+
+def common_files(folder1, folder2):
+    file_list_1 = get_file_list(folder1, "smt2")
     file_list_2 = get_file_list(folder2, "smt2")
-    common_file=set(file_list_1).intersection(file_list_2)
+    file_list_1 = [os.path.basename(f)[:-len(".zip")] for f in file_list_1]
+    file_list_2 = [os.path.basename(f)[:-len(".zip")] for f in file_list_2]
+    common_file = set(file_list_1).intersection(file_list_2)
     return list(common_file)

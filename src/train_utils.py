@@ -2,9 +2,8 @@ import torch
 from torch_geometric.profile import count_parameters
 def get_loss_function(params,device):
     if params["task_type"] == "binary_classification" :
-        loss_function = torch.nn.BCEWithLogitsLoss(pos_weight=torch.tensor(params["class_weight"][1]*10)).to(device)
-        #, pos_weight=torch.tensor(params["class_weight"][1]*10)
-        #loss_function = torch.nn.functional.binary_cross_entropy_with_logits
+        #loss_function = torch.nn.BCEWithLogitsLoss(pos_weight=torch.tensor(params["class_weight"][1]*10)).to(device)
+        loss_function = torch.nn.functional.binary_cross_entropy_with_logits
         #loss_function = torch.nn.BCELoss(weight=torch.tensor(params["class_weight"][1])).to(device)
     else:
         # todo: use alternative to tf.nn.sigmoid_cross_entropy_with_logits

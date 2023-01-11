@@ -30,7 +30,7 @@ def main():
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     task = get_task_by_folder_name(folder_1)
     # todo add inner layer control to graph conv operator
-    num_gnn_layers = [2]  # 8 works best
+    num_gnn_layers = [8]  # 8 works best
     dropout_rate = [  # all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
         # {"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
@@ -42,7 +42,7 @@ def main():
     use_intermediate_gnn_results = [False]
     message_normalization = [False]
     add_backward_edges = [False]
-    add_global_edges = [False]
+    add_global_edges = [True]
     self_loop = [False]
     gradient_clip = [True]
     inter_layer_norm = [True]
