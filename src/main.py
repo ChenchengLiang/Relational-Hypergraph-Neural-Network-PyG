@@ -5,7 +5,9 @@ from cluster_utils.utils import get_task_by_folder_name
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore-union-aligned-old-data-CDHG",
+    benchmarks = ["../benchmarks/unsatcore-union-aligned-new-data-CDHG",
+                  "../benchmarks/unsatcore-union-aligned-new-data-CG",
+                "../benchmarks/unsatcore-union-aligned-old-data-CDHG",
                   "../benchmarks/unsatcore-union-aligned-old-data-CG",
                   ]
 

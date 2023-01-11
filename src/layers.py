@@ -73,6 +73,7 @@ class HyperConv(MessagePassing):
         messages_targets=torch.concat(messages_targets,dim=0)
         messages=torch.concat(messages,dim=0)
         #index_add_ is non-deterministic
+        #messages_targets,_ =torch.sort(messages_targets)
         aggregated_messages = aggregated_messages.index_add_(dim=0, index=messages_targets,source=messages)  # [N,embedding_size]
         aggregated_messages = F.relu(aggregated_messages)  # [N,embedding_size]
         # aggregated_messages = self.final_update_func(aggregated_messages)
