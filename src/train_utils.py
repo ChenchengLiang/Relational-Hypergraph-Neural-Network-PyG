@@ -12,7 +12,29 @@ def get_loss_function(params):
     return loss_function
 
 def get_parameter_summary(model):
+    def _get_param_num(param):
+        num=0
+        if len(param.shape) == 1:
+            num += param.shape[0]
+        else:
+            num += param.shape[0] * param.shape[1]
+        return num
+    embedding=0
+    conv=0
+    regression=0
     for name, param in model.named_parameters():
         print(name, param.shape)
+        if "embedding" in name:
+            embedding=param.shape[0]*param.shape[1]
+        if "conv" in name:
+            conv+=_get_param_num(param)
+        if "regression" in name:
+            regression += _get_param_num(param)
+
+
+
+    print("embedding:",embedding)
+    print("conv:", conv)
+    print("regression:",regression)
     print("total parameters", sum(p.numel() for p in model.parameters()))
     print("trainable parameters", count_parameters(model))

@@ -34,15 +34,15 @@ def initialize_linear_layers(num_linear_layer, embedding_size, activation, dropo
         linear_dropout_list.append(Dropout(p=dropout_probability))
     return linear_list, linear_lin_norm_list, linear_act_list,linear_dropout_list
 
-def forward_linear_layers(x,linear_list,linear_ln_list,linear_act_list,linear_dropout_list,linear_out,training,norm=True):
+def forward_linear_layers(x,regression_linear_list,regression_linear_ln_list,regression_linear_act_list,regression_linear_dropout_list,regression_linear_out,training,norm=True):
     for i, (lin, lin_norm, act, drop) in enumerate(
-            zip(linear_list, linear_ln_list, linear_act_list, linear_dropout_list)):
+            zip(regression_linear_list, regression_linear_ln_list, regression_linear_act_list, regression_linear_dropout_list)):
         x = lin(x)
         if norm ==  True:
             x = lin_norm(x)
-        if training == True and i < len(linear_list) - 1:  # don't dropout at last conv layer
+        if training == True and i < len(regression_linear_list) - 1:  # don't dropout at last conv layer
             x = drop(x)  # x = F.dropout(x, p=0.8, training=self.training)
         x = act(x)
 
-    x = linear_out(x)
+    x = regression_linear_out(x)
     return x
