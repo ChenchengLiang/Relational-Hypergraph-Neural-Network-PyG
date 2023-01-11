@@ -78,11 +78,12 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
     params["message_normalization"] = _message_normalization
     params["inter_layer_norm"]=_inter_layer_norm
     params["regression_layer_norm"]=_regression_layer_norm
+    params["fix_random_seeds"]=_fix_random_seeds
+    params["GPU"]=_GPU
 
     with mlflow.start_run(description=""):
         edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,
                                                                                                      reload_data=_reload_data)
-
         # todo: fix embedding layer outside of the training, otherwise random seed will affect them.
 
         if _GPU==True:

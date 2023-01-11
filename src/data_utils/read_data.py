@@ -105,7 +105,7 @@ def build_vocabulary(params):
         folder = opj(params["benchmark"], fold) + "/raw"
         total_file_list += get_file_list(folder, "." + params["graph_type"] + ".JSON")
 
-    fixed_symbol = ["initial_0", "false_0", "dummy_0", "unknown_0", "empty"]
+    fixed_symbol = []#["initial_0", "false_0", "dummy_0", "unknown_0", "empty"]
     canonical_symbol_key = ["relationSymbol", "relationSymbolArgument", "variable", "operator", "constant", "guard",
                             "clause", "clauseHead", "clauseBody", "clauseArgument", "templateBool", "templateEq",
                             "templateIneq"]

@@ -29,7 +29,7 @@ def _train(benchmarks):
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsatcore_binary_classification"]
     task = get_task_by_folder_name(benchmarks[0])
-    num_gnn_layers = [8]
+    num_gnn_layers = [2]
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
     dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
@@ -37,7 +37,7 @@ def _train(benchmarks):
     epochs = 10
     reload_data = False
     fix_random_seed = True
-    GPU = False
+    GPU = True
     message_normalization = False
     self_loop = [False]
     add_backward_edges = [False]

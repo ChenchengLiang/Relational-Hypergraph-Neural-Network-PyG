@@ -8,14 +8,12 @@ import torch
 
 def predict(trained_model, test_loader, device, params):
     optimizer = torch.optim.Adam(trained_model.parameters(), lr=params["learning_rate"])
-    ls_func = get_loss_function(params).to(device)
+    ls_func = get_loss_function(params,device)
     trained_model.eval()
-    test_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(trained_model,
+    test_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(params,trained_model,
                                                                                               test_loader, optimizer,
                                                                                               ls_func, device,
-                                                                                              train=False,
-                                                                                              task_type=params[
-                                                                                                  "task_type"])
+                                                                                              train=False)
 
     print("test_loss:", test_loss)
     # print("raw_predicted_list", raw_predicted_list)

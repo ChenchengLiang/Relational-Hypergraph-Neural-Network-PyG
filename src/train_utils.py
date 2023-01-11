@@ -1,14 +1,16 @@
 import torch
 from torch_geometric.profile import count_parameters
-def get_loss_function(params):
+def get_loss_function(params,device):
     if params["task_type"] == "binary_classification" :
-        loss_function = torch.nn.BCEWithLogitsLoss(pos_weight=torch.tensor(params["class_weight"][1]*10))
-        #loss_function = torch.nn.BCELoss(weight=torch.tensor(params["class_weight"][1]))
+        #loss_function = torch.nn.BCEWithLogitsLoss(pos_weight=torch.tensor(params["class_weight"][1]*10)).to(device)
+        loss_function = torch.nn.functional.binary_cross_entropy_with_logits
+        #loss_function = torch.nn.BCELoss(weight=torch.tensor(params["class_weight"][1])).to(device)
     else:
+        # todo: use alternative to tf.nn.sigmoid_cross_entropy_with_logits
         if len(params["class_weight"])==0:
-            loss_function = torch.nn.CrossEntropyLoss()
+            loss_function = torch.nn.CrossEntropyLoss().to(device)
         else:
-            loss_function=torch.nn.CrossEntropyLoss(weight=torch.tensor(params["class_weight"]))
+            loss_function=torch.nn.CrossEntropyLoss(weight=torch.tensor(params["class_weight"])).to(device)
     return loss_function
 
 def get_parameter_summary(model):
@@ -23,7 +25,7 @@ def get_parameter_summary(model):
     conv=0
     regression=0
     for name, param in model.named_parameters():
-        print(name, param.shape)
+        #print(name, param.shape)
         if "embedding" in name:
             embedding=param.shape[0]*param.shape[1]
         if "conv" in name:
@@ -32,9 +34,8 @@ def get_parameter_summary(model):
             regression += _get_param_num(param)
 
 
-
     print("embedding:",embedding)
     print("conv:", conv)
     print("regression:",regression)
-    print("total parameters", sum(p.numel() for p in model.parameters()))
+    print("total parameters", embedding+conv+regression)
     print("trainable parameters", count_parameters(model))
