@@ -14,7 +14,7 @@ from src.train_utils import get_loss_function
 # import wandb
 
 
-def run_one_epoch(params,model, data_loader, optimizer, ls_func, device, train=True):
+def run_one_epoch(params, model, data_loader, optimizer, ls_func, device, train=True):
     running_loss = 0.0
     raw_predicted_list = []
     predicted_list = []
@@ -27,10 +27,11 @@ def run_one_epoch(params,model, data_loader, optimizer, ls_func, device, train=T
         try:
             pred = model(batch)
             if params["task_type"] == "binary_classification":
-                loss = torch.mean(ls_func(torch.squeeze(pred), batch.y.float(), pos_weight=torch.tensor(params["class_weight"][1]*10)))
+                loss = ls_func(torch.squeeze(pred), batch.y.float())
                 sigmoid_pred = torch.sigmoid(pred)
                 raw_predicted_list.append(sigmoid_pred.cpu().detach().numpy())
                 predicted_list.append(np.rint(sigmoid_pred.cpu().detach().numpy()))
+
             elif params["task_type"] == "multi_classification":
                 loss = ls_func(pred, batch.y)
                 softmax_value = torch.softmax(pred, dim=1).cpu().detach().numpy()
@@ -64,7 +65,7 @@ def run_one_epoch(params,model, data_loader, optimizer, ls_func, device, train=T
 
 
 def train(train_loader, valid_loader, model, device, params):
-    ls_func = get_loss_function(params,device)
+    ls_func = get_loss_function(params, device)
     model_folder = make_dirct(os.path.join(params["benchmark"], "model"))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=params["learning_rate"])
@@ -78,7 +79,8 @@ def train(train_loader, valid_loader, model, device, params):
     for epoch in tqdm(range(params["epochs"]), desc="Training progress"):
         # training
         model.train()
-        train_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(params,model, train_loader,
+        train_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(params, model,
+                                                                                                   train_loader,
                                                                                                    optimizer, ls_func,
                                                                                                    device,
                                                                                                    train=True)
@@ -91,7 +93,8 @@ def train(train_loader, valid_loader, model, device, params):
 
         # validating
         model.eval()
-        valid_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(params,model, valid_loader,
+        valid_loss, predicted_list, raw_predicted_list, label_list, file_name_list = run_one_epoch(params, model,
+                                                                                                   valid_loader,
                                                                                                    optimizer, ls_func,
                                                                                                    device,
                                                                                                    train=False)
