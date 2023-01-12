@@ -50,6 +50,8 @@ def _train(benchmarks):
     embedding_size = [64]
     epochs = 200
     patient = 50
+    dense_every_num_layers = 2
+    residual_every_num_layers=2
     GPU = [True]
     reload_data = False
     regression_layer_norm = False
@@ -92,6 +94,7 @@ def _train(benchmarks):
                                                                         parameter_dict_list.append(
                                                                             {"model": model, "learning_task": task,
                                                                              "num_gnn_layer": num_gnn_layer,
+                                                                             "experiment_name": benchmark,
                                                                              "benchmark": benchmark,
                                                                              "data_shuffle": data_shuffle,
                                                                              "gnn": gnn.__name__,
@@ -115,7 +118,8 @@ def _train(benchmarks):
                                                                              "embedding_size": _embedding_size,
                                                                              "GPU": _GPU,
                                                                              "regression_layer_norm": regression_layer_norm,
-                                                                             "patient": patient})
+                                                                             "patient": patient,
+                                                                             "dense_every_num_layers": dense_every_num_layers,"residual_every_num_layers":residual_every_num_layers})
 
 
                                                                 else:
@@ -124,8 +128,10 @@ def _train(benchmarks):
                                                                             for _message_normalization in message_normalization:
                                                                                 for _inter_layer_norm in inter_layer_norm:
                                                                                     parameter_dict_list.append(
-                                                                                        {"model": model, "learning_task": task,
+                                                                                        {"model": model,
+                                                                                         "learning_task": task,
                                                                                          "num_gnn_layer": num_gnn_layer,
+                                                                                         "experiment_name": benchmark,
                                                                                          "benchmark": benchmark,
                                                                                          "data_shuffle": data_shuffle,
                                                                                          "gnn": HyperConv.__name__,
@@ -151,9 +157,11 @@ def _train(benchmarks):
                                                                                          "inter_layer_norm": _inter_layer_norm,
                                                                                          "GPU": _GPU,
                                                                                          "regression_layer_norm": regression_layer_norm,
-                                                                                         "patient": patient})
+                                                                                         "patient": patient,
+                                                                                         "dense_every_num_layers": dense_every_num_layers,"residual_every_num_layers":residual_every_num_layers})
     for i, parameter_dict in enumerate(parameter_dict_list):
         run_one_experiment(parameter_dict)
+
 
 if __name__ == '__main__':
     main()

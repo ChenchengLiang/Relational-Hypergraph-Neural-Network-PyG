@@ -123,7 +123,7 @@ class Hyper_classification(torch.nn.Module):
         self.conv_norm_list = ModuleList()
         self.conv_act_list = ModuleList()
         self.conv_drop_list = ModuleList()
-        self._dense_layer_list = ModuleList()
+        self.conv_dense_layer_list = ModuleList()
         for layer_idx in range(self._num_gnn_layers):
             self.hyper_conv_list.append(
                 HyperConv(self._embedding_size, self._embedding_size, edge_arity_dict=edge_arity_dict,
@@ -135,7 +135,7 @@ class Hyper_classification(torch.nn.Module):
             self.conv_drop_list.append(Dropout(p=self._dropout_probability["gnn_dropout_rate"]))
             if self._dense_every_num_layers!=0:
                 if layer_idx % self._dense_every_num_layers == 0:
-                    self._dense_layer_list.append(Linear(self._embedding_size, self._embedding_size, bias=False))
+                    self.conv_dense_layer_list.append(Linear(self._embedding_size, self._embedding_size, bias=False))
 
         # transform concatenated intermediate layer to linear layer size, +1 means include embeddeding layer
         if self._use_intermediate_gnn_results==True:
@@ -204,7 +204,7 @@ class Hyper_classification(torch.nn.Module):
             # Apply dense layer, if needed.
             if self._dense_every_num_layers!=0:
                 if layer_idx % self._dense_every_num_layers == 0:
-                    x = self._dense_layer_list[dense_layer_index](x)
+                    x = self.conv_dense_layer_list[dense_layer_index](x)
                     x = F.dropout(x, p=0, training=self.training)
                     x = self._dense_intermediate_layer_activation_fn(x)
                     dense_layer_index += 1

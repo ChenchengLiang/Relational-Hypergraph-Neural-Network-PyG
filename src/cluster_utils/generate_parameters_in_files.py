@@ -30,7 +30,7 @@ def main():
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     task = get_task_by_folder_name(folder_1)
     # todo add inner layer control to graph conv operator
-    num_gnn_layers = [2,4,8]  # 8 works best
+    num_gnn_layers = [2, 8]  # 8 works best
     dropout_rate = [  # all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
         # {"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
@@ -41,17 +41,19 @@ def main():
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
     message_normalization = [False]
-    add_backward_edges = [False]
-    add_global_edges = [True,False]
-    self_loop = [True,False]
+    add_backward_edges = [True, False]
+    add_global_edges = [True, False]
+    self_loop = [True, False]
     gradient_clip = [True]
     inter_layer_norm = [True]
     embedding_size = [64]
     epochs = 200
-    patient=50
+    patient = 50
+    dense_every_num_layers = 0
+    residual_every_num_layers = 0
     GPU = [True]
     reload_data = False
-    regression_layer_norm=False
+    regression_layer_norm = False
     fix_random_seed = [True]
     use_class_weight = [True]
     learning_rate = [0.001]
@@ -91,15 +93,20 @@ def main():
                                                                         parameter_dict_list.append(
                                                                             {"model": model, "learning_task": task,
                                                                              "num_gnn_layer": num_gnn_layer,
-                                                                             "benchmark": benchmark, "data_shuffle": data_shuffle,
+                                                                             "experiment_name": benchmark,
+                                                                             "benchmark": benchmark,
+                                                                             "data_shuffle": data_shuffle,
                                                                              "gnn": gnn.__name__,
                                                                              "use_intermediate_gnn_results": False,
-                                                                             "epochs": epochs, "file_name": "", "reload_data": True,
-                                                                             "self_loop": True, "add_backward_edges": False,
+                                                                             "epochs": epochs, "file_name": "",
+                                                                             "reload_data": True,
+                                                                             "self_loop": True,
+                                                                             "add_backward_edges": False,
                                                                              "add_global_edges": False,
                                                                              "fix_random_seeds": _fix_random_seed,
                                                                              "experiment_date": experiment_date,
-                                                                             "dropout_rate": _dropout_rate, "num_linear_layer": 4,
+                                                                             "dropout_rate": _dropout_rate,
+                                                                             "num_linear_layer": 4,
                                                                              "use_class_weight": _use_class_weight,
                                                                              "gradient_clip": _gradient_clip,
                                                                              "add_global_edges": _add_global_edge,
@@ -107,8 +114,12 @@ def main():
                                                                              "activation": _activation,
                                                                              "cdhg_edge_types": cdhg_edge_types,
                                                                              "cg_edge_types": cg_edge_types,
-                                                                             "embedding_size": _embedding_size, "GPU": _GPU,
-                                                                             "regression_layer_norm":regression_layer_norm,"patient":patient})
+                                                                             "embedding_size": _embedding_size,
+                                                                             "GPU": _GPU,
+                                                                             "regression_layer_norm": regression_layer_norm,
+                                                                             "patient": patient,
+                                                                             "dense_every_num_layers": dense_every_num_layers,
+                                                                             "residual_every_num_layers": residual_every_num_layers})
 
 
                                                                 else:
@@ -117,13 +128,16 @@ def main():
                                                                             for _message_normalization in message_normalization:
                                                                                 for _inter_layer_norm in inter_layer_norm:
                                                                                     parameter_dict_list.append(
-                                                                                        {"model": model, "learning_task": task,
+                                                                                        {"model": model,
+                                                                                         "learning_task": task,
                                                                                          "num_gnn_layer": num_gnn_layer,
+                                                                                         "experiment_name": benchmark,
                                                                                          "benchmark": benchmark,
                                                                                          "data_shuffle": data_shuffle,
                                                                                          "gnn": HyperConv.__name__,
                                                                                          "use_intermediate_gnn_results": _use_intermediate_gnn_results,
-                                                                                         "epochs": epochs, "file_name": "",
+                                                                                         "epochs": epochs,
+                                                                                         "file_name": "",
                                                                                          "reload_data": reload_data,
                                                                                          "self_loop": _self_loop,
                                                                                          "add_backward_edges": _add_backward_edge,
@@ -141,7 +155,11 @@ def main():
                                                                                          "embedding_size": _embedding_size,
                                                                                          "message_normalization": _message_normalization,
                                                                                          "inter_layer_norm": _inter_layer_norm,
-                                                                                         "GPU": _GPU,"regression_layer_norm":regression_layer_norm,"patient":patient})
+                                                                                         "GPU": _GPU,
+                                                                                         "regression_layer_norm": regression_layer_norm,
+                                                                                         "patient": patient,
+                                                                                         "dense_every_num_layers": dense_every_num_layers,
+                                                                                         "residual_every_num_layers": residual_every_num_layers})
 
     for i, parameter_dict in enumerate(parameter_dict_list):
         with open(parameter_folder + "/hyper-paprameter_" + str(i) + ".JSON", 'w') as f:
