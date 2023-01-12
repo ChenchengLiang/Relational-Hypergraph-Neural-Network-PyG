@@ -19,17 +19,80 @@ from torch_geometric.profile.utils import byte_to_megabyte
 
 # import wandb
 
+def get_default_parameters():
+    return {
+        "model":"hyper_GCN",
+        "learning_task":"unsatcore_binary_classification",
+        "num_gnn_layers":2,
+        "benchmark":"",
+        "data_loader_shuffle": False,
+        "gnn":HyperConv,
+        "use_intermediate_gnn_results":False,
+        "epochs":100,
+        "file_name":"",
+        "reload_data":False,
+        "add_self_loop_edges":False,
+        "add_backward_edges":False,
+        "add_global_edges":False,
+        "fix_random_seeds":True,
+        "experiment_date":True,
+        "drop_out_rate":{"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
+        "num_linear_layer":2,
+        "use_class_weight":True,
+        "experiment_name":"",
+        "gradient_clip":True,
+        "learning_rate":0.001,
+        "activation":"relu",# relu,leak_relu, tanh
+        "cdhg_edge_types":["relationSymbolArgumentEdge", "guardEdge",
+                       "ASTLeftEdge", "ASTRightEdge",
+                       # "ASTEdge",
+                       # "quantifierEdge",
+                       "controlFlowHyperEdge", "dataFlowHyperEdge"],
+        "cg_edge_types":["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
+                     "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge",
+                     # "ASTLeftEdge", "ASTRightEdge",
+                     "ASTEdge",
+                     # "quantifierEdge",
+                     "guardEdge", "dataEdge",
+                     ],
+        "edge_types":[],
+        "embedding_size":64,
+        "message_normalization":False,
+        "inter_layer_norm":True,
+        "GPU":True,
+        "regression_layer_norm":False,
+        "patient":50,
+        "batch_size":1,
+    }
 
-def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
-                       _epochs, _file_name="", _reload_data=True,
-                       _self_loop=False, _add_backward_edges=False, _add_global_edges=False, _fix_random_seeds=True,
-                       _experiment_date=True,
-                       _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
-                       _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
-                       _gradient_clip=False, _learning_rate=0.001, _activation="relu", _cdhg_edge_types=[],
-                       _cg_edge_types=[], _embedding_size=64, _message_normalization=False,_inter_layer_norm=True,
-                       _GPU=True,_regression_layer_norm=True,_patient=20) -> object:
-    if _fix_random_seeds == True:
+def run_one_experiment(input_params
+                       # ,_model, _task, _num_gnn_layers, _benchmark, data_shuffle, _gnn, _use_intermediate_gnn_results,
+                       # _epochs, _file_name="", _reload_data=True,
+                       # _self_loop=False, _add_backward_edges=False, _add_global_edges=False, _fix_random_seeds=True,
+                       # _experiment_date=True,
+                       # _dropout_rate={"gnn_dropout_rate": 0, "mlp_dropout_rate": 0, "gnn_inner_layer_dropout_rate": 0},
+                       # _num_linear_layer=4, _use_class_weight=True, _experiment_name="",
+                       # _gradient_clip=False, _learning_rate=0.001, _activation="relu", _cdhg_edge_types=[],
+                       # _cg_edge_types=[], _embedding_size=64, _message_normalization=False,_inter_layer_norm=True,
+                       # _GPU=True,_regression_layer_norm=True,_patient=20
+                       ) -> object:
+
+
+
+    gnn_name_map = {"GCNConv": GCNConv, "SAGEConv": SAGEConv, "FiLMConv": FiLMConv, "HyperConv": HyperConv}
+    task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
+                           "unsatcore_binary_classification": 2,
+                           "template_multi_classification": 5}
+
+    params=get_default_parameters()
+    input_params["gnn"]=gnn_name_map[input_params["gnn"]]
+    input_params["edge_types"]=input_params["cdhg_edge_types"] if "CDHG" in input_params["benchmark"] else input_params["cg_edge_types"]
+    input_params["num_classes"]=task_num_class_dict[input_params["learning_task"]]
+    input_params["task_type"] = "multi_classification" if input_params["num_classes"] > 2 else "binary_classification"
+    input_params["graph_type"] = "hyperEdgeGraph" if "CDHG" in input_params["benchmark"] else "monoDirectionLayerGraph"
+    params.update(input_params)
+
+    if params["fix_random_seeds"] == True:
         np.random.seed(42)
         random.seed(42)
         torch.manual_seed(42)
@@ -37,58 +100,58 @@ def run_one_experiment(_model, _task, _num_gnn_layers, _benchmark, data_shuffle,
 
     # set experiment name
     today = datetime.today().strftime('%Y-%m-%d')
-    experiment_name = _benchmark if _experiment_name == "" else _experiment_name
+    experiment_name = params["benchmark"] if params["experiment_name"] == "" else params["experiment_name"]
     mlflow_experiment_name = today + "-" + os.path.basename(
-        experiment_name) if _experiment_date == True else os.path.basename(experiment_name)
+        experiment_name) if params["experiment_date"] == True else os.path.basename(experiment_name)
     print("mlflow_experiment_name:", mlflow_experiment_name)
 
     # wandb_run = wandb.init(project=mlflow_experiment_name,reinit=True)
 
     mlflow.set_experiment(mlflow_experiment_name)
     mlflow.set_tracking_uri("http://localhost:5000")  # Specify tracking server
-    task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
-                           "unsatcore_binary_classification": 2,
-                           "template_multi_classification": 5}
-    gnn_name_map = {"GCNConv": GCNConv, "SAGEConv": SAGEConv, "FiLMConv": FiLMConv, "HyperConv": HyperConv}
 
-    params = {}
-    params["benchmark"] = _benchmark
-    params["learning_task"] = _task
-    params["model"] = _model
-    params["epochs"] = _epochs
-    params["num_classes"] = task_num_class_dict[params["learning_task"]]
-    params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
-    params["embedding_size"] = _embedding_size
-    params["num_gnn_layers"] = _num_gnn_layers
-    params["num_linear_layer"] = _num_linear_layer
-    params["graph_type"] = "hyperEdgeGraph" if "CDHG" in _benchmark else "monoDirectionLayerGraph"
-    params["edge_types"] = _cdhg_edge_types if "CDHG" in _benchmark else _cg_edge_types
-    params["batch_size"] = 1
-    params["add_self_loop_edges"] = _self_loop
-    params["add_backward_edges"] = _add_backward_edges
-    params["add_global_edges"] = _add_global_edges
-    params["activation"] = _activation  # relu,leak_relu, tanh
-    params["data_loader_shuffle"] = data_shuffle
-    params["drop_out_rate"] = _dropout_rate
-    params["learning_rate"] = _learning_rate
-    params["gnn"] = gnn_name_map[_gnn]
-    params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results
-    params["file_name"] = _file_name
-    params["gradient_clip"] = _gradient_clip
-    params["use_class_weight"] = _use_class_weight
-    params["message_normalization"] = _message_normalization
-    params["inter_layer_norm"]=_inter_layer_norm
-    params["regression_layer_norm"]=_regression_layer_norm
-    params["fix_random_seeds"]=_fix_random_seeds
-    params["GPU"]=_GPU
-    params["patient"]=_patient
+
+
+    # params = {}
+    # params["model"] = _model
+    # params["learning_task"] = _task
+    # params["num_gnn_layers"] = _num_gnn_layers
+    # params["benchmark"] = _benchmark
+    # params["data_loader_shuffle"] = data_shuffle
+    # params["gnn"] = gnn_name_map[_gnn]
+    # params["epochs"] = _epochs
+    # params["file_name"] = _file_name
+    # params["use_intermediate_gnn_results"] = _use_intermediate_gnn_results
+    # params["add_self_loop_edges"] = _self_loop
+    # params["add_backward_edges"] = _add_backward_edges
+    # params["add_global_edges"] = _add_global_edges
+    # params["drop_out_rate"] = _dropout_rate
+    # params["num_linear_layer"] = _num_linear_layer
+    # params["use_class_weight"] = _use_class_weight
+    # params["gradient_clip"] = _gradient_clip
+    # params["learning_rate"] = _learning_rate
+    # params["activation"] = _activation  # relu,leak_relu, tanh
+    # params["edge_types"] = _cdhg_edge_types if "CDHG" in _benchmark else _cg_edge_types
+    # params["embedding_size"] = _embedding_size
+    # params["message_normalization"] = _message_normalization
+    # params["inter_layer_norm"] = _inter_layer_norm
+    # params["GPU"] = _GPU
+    # params["regression_layer_norm"] = _regression_layer_norm
+    # params["fix_random_seeds"] = _fix_random_seeds
+    # params["patient"] = _patient
+    # params["batch_size"] = 1
+    # params["num_classes"] = task_num_class_dict[params["learning_task"]]
+    # params["task_type"] = "multi_classification" if params["num_classes"] > 2 else "binary_classification"
+    # params["graph_type"] = "hyperEdgeGraph" if "CDHG" in _benchmark else "monoDirectionLayerGraph"
+    #
+
+
 
     with mlflow.start_run(description=""):
-        edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params,
-                                                                                                     reload_data=_reload_data)
+        edge_arity_dict, train_loader, valid_loader, test_loader, vocabulary_size, params = get_data(params)
         # todo: fix embedding layer outside of the training, otherwise random seed will affect them.
 
-        if _GPU==True:
+        if params["GPU"]==True:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
             device = torch.device('cpu')

@@ -24,29 +24,39 @@ def main():
 # send_email("train finished")
 
 def _train(benchmarks):
-
+    experiment_date = False
     # models = ["hyper_GCN", "GNN"]
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
-    # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsatcore_binary_classification"]
+    # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     task = get_task_by_folder_name(benchmarks[0])
-    num_gnn_layers = [2]
+    # todo add inner layer control to graph conv operator
+    num_gnn_layers = [2, 4, 8]  # 8 works best
+    dropout_rate = [  # all 0 works
+        {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
+        # {"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
+        # {"gnn_dropout_rate": 0.4, "mlp_dropout_rate": 0.2, "gnn_inner_layer_dropout_rate": 0.0},
+        # {"gnn_dropout_rate": 0.8, "mlp_dropout_rate": 0.8, "gnn_inner_layer_dropout_rate": 0.0}
+    ]
+    num_linear_layers = [2]  # 2 works
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
-    num_linear_layer = 2
-    epochs = 100
-    patient=10
-    reload_data = False
-    fix_random_seed = True
-    GPU = True
-    message_normalization = False
-    self_loop = [False]
+    message_normalization = [False]
     add_backward_edges = [False]
-    add_global_edges = [False]
-    use_class_weight = False  # this may interact (collapse) with gradient clip
-    gradient_clip = False
+    add_global_edges = [True, False]
+    self_loop = [True, False]
+    gradient_clip = [True]
+    inter_layer_norm = [True]
+    embedding_size = [64]
+    epochs = 200
+    patient = 50
+    GPU = [True]
+    reload_data = False
     regression_layer_norm = False
+    fix_random_seed = [True]
+    use_class_weight = [True]
+    learning_rate = [0.001]
+    activation = ["relu"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
                        "ASTLeftEdge", "ASTRightEdge",
                        # "ASTEdge",
@@ -60,43 +70,90 @@ def _train(benchmarks):
                      "guardEdge", "dataEdge",
                      ]
 
-    for bench in benchmarks:
-        for model in models:
-            for _num_gnn_layer in num_gnn_layers:
-                for data_shuffle in data_loader_shuffle:
-                    for _self_loop in self_loop:
-                        if model == "GNN":
-                            for _gnn in gnns:
-                                run_one_experiment(model, task, _num_gnn_layer, bench, data_shuffle,
-                                                   _gnn.__name__, False, epochs, _reload_data=reload_data,
-                                                   _self_loop=False, _add_backward_edges=False,
-                                                   _add_global_edges=True,
-                                                   _fix_random_seeds=fix_random_seed, _experiment_date=False,
-                                                   _dropout_rate=dropout_rate,
-                                                   _num_linear_layer=num_linear_layer,
-                                                   _use_class_weight=use_class_weight, _gradient_clip=gradient_clip,
-                                                   _cdhg_edge_types=cdhg_edge_types, _cg_edge_types=cg_edge_types,_message_normalization=message_normalization,
-                                                   _GPU=GPU, _regression_layer_norm=regression_layer_norm,_patient=patient)
-                        else:
-                            for _use_intermediate_gnn_results in use_intermediate_gnn_results:
-                                for _add_backward_edge in add_backward_edges:
-                                    for _add_global_edges in add_global_edges:
-                                        run_one_experiment(model, task, _num_gnn_layer, bench, data_shuffle,
-                                                           HyperConv.__name__, _use_intermediate_gnn_results,
-                                                           epochs,
-                                                           _reload_data=reload_data, _self_loop=_self_loop,
-                                                           _add_backward_edges=_add_backward_edge,
-                                                           _add_global_edges=_add_global_edges,
-                                                           _fix_random_seeds=fix_random_seed,
-                                                           _experiment_date=False,
-                                                           _dropout_rate=dropout_rate,
-                                                           _num_linear_layer=num_linear_layer,
-                                                           _use_class_weight=use_class_weight,
-                                                           _gradient_clip=gradient_clip,
-                                                           _cdhg_edge_types=cdhg_edge_types,
-                                                           _cg_edge_types=cg_edge_types, _GPU=GPU,_message_normalization=message_normalization,
-                                                           _regression_layer_norm=regression_layer_norm,_patient=patient)
+    parameter_dict_list = []
 
+    for benchmark in benchmarks:
+        for model in models:
+            for _GPU in GPU:
+                for _fix_random_seed in fix_random_seed:
+                    for _use_class_weight in use_class_weight:
+                        for num_gnn_layer in num_gnn_layers:
+                            for data_shuffle in data_loader_shuffle:
+                                for _self_loop in self_loop:
+                                    for _gradient_clip in gradient_clip:
+                                        for _dropout_rate in dropout_rate:
+                                            for _learning_rate in learning_rate:
+                                                for _activation in activation:
+                                                    for _add_global_edge in add_global_edges:
+                                                        for num_linear_layer in num_linear_layers:
+                                                            for _embedding_size in embedding_size:
+                                                                if model == "GNN":
+                                                                    for gnn in gnns:
+                                                                        parameter_dict_list.append(
+                                                                            {"model": model, "learning_task": task,
+                                                                             "num_gnn_layer": num_gnn_layer,
+                                                                             "benchmark": benchmark,
+                                                                             "data_shuffle": data_shuffle,
+                                                                             "gnn": gnn.__name__,
+                                                                             "use_intermediate_gnn_results": False,
+                                                                             "epochs": epochs, "file_name": "",
+                                                                             "reload_data": True,
+                                                                             "self_loop": True,
+                                                                             "add_backward_edges": False,
+                                                                             "add_global_edges": False,
+                                                                             "fix_random_seeds": _fix_random_seed,
+                                                                             "experiment_date": experiment_date,
+                                                                             "dropout_rate": _dropout_rate,
+                                                                             "num_linear_layer": 4,
+                                                                             "use_class_weight": _use_class_weight,
+                                                                             "gradient_clip": _gradient_clip,
+                                                                             "add_global_edges": _add_global_edge,
+                                                                             "learning_rate": _learning_rate,
+                                                                             "activation": _activation,
+                                                                             "cdhg_edge_types": cdhg_edge_types,
+                                                                             "cg_edge_types": cg_edge_types,
+                                                                             "embedding_size": _embedding_size,
+                                                                             "GPU": _GPU,
+                                                                             "regression_layer_norm": regression_layer_norm,
+                                                                             "patient": patient})
+
+
+                                                                else:
+                                                                    for _use_intermediate_gnn_results in use_intermediate_gnn_results:
+                                                                        for _add_backward_edge in add_backward_edges:
+                                                                            for _message_normalization in message_normalization:
+                                                                                for _inter_layer_norm in inter_layer_norm:
+                                                                                    parameter_dict_list.append(
+                                                                                        {"model": model, "learning_task": task,
+                                                                                         "num_gnn_layer": num_gnn_layer,
+                                                                                         "benchmark": benchmark,
+                                                                                         "data_shuffle": data_shuffle,
+                                                                                         "gnn": HyperConv.__name__,
+                                                                                         "use_intermediate_gnn_results": _use_intermediate_gnn_results,
+                                                                                         "epochs": epochs,
+                                                                                         "file_name": "",
+                                                                                         "reload_data": reload_data,
+                                                                                         "self_loop": _self_loop,
+                                                                                         "add_backward_edges": _add_backward_edge,
+                                                                                         "add_global_edges": _add_global_edge,
+                                                                                         "fix_random_seeds": _fix_random_seed,
+                                                                                         "experiment_date": experiment_date,
+                                                                                         "dropout_rate": _dropout_rate,
+                                                                                         "num_linear_layer": num_linear_layer,
+                                                                                         "use_class_weight": _use_class_weight,
+                                                                                         "gradient_clip": _gradient_clip,
+                                                                                         "learning_rate": _learning_rate,
+                                                                                         "activation": _activation,
+                                                                                         "cdhg_edge_types": cdhg_edge_types,
+                                                                                         "cg_edge_types": cg_edge_types,
+                                                                                         "embedding_size": _embedding_size,
+                                                                                         "message_normalization": _message_normalization,
+                                                                                         "inter_layer_norm": _inter_layer_norm,
+                                                                                         "GPU": _GPU,
+                                                                                         "regression_layer_norm": regression_layer_norm,
+                                                                                         "patient": patient})
+    for i, parameter_dict in enumerate(parameter_dict_list):
+        run_one_experiment(parameter_dict)
 
 if __name__ == '__main__':
     main()

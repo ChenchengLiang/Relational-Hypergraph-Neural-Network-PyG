@@ -9,7 +9,7 @@ from torch_geometric.loader import DataLoader
 import os
 
 
-def get_data(params, reload_data=True):
+def get_data(params):
     cdhg_edge_type=["relationSymbolArgumentEdge", "ASTLeftEdge", "ASTRightEdge", "ASTEdge", "guardEdge",
      "quantifierEdge",
      "controlFlowHyperEdge", "dataFlowHyperEdge"]
@@ -18,24 +18,24 @@ def get_data(params, reload_data=True):
      "ASTRightEdge", "ASTEdge", "guardEdge", "dataEdge",
      "quantifierEdge"
      ]
-    if reload_data==True:
+    if params["reload_data"]==True:
         params["edge_types"] =  cdhg_edge_type if params["graph_type"]=="hyperEdgeGraph" else cg_edge_type
 
     vocabulary, token_map = build_vocabulary(params)
     mlflow.log_dict(token_map, "token_map.json")
 
     root = opj(params["benchmark"], "train_data")
-    if reload_data == True:
+    if params["reload_data"] == True:
         remove_processed_file(root=root)
     train_data = HornGraphDataset(params=params, root=root, token_map=token_map)
 
     root = opj(params["benchmark"], "valid_data")
-    if reload_data == True:
+    if params["reload_data"] == True:
         remove_processed_file(root=root)
     valid_data = HornGraphDataset(params=params, root=root, token_map=token_map)
 
     root = opj(params["benchmark"], "test_data")
-    if reload_data == True:
+    if params["reload_data"] == True:
         remove_processed_file(root=root)
     test_data = HornGraphDataset(params=params, root=root, token_map=token_map)
 

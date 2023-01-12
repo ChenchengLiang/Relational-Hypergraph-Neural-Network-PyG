@@ -48,6 +48,7 @@ def main():
     inter_layer_norm = [True]
     embedding_size = [64]
     epochs = 200
+    patient=50
     GPU = [True]
     reload_data = False
     regression_layer_norm=False
@@ -88,7 +89,7 @@ def main():
                                                                 if model == "GNN":
                                                                     for gnn in gnns:
                                                                         parameter_dict_list.append(
-                                                                            {"model": model, "task": task,
+                                                                            {"model": model, "learning_task": task,
                                                                              "num_gnn_layer": num_gnn_layer,
                                                                              "benchmark": benchmark, "data_shuffle": data_shuffle,
                                                                              "gnn": gnn.__name__,
@@ -106,7 +107,8 @@ def main():
                                                                              "activation": _activation,
                                                                              "cdhg_edge_types": cdhg_edge_types,
                                                                              "cg_edge_types": cg_edge_types,
-                                                                             "embedding_size": _embedding_size, "GPU": _GPU,"regression_layer_norm":regression_layer_norm})
+                                                                             "embedding_size": _embedding_size, "GPU": _GPU,
+                                                                             "regression_layer_norm":regression_layer_norm,"patient":patient})
 
 
                                                                 else:
@@ -115,7 +117,7 @@ def main():
                                                                             for _message_normalization in message_normalization:
                                                                                 for _inter_layer_norm in inter_layer_norm:
                                                                                     parameter_dict_list.append(
-                                                                                        {"model": model, "task": task,
+                                                                                        {"model": model, "learning_task": task,
                                                                                          "num_gnn_layer": num_gnn_layer,
                                                                                          "benchmark": benchmark,
                                                                                          "data_shuffle": data_shuffle,
@@ -139,7 +141,7 @@ def main():
                                                                                          "embedding_size": _embedding_size,
                                                                                          "message_normalization": _message_normalization,
                                                                                          "inter_layer_norm": _inter_layer_norm,
-                                                                                         "GPU": _GPU,"regression_layer_norm":regression_layer_norm})
+                                                                                         "GPU": _GPU,"regression_layer_norm":regression_layer_norm,"patient":patient})
 
     for i, parameter_dict in enumerate(parameter_dict_list):
         with open(parameter_folder + "/hyper-paprameter_" + str(i) + ".JSON", 'w') as f:
