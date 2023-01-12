@@ -45,24 +45,24 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, name):
     fig.write_html(save_file_name)
 
 
-def loss_plot(train_loss_floats, valid_loss_floats, folder):
+def train_valid_plot(train_loss_floats, valid_loss_floats, folder, field="loss"):
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=list(range(len(train_loss_floats))),
         y=train_loss_floats,
-        name="train_loss"
+        name="train_"+field
     ))
     fig.add_trace(go.Scatter(
         x=list(range(len(valid_loss_floats))),
         y=valid_loss_floats,
-        name="valid_loss"
+        name="valid_"+field
     ))
 
     fig.update_layout(
         title='',
-        xaxis_title='epocs',
-        yaxis_title='loss')
-    plot_name = "loss"
+        xaxis_title='epochs',
+        yaxis_title=field)
+    plot_name = field
     figure_folder = make_dirct(os.path.join(folder, "figures"))
     save_file_name = os.path.join(figure_folder, plot_name + ".html")
     # fig.update_yaxes(type="linear")

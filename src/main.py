@@ -5,10 +5,8 @@ from cluster_utils.utils import get_task_by_folder_name
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore-union-aligned-new-data-CDHG",
-                  "../benchmarks/unsatcore-union-aligned-new-data-CG",
-                "../benchmarks/unsatcore-union-aligned-old-data-CDHG",
-                  "../benchmarks/unsatcore-union-aligned-old-data-CG",
+    benchmarks = ["../benchmarks/unsatcore_pipeline_small-overfitting-CDHG",
+                  "../benchmarks/unsatcore_pipeline_small-overfitting-CG",
                   ]
 
     # load data
@@ -26,6 +24,7 @@ def main():
 # send_email("train finished")
 
 def _train(benchmarks):
+
     # models = ["hyper_GCN", "GNN"]
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
@@ -36,7 +35,8 @@ def _train(benchmarks):
     use_intermediate_gnn_results = [False]
     dropout_rate = {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0}
     num_linear_layer = 2
-    epochs = 10
+    epochs = 100
+    patient=10
     reload_data = False
     fix_random_seed = True
     GPU = True
@@ -76,7 +76,7 @@ def _train(benchmarks):
                                                    _num_linear_layer=num_linear_layer,
                                                    _use_class_weight=use_class_weight, _gradient_clip=gradient_clip,
                                                    _cdhg_edge_types=cdhg_edge_types, _cg_edge_types=cg_edge_types,_message_normalization=message_normalization,
-                                                   _GPU=GPU, _regression_layer_norm=regression_layer_norm)
+                                                   _GPU=GPU, _regression_layer_norm=regression_layer_norm,_patient=patient)
                         else:
                             for _use_intermediate_gnn_results in use_intermediate_gnn_results:
                                 for _add_backward_edge in add_backward_edges:
@@ -95,7 +95,7 @@ def _train(benchmarks):
                                                            _gradient_clip=gradient_clip,
                                                            _cdhg_edge_types=cdhg_edge_types,
                                                            _cg_edge_types=cg_edge_types, _GPU=GPU,_message_normalization=message_normalization,
-                                                           _regression_layer_norm=regression_layer_norm)
+                                                           _regression_layer_norm=regression_layer_norm,_patient=patient)
 
 
 if __name__ == '__main__':
