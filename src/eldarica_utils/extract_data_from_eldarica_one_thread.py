@@ -24,11 +24,11 @@ def main():
     #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) )
 
     # unsatcore: get labeled data # 3 hours
-    #parameters_pipeline.append(" -mineCounterExample:union ")
+    #parameters_pipeline.append(" -mineCounterExample:union -useUnsimplifiedClauses ")
 
     # unsatcore: construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -log ")
-    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -log ")
+    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
+    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
 
     # unsatcore: check solvability differernt threshold # 36 hours
     #for g in [CDHG,CG]:
@@ -43,8 +43,8 @@ def main():
     #parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
 
     # template_selection: construct graphs # 6 hours
-    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:template -log ")
-    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:template -log ")
+    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:template -log ")
+    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:template -log ")
 
 
 

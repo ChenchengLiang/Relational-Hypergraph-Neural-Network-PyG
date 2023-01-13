@@ -78,7 +78,6 @@ def train(train_loader, valid_loader, model, device, params):
     valid_acc_list = []
     best_loss = 10000000
     best_epoch = 0
-    current_patient=0
     for epoch in tqdm(range(params["epochs"]), desc="Training progress"):
         # training
         model.train()
@@ -109,15 +108,12 @@ def train(train_loader, valid_loader, model, device, params):
         mlflow.log_metric("valid accuracy", '{:e}'.format(valid_acc), epoch)
         mlflow.log_metric("epoch", epoch, epoch)
 
-        if valid_loss < best_loss:
-            current_patient=0
+        if valid_loss <= best_loss:
             best_loss = valid_loss
             best_epoch = epoch
             torch.save(model, os.path.join(model_folder, "best_model.pth"))
             draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"],
                                   params["benchmark"], name="best-valid-" + params["task_type"], acc=valid_acc)
-        else:
-            current_patient += 1
 
         if valid_acc == 1.0:
             torch.save(model, os.path.join(model_folder, "best_model.pth"))
@@ -126,7 +122,7 @@ def train(train_loader, valid_loader, model, device, params):
             train_valid_plot(train_acc_list, valid_acc_list, params["benchmark"], field="acc")
             return model
 
-        if current_patient >= params["patient"]:
+        if epoch - best_epoch >= params["patient"]:
             torch.save(model, os.path.join(model_folder, "best_model.pth"))
             mlflow.log_metric("early stop epoch", epoch)
             train_valid_plot(train_loss_list, valid_loss_list, params["benchmark"], field="loss")
