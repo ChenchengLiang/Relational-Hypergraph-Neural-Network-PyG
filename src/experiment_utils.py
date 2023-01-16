@@ -12,6 +12,7 @@ from src.predict import predict
 from src.data_utils.read_data import get_data
 from src.train import train
 from src.utils import write_predicted_label_to_JSON_file, send_email
+from src.cluster_utils.utils import get_task_by_folder_name
 from src.train_utils import get_parameter_summary
 from torch_geometric.profile import get_model_size, count_parameters, get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
@@ -87,6 +88,7 @@ def run_one_experiment(input_params
     params=get_default_parameters()
     input_params["gnn"]=gnn_name_map[input_params["gnn"]]
     input_params["edge_types"]=input_params["cdhg_edge_types"] if "CDHG" in input_params["benchmark"] else input_params["cg_edge_types"]
+    input_params["learning_task"]=get_task_by_folder_name(input_params["benchmark"])
     input_params["num_classes"]=task_num_class_dict[input_params["learning_task"]]
     input_params["task_type"] = "multi_classification" if input_params["num_classes"] > 2 else "binary_classification"
     input_params["graph_type"] = "hyperEdgeGraph" if "CDHG" in input_params["benchmark"] else "monoDirectionLayerGraph"

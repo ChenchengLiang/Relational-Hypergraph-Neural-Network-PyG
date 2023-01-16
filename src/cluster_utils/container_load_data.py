@@ -9,7 +9,6 @@ from utils import get_task_by_folder_name
 
 def main():
     folder_name = sys.argv[1]
-    task = get_task_by_folder_name(folder_name[0])
     params = {"benchmark": folder_name, "experiment_date": True, "experiment_name": "load_data", "reload_data": True,
               "gnn": HyperConv.__name__, "cdhg_edge_types": ["relationSymbolArgumentEdge", "guardEdge",
                                                              "ASTLeftEdge", "ASTRightEdge",
@@ -22,7 +21,7 @@ def main():
                                 "ASTEdge",
                                 "quantifierEdge",
                                 "guardEdge", "dataEdge",
-                                ], "learning_task":task}
+                                ]}
 
     benchmarks = [folder_name]
 

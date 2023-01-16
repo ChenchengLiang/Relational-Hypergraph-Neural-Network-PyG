@@ -10,12 +10,7 @@ def main():
                   ]
 
     # load data
-    # task = get_task_by_folder_name(benchmarks[0])
-    # for _benchmark in benchmarks:
-    #     run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark,
-    #                        data_shuffle=False, _gnn=HyperConv.__name__, _use_intermediate_gnn_results=False, _epochs=1,
-    #                        _reload_data=True, _self_loop=False, _add_global_edges=False,_add_backward_edges=False,
-    #                        _file_name="",_experiment_name="load_data")
+    _load_data(benchmarks)
 
     # train
     _train(benchmarks)
@@ -29,7 +24,7 @@ def _train(benchmarks):
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
-    task = get_task_by_folder_name(benchmarks[0])
+    task = benchmarks[0]
     num_gnn_layers = [2]  # 8 works best
     dropout_rate = [  # all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
@@ -161,6 +156,24 @@ def _train(benchmarks):
     for i, parameter_dict in enumerate(parameter_dict_list):
         run_one_experiment(parameter_dict)
 
+
+def _load_data(benchmarks):
+    for benchmark in benchmarks:
+        params = {"benchmark": benchmark, "experiment_date": True, "experiment_name": "load_data", "reload_data": True,
+                  "gnn": HyperConv.__name__, "cdhg_edge_types": ["relationSymbolArgumentEdge", "guardEdge",
+                                                                 "ASTLeftEdge", "ASTRightEdge",
+                                                                 "ASTEdge",
+                                                                 "quantifierEdge",
+                                                                 "controlFlowHyperEdge", "dataFlowHyperEdge"],
+                  "cg_edge_types": ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
+                                    "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge",
+                                    "ASTLeftEdge", "ASTRightEdge",
+                                    "ASTEdge",
+                                    "quantifierEdge",
+                                    "guardEdge", "dataEdge",
+                                    ]}
+
+        run_one_experiment(params)
 
 if __name__ == '__main__':
     main()
