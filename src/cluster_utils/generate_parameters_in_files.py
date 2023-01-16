@@ -33,7 +33,7 @@ def main():
     num_gnn_layers = [2, 8]  # 8 works best
     dropout_rate = [  # all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
-        #{"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
+        {"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
         # {"gnn_dropout_rate": 0.4, "mlp_dropout_rate": 0.2, "gnn_inner_layer_dropout_rate": 0.0},
         # {"gnn_dropout_rate": 0.8, "mlp_dropout_rate": 0.8, "gnn_inner_layer_dropout_rate": 0.0}
     ]
@@ -47,8 +47,8 @@ def main():
     gradient_clip = [True]
     inter_layer_norm = [True]
     embedding_size = [64]
-    epochs = 2
-    patient = 2
+    epochs = 200
+    patient = 50
     dense_every_num_layers = 2
     residual_every_num_layers = 2
     GPU = [True]
@@ -57,7 +57,7 @@ def main():
     fix_random_seed = [True]
     use_class_weight = [True]
     learning_rate = [0.001]
-    activation = ["relu","tanh"]  # ["relu","leak_relu", "tanh"]
+    activation = ["relu"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
                        "ASTLeftEdge", "ASTRightEdge",
                        # "ASTEdge",
