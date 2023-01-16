@@ -33,11 +33,11 @@ def main():
     num_gnn_layers = [2, 8]  # 8 works best
     dropout_rate = [  # all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
-        {"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
+        #{"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
         # {"gnn_dropout_rate": 0.4, "mlp_dropout_rate": 0.2, "gnn_inner_layer_dropout_rate": 0.0},
         # {"gnn_dropout_rate": 0.8, "mlp_dropout_rate": 0.8, "gnn_inner_layer_dropout_rate": 0.0}
     ]
-    num_linear_layers = [2,8]  # 2 works
+    num_linear_layers = [2]  # 2 works
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
     message_normalization = [False]
@@ -47,8 +47,8 @@ def main():
     gradient_clip = [True]
     inter_layer_norm = [True]
     embedding_size = [64]
-    epochs = 200
-    patient = 50
+    epochs = 2
+    patient = 2
     dense_every_num_layers = 2
     residual_every_num_layers = 2
     GPU = [True]

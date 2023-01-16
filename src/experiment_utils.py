@@ -29,7 +29,7 @@ def get_default_parameters():
         "data_loader_shuffle": False,
         "gnn":HyperConv.__name__,
         "use_intermediate_gnn_results":False,
-        "epochs":100,
+        "epochs":2,
         "file_name":"",
         "reload_data":False,
         "add_self_loop_edges":False,
@@ -62,7 +62,7 @@ def get_default_parameters():
         "inter_layer_norm":True,
         "GPU":True,
         "regression_layer_norm":False,
-        "patient":50,
+        "patient":2,
         "batch_size":1,
     }
 

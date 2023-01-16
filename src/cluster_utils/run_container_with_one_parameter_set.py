@@ -27,6 +27,7 @@ def main():
     temp_folder_path = parameter_dict["benchmark"] + "_" + str(parameter_index)
     shutil.copytree(parameter_dict["benchmark"], temp_folder_path)
     parameter_dict["benchmark"] = temp_folder_path
+    parameter_dict["experiment_name"]=experiment_name
 
     run_one_experiment(parameter_dict)
 

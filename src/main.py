@@ -171,7 +171,7 @@ def _load_data(benchmarks):
                                     "ASTEdge",
                                     "quantifierEdge",
                                     "guardEdge", "dataEdge",
-                                    ]}
+                                    ],"epochs":1}
 
         run_one_experiment(params)
 

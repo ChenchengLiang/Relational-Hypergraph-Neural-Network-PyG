@@ -21,7 +21,7 @@ def main():
                                 "ASTEdge",
                                 "quantifierEdge",
                                 "guardEdge", "dataEdge",
-                                ]}
+                                ],"epochs":1,"patient":1}
 
     benchmarks = [folder_name]
 
