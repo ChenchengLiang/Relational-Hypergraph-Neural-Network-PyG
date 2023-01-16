@@ -5,8 +5,8 @@ from cluster_utils.utils import get_task_by_folder_name
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore_pipeline_small-overfitting-CDHG",
-                  "../benchmarks/unsatcore_pipeline_small-overfitting-CG",
+    benchmarks = ["../benchmarks/template-selection-one-CDHG",
+                  "../benchmarks/template-selection-one-CG",
                   ]
 
     # load data
@@ -25,7 +25,7 @@ def main():
 
 def _train(benchmarks):
     experiment_date = False
-    # models = ["hyper_GCN", "GNN"]
+    # models = ["hyper_GCN", "GNN"]f
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]

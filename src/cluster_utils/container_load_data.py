@@ -6,18 +6,29 @@ from src.experiment_utils import run_one_experiment
 from src.layers import HyperConv
 from utils import get_task_by_folder_name
 
+
 def main():
     folder_name = sys.argv[1]
-    benchmarks = [folder_name]
-    task= get_task_by_folder_name(folder_name)
+    task = get_task_by_folder_name(folder_name[0])
+    params = {"benchmark": folder_name, "experiment_date": True, "experiment_name": "load_data", "reload_data": True,
+              "gnn": HyperConv.__name__, "cdhg_edge_types": ["relationSymbolArgumentEdge", "guardEdge",
+                                                             "ASTLeftEdge", "ASTRightEdge",
+                                                             "ASTEdge",
+                                                             "quantifierEdge",
+                                                             "controlFlowHyperEdge", "dataFlowHyperEdge"],
+              "cg_edge_types": ["relationSymbolArgumentEdge", "relationSymbolInstanceEdge", "argumentInstanceEdge",
+                                "clauseHeadEdge", "clauseBodyEdge", "clauseArgumentEdge",
+                                "ASTLeftEdge", "ASTRightEdge",
+                                "ASTEdge",
+                                "quantifierEdge",
+                                "guardEdge", "dataEdge",
+                                ], "learning_task":task}
 
-    experiment_date = True
+    benchmarks = [folder_name]
+
     # load data
     for _benchmark in benchmarks:
-        run_one_experiment("hyper_GCN", task, _num_gnn_layers=2, _benchmark=_benchmark, data_shuffle=False,
-                           _gnn=HyperConv.__name__, _use_intermediate_gnn_results=True, _epochs=1,
-                           _reload_data=True, _fix_random_seeds=True, _experiment_date=experiment_date,
-                           _experiment_name="load_data")
+        run_one_experiment(params)
 
 
 if __name__ == '__main__':

@@ -26,7 +26,7 @@ def get_default_parameters():
         "num_gnn_layers":2,
         "benchmark":"",
         "data_loader_shuffle": False,
-        "gnn":HyperConv,
+        "gnn":HyperConv.__name__,
         "use_intermediate_gnn_results":False,
         "epochs":100,
         "file_name":"",

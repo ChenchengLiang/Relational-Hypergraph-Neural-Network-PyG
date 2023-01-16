@@ -37,11 +37,11 @@ def main():
         # {"gnn_dropout_rate": 0.4, "mlp_dropout_rate": 0.2, "gnn_inner_layer_dropout_rate": 0.0},
         # {"gnn_dropout_rate": 0.8, "mlp_dropout_rate": 0.8, "gnn_inner_layer_dropout_rate": 0.0}
     ]
-    num_linear_layers = [2]  # 2 works
+    num_linear_layers = [2,8]  # 2 works
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
     message_normalization = [False]
-    add_backward_edges = [True, False]
+    add_backward_edges = [False]
     add_global_edges = [True]
     self_loop = [True]
     gradient_clip = [True]
@@ -57,7 +57,7 @@ def main():
     fix_random_seed = [True]
     use_class_weight = [True]
     learning_rate = [0.001]
-    activation = ["relu","leak_relu"]  # ["relu","leak_relu", "tanh"]
+    activation = ["relu","tanh"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
                        "ASTLeftEdge", "ASTRightEdge",
                        # "ASTEdge",

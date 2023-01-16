@@ -17,6 +17,9 @@ def main():
     data_fold = ["train_data", "valid_data", "test_data"]
     file_type = "smt2"
 
+    # analysisClauses
+    parameters_pipeline.append(" -analysisClauses ")
+
     # description: get getSolvability # 15 hours
     # for a in manual_abstract_options:
     #     for s in split_clause_option:
@@ -27,8 +30,8 @@ def main():
     #parameters_pipeline.append(" -mineCounterExample:union -useUnsimplifiedClauses ")
 
     # unsatcore: construct graphs # 6 hours
-    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
-    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
+    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
+    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
 
     # unsatcore: check solvability differernt threshold # 36 hours
     #for g in [CDHG,CG]:
