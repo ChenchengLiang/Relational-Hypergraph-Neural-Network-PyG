@@ -20,7 +20,7 @@ def predict(trained_model, test_loader, device, params):
     # print("predicted_list[0]:", predicted_list[0])
     # print("label_list[0]:", label_list[0])
     mlflow.log_metric("test_loss", test_loss)
-    draw_label_pie_chart(params["num_classes"], lambda: (t for t in predicted_list), params["benchmark"],
+    draw_label_pie_chart(params["num_classes"], lambda: (t for t in predicted_list), folder=params["benchmark"],
                          name="predicted-data")
 
     print("-" * 10)
