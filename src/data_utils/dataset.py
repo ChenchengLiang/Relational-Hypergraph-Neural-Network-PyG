@@ -39,6 +39,7 @@ class HornGraphDataset(Dataset):
     def process(self):
 
         file_list = self.raw_file_names
+        print("self.raw_dir",self.raw_dir)
         for index, file_name in tqdm(enumerate(file_list), desc=os.path.basename(self.root)):
             ############################## read file begin##############################
             unzip_file(file_name)

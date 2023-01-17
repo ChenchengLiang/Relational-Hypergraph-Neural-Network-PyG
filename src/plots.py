@@ -14,19 +14,23 @@ from src.utils import count_generator, make_dirct
 plt.style.use("ggplot")
 
 
-def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, name):
+def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name):
     fig = go.Figure()
-    if len(z_data)!=0:
-        x_data_1,y_data_1, x_data_2,y_data_2=[],[],[],[]
-        for x,y,z in zip(x_data,y_data,z_data):
-            if z!=10800:
+    if len(z_data) != 0:
+        x_data_1, y_data_1, text_data_1, x_data_2, y_data_2, text_data_2 = [], [], [], [], [], []
+        for x, y, z, t in zip(x_data, y_data, z_data, data_text):
+            if z != 10800:
                 x_data_1.append(x)
                 y_data_1.append(y)
+                text_data_1.append(t)
             else:
                 x_data_2.append(x)
                 y_data_2.append(y)
-        fig.add_trace(go.Scatter(x=x_data_1, y=y_data_1, marker=dict(color='blue'),mode = 'markers',name = 'solvable'))
-        fig.add_trace(go.Scatter(x=x_data_2, y=y_data_2, marker=dict(color='red'), mode='markers', name='unsolvable'))
+                text_data_2.append(t)
+        fig.add_trace(go.Scatter(x=x_data_1, y=y_data_1, text=text_data_1, marker=dict(color='blue'), mode='markers',
+                                 name='solvable'))
+        fig.add_trace(go.Scatter(x=x_data_2, y=y_data_2, text=text_data_2, marker=dict(color='red'), mode='markers',
+                                 name='unsolvable'))
     else:
         fig.add_trace(go.Scatter(x=x_data, y=y_data, marker=dict(color='blue'), mode='markers', name='marker'))
 
@@ -50,12 +54,12 @@ def train_valid_plot(train_loss_floats, valid_loss_floats, folder, field="loss")
     fig.add_trace(go.Scatter(
         x=list(range(len(train_loss_floats))),
         y=train_loss_floats,
-        name="train_"+field
+        name="train_" + field
     ))
     fig.add_trace(go.Scatter(
         x=list(range(len(valid_loss_floats))),
         y=valid_loss_floats,
-        name="valid_"+field
+        name="valid_" + field
     ))
 
     fig.update_layout(
@@ -89,16 +93,16 @@ def draw_label_pie_chart(num_label, learning_label_generator, folder, name=""):
     save_file_name = os.path.join(figure_folder, name + "-distribution.html")
     fig.write_html(save_file_name)
     mlflow.log_artifact(save_file_name)
-    mlflow.set_tag(name+" dominate distribution",max(values)/sum(values))
+    mlflow.set_tag(name + " dominate distribution", max(values) / sum(values))
     return values
 
 
-def draw_confusion_matrix(predicted_y, true_y, num_classes, folder, name="",acc=""):
+def draw_confusion_matrix(predicted_y, true_y, num_classes, folder, name="", acc=""):
     label_list = list(range(num_classes))
     cm = confusion_matrix(true_y, predicted_y, labels=label_list)
     fig = px.imshow(cm, x=label_list, y=label_list, text_auto=True)
     fig.update_layout(
-        title='confusion matrix, '+"accuracy: " + str(acc),
+        title='confusion matrix, ' + "accuracy: " + str(acc),
         xaxis_title='predicted_y',
         yaxis_title='true_y')
     figure_folder = make_dirct(os.path.join(folder, "figures"))

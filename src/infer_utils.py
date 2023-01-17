@@ -8,8 +8,9 @@ from os.path import join as opj
 from datetime import datetime
 
 def infer(benchmark, artifact_uri):
+    device = torch.device("cpu")#torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model_path = opj(artifact_uri, "model/data/model.pth")
-    best_model = torch.load(model_path)
+    best_model = torch.load(model_path).to(device)
     # mlflow.pytorch.load_model()
     params = mlflow.artifacts.load_dict(opj(artifact_uri, "params.json"))
     params["benchmark"]=benchmark
@@ -27,7 +28,7 @@ def infer(benchmark, artifact_uri):
     mlflow_experiment_name=today + "-infer"
     print("mlflow_experiment_name",mlflow_experiment_name)
     mlflow.set_experiment(mlflow_experiment_name)
-    device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     with mlflow.start_run(description=""):
         predicted_list, raw_predicted_list, file_name_list, predicted_accuracy = predict(best_model, test_loader,device,
                                                                                          params)
