@@ -25,9 +25,11 @@ def run_one_epoch(params, model, data_loader, optimizer, ls_func, device, train=
             batch = batch[0]
         batch.to(device)  # Use GPU
         try:
+
             pred = model(batch)
             if params["task_type"] == "binary_classification":
-                loss = ls_func(torch.squeeze(pred), batch.y.float(),pos_weight=torch.tensor(params["class_weight"][1]*10))
+                loss = ls_func(torch.squeeze(pred), batch.y.float(),
+                               pos_weight=torch.tensor(params["class_weight"][1] * 10))
                 sigmoid_pred = torch.sigmoid(pred)
                 raw_predicted_list.append(sigmoid_pred.cpu().detach().numpy())
                 predicted_list.append(np.rint(sigmoid_pred.cpu().detach().numpy()))

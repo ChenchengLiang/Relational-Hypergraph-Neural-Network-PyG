@@ -8,7 +8,7 @@ import os
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category,get_sumary_folder
 def main():
-    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Linear-dateset-new/splitClauses-1/solvability-splitClauses-1/train_data_separate_summary/UNKNOWN+UNSAT"
+    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/Linear-dateset-new/splitClauses-1/unsatcore-data/unsat+unknown"
     summary_folder = get_sumary_folder(folder)
     folder_basename=os.path.basename(folder)
 

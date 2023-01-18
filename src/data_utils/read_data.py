@@ -42,6 +42,7 @@ def get_data(params):
     dataset = train_data + valid_data + test_data
     vocabulary_size = len(vocabulary)
     print("vocabulary_size", vocabulary_size)
+    params["vocabulary_size"]=vocabulary_size
 
     # train_data = dataset
     # valid_data = train_data

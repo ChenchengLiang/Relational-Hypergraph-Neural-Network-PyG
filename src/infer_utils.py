@@ -15,13 +15,15 @@ def infer(benchmark, artifact_uri):
     params = mlflow.artifacts.load_dict(opj(artifact_uri, "params.json"))
     params["benchmark"]=benchmark
 
+
     # Load test data
     token_map = mlflow.artifacts.load_dict(opj(artifact_uri, "token_map.json"))
+    print("token_map",len(token_map))
     root = opj(benchmark, "test_data")
-    if params["reload_data"] == True:
-        remove_processed_file(root=root)
+    #if params["reload_data"] == True:
+    remove_processed_file(root=root)
     test_data = HornGraphDataset(params=params, root=root, token_map=token_map)
-    test_loader = DataLoader(test_data, batch_size=params["batch_size"], shuffle=True)
+    test_loader = DataLoader(test_data, batch_size=params["batch_size"], shuffle=False)
 
     # predict
     today = datetime.today().strftime('%Y-%m-%d')
