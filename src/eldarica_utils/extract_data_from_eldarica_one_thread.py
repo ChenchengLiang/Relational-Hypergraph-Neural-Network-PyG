@@ -30,13 +30,13 @@ def main():
     #parameters_pipeline.append(" -mineCounterExample:union -useUnsimplifiedClauses ")
 
     # unsatcore: construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
-    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
+    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
+    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
 
     # unsatcore: check solvability differernt threshold # 36 hours
-    for g in ["CDHG","CG"]:
-        for threshold in [0.5,0.4,0.3,0.2,0.1,0.05]:
-            parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:"+str(threshold)+" -hornGraphType:"+g+" -log ")
+    # for g in ["CDHG","CG"]:
+    #     for threshold in [0.5,0.4,0.3,0.2,0.1,0.05]:
+    #         parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:"+str(threshold)+" -hornGraphType:"+g+" -log ")
 
     # template_selection: get labeled templates # 3 hours
     #parameters_pipeline.append(" -mineTemplates -log ")
