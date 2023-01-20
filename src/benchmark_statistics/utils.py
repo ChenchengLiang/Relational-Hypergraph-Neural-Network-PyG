@@ -100,6 +100,8 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
 
 def read_solving_time_from_json_file(file_list, statistic_dict):
     record_fields = ["satisfiability",
+                     "satisfiability-CDHG",
+                     "satisfiability-CG",
                      "min_solving_time_option", "min_solving_time (s)",
                      "min_solving_time_cegar_interation_number",
                      "min_solving_time_generated_predicate_number",
@@ -123,8 +125,11 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 max_solving_option = get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, max)
 
                 satisfiability = get_satisfiability(json_obj, min_solving_option)
-
                 statistic_dict["satisfiability"].append(satisfiability)
+
+                statistic_dict["satisfiability-CDHG"].append(decode_satisfiability(json_obj["satisfiability-CDHG"][0]))
+                statistic_dict["satisfiability-CG"].append(decode_satisfiability(json_obj["satisfiability-CG"][0]))
+
                 statistic_dict["solvable_option_list"].append(
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))
 
@@ -147,9 +152,12 @@ def assign_values_to_unsolvable_problem(statistic_dict, record_fields):
 def get_satisfiability(json_obj, min_solving_option):
     satisfiability = read_satisfiability(json_obj, min_solving_option)
 
-    if satisfiability == 1:
+    return decode_satisfiability(satisfiability)
+
+def decode_satisfiability(satisfiability):
+    if int(satisfiability) == 1:
         return "safe"
-    elif satisfiability == 0:
+    elif int(satisfiability) == 0:
         return "unsafe"
     else:
         return "unknown"

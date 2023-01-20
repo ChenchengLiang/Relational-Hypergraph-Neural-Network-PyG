@@ -102,6 +102,7 @@ class HornGraphDataset(Dataset):
         return data
 
     def _process_edge_list(self, data):
+        #todo: check here. the new and the old graph generation difererences may causesed by reading
         #control all edge type by parameters
         temp_edge_list=[]
         temp_edge_arity_dict={}
