@@ -11,6 +11,7 @@ def get_scatters(summary_folder,data_dict):
     # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
     # combinations_pairs=itertools.combinations(combinations_list,2)
     combinations_pairs=[["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"],
+                        ["clauseNumberAfterSimplification","clauseNumberAfterPruning"],
                         ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification"],
                         #["clauseNumberBeforeSimplification", "relationSymbolNumberBeforeSimplification"],
                         #["clauseNumberAfterSimplification", "relationSymbolNumberAfterSimplification"],

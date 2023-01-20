@@ -27,6 +27,7 @@ def main():
 
         # get fix clause attributes
     fixed_clause_measurements = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
+                                 "clauseNumberAfterPruning",
                                  "relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
                                  # "minedSingleVariableTemplatesNumber", "minedBinaryVariableTemplatesNumber",
                                  # "minedTemplateNumber", "minedTemplateRelationSymbolNumber",
