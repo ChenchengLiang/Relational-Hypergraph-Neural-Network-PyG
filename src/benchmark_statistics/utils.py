@@ -26,16 +26,20 @@ def get_scatters(summary_folder, data_dict):
                           ["clauseNumberAfterSimplification", "CG_label_number"],
                           ["CDHG_node_number", "CG_node_number"],
                           ]
-    #z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
+    # z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
     if data_dict["satisfiability-CDHG"] != "unknown":
-        z_data=data_dict["satisfiability-CDHG"]
+        z_data = data_dict["satisfiability-CDHG"]
     elif data_dict["satisfiability-CG"] != "unknown":
         z_data = data_dict["satisfiability-CG"]
     elif data_dict["satisfiability"] != "unknown":
         z_data = data_dict["satisfiability"]
     else:
-        z_data="unknown"
-    data_text = data_dict["file_name"]
+        z_data = "unknown"
+
+    data_text = []
+    for f, t1, t2 in zip(data_dict["file_name"], data_dict["unsatCoreThreshold-CDHG"],
+                         data_dict["unsatCoreThreshold-CG"]):
+        data_text.append(f + "\n" + "unsatCoreThreshold-CDHG:" + str(t1) + "\n" + "unsatCoreThreshold-CG:" + str(t2))
     for pairs in combinations_pairs:
         x_key = pairs[0]
         y_key = pairs[1]
@@ -146,9 +150,9 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["satisfiability-CG"].append(
                     decode_satisfiability(float(json_obj["satisfiability-CG"][0])))
                 statistic_dict["unsatCoreThreshold-CDHG"].append(
-                    round(float(json_obj["unsatCoreThreshold-CDHG"][0]),2))
+                    round(float(json_obj["unsatCoreThreshold-CDHG"][0]), 2))
                 statistic_dict["unsatCoreThreshold-CG"].append(
-                    round(float(json_obj["unsatCoreThreshold-CG"][0]),2))
+                    round(float(json_obj["unsatCoreThreshold-CG"][0]), 2))
 
                 statistic_dict["solvable_option_list"].append(
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))
