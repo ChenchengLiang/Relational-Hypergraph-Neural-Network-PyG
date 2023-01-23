@@ -115,9 +115,10 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
 
 
 def read_solving_time_from_json_file(file_list, statistic_dict):
-    record_fields = ["pruned_clauses_number",
-                     "satisfiability",
-                     "satisfiability-CDHG",
+    record_fields = ["clauseNumberAfterPruning",
+                     "pruned_clauses_number",
+                     "satisfiability",  # todo include threshold
+                     "satisfiability-CDHG",  # todo include threshold
                      "satisfiability-CG",
                      "unsatCoreThreshold-CDHG",
                      "unsatCoreThreshold-CG",
@@ -168,7 +169,34 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
             assign_values_to_unsolvable_problem(statistic_dict, record_fields)
 
 
-#
+def get_satisfiability_pruned_clauses_by_threshold(json_obj, graph_type,
+                                                   threshold_list=[0.1, 0.2, .3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]):
+    satisfiability_dict_key_list=[]
+    for x in ["safe", "unsafe", "unknown"]:
+        satisfiability_dict_key_list.append(x+"satisfiability_list")
+        satisfiability_dict_key_list.append(x + "clause_number_after_pruning_list")
+        satisfiability_dict_key_list.append(x + "threshold_list")
+
+    satisfiability_dict=assign_dict_key_empty_list(satisfiability_dict_key_list)
+
+    for t in threshold_list:
+        suffix = "-" + graph_type + "-" + str(t)
+        satisfiability=decode_satisfiability(float(json_obj["satisfiability" + suffix][0]))
+        clause_number_after_pruning=int(json_obj["clauseNumberAfterPruning" + suffix][0])
+        if satisfiability == "safe":
+            satisfiability_dict["safe_satisfiability_list"].append(satisfiability)
+            satisfiability_dict["safe_clause_number_after_pruning_list"].append(clause_number_after_pruning)
+            satisfiability_dict["safe_threshold_list"].append(t)
+
+        elif satisfiability == "unsafe":
+            satisfiability_dict["unsafe_satisfiability_list"].append(satisfiability)
+            satisfiability_dict["unsafe_clause_number_after_pruning_list"].append(clause_number_after_pruning)
+            satisfiability_dict["unsafe_threshold_list"].append(t)
+        else:
+            satisfiability_dict["unknown_satisfiability_list"].append(satisfiability)
+            satisfiability_dict["unknown_clause_number_after_pruning_list"].append(clause_number_after_pruning)
+            satisfiability_dict["unknown_threshold_list"].append(t)
+
 def assign_values_to_unsolvable_problem(statistic_dict, record_fields):
     for rf in record_fields:
         if rf != "satisfiability":
