@@ -115,7 +115,8 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
 
 
 def read_solving_time_from_json_file(file_list, statistic_dict):
-    record_fields = ["satisfiability",
+    record_fields = ["pruned_clauses_number",
+                     "satisfiability",
                      "satisfiability-CDHG",
                      "satisfiability-CG",
                      "unsatCoreThreshold-CDHG",
@@ -153,6 +154,9 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     round(float(json_obj["unsatCoreThreshold-CDHG"][0]), 2))
                 statistic_dict["unsatCoreThreshold-CG"].append(
                     round(float(json_obj["unsatCoreThreshold-CG"][0]), 2))
+
+                statistic_dict["pruned_clauses_number"].append(
+                    int(json_obj["clauseNumberAfterSimplification"][0]) - int(json_obj["clauseNumberAfterPruning"][0]))
 
                 statistic_dict["solvable_option_list"].append(
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))

@@ -6,29 +6,31 @@ from src.utils import get_file_list
 from src.plots import scatter_plot
 import os
 import pandas as pd
-from src.collect_results.utils import read_files, read_smt2_category,get_sumary_folder
+from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
+
+
 def main():
-    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/2-uppmax-unsatcore-linear-predicted-unsolvable-part-1-divided-324/temp"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/2-uppmax-unsatcore-linear-predicted-unsolvable-part-1-divided-324/train_data"
     summary_folder = get_sumary_folder(folder)
-    folder_basename=os.path.basename(folder)
+    folder_basename = os.path.basename(folder)
 
     file_list = get_file_list(folder, "smt2")
     data_dict = {}
 
     # get file names
     data_dict["file_name"] = [os.path.basename(x["file_name"]) for x in
-                                        read_files(file_list, file_type="",
-                                                   read_function=read_smt2_category)]
+                              read_files(file_list, file_type="",
+                                         read_function=read_smt2_category)]
     # get fix smt attributes
     smt_measurements = ["file_size", "file_size_h", "category"]
     for sm in smt_measurements:
         data_dict[sm] = [x[sm] for x in
-                                   read_files(file_list, file_type="", read_function=read_smt2_category)]
+                         read_files(file_list, file_type="", read_function=read_smt2_category)]
 
         # get fix clause attributes
-    fixed_clause_measurements = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
+    fixed_clause_measurements = ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
+                                 "clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
                                  "clauseNumberAfterPruning",
-                                 "relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
                                  # "minedSingleVariableTemplatesNumber", "minedBinaryVariableTemplatesNumber",
                                  # "minedTemplateNumber", "minedTemplateRelationSymbolNumber",
                                  # "labeledSingleVariableTemplatesNumber", "labeledBinaryVariableTemplatesNumber",
@@ -47,19 +49,19 @@ def main():
 
     get_scatters(summary_folder=summary_folder, data_dict=data_dict)
 
-    #get summaries
+    # get summaries
 
     category_summary = get_category_summary(data_dict)
 
     statistic_summary = get_statistic_summary(data_dict)
 
-    #filter list that has the same value
+    # filter list that has the same value
     filter_columns(data_dict)
     filter_columns(category_summary)
-    statistic_summary=filter_rows(statistic_summary, "statistic_value")
+    statistic_summary = filter_rows(statistic_summary, "statistic_value")
 
     # write to excel
-    with pd.ExcelWriter(summary_folder + "/"+folder_basename+"_statistics_split_clauses_1.xlsx") as writer:
+    with pd.ExcelWriter(summary_folder + "/" + folder_basename + "_statistics_split_clauses_1.xlsx") as writer:
         pd.DataFrame(pd.DataFrame(data_dict)).to_excel(writer, sheet_name=folder_basename)
         pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
         pd.DataFrame(pd.DataFrame(statistic_summary)).to_excel(writer, sheet_name="statistic_summary")
