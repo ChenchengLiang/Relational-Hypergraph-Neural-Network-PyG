@@ -2,39 +2,42 @@ from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean
-from src.utils import camel_to_snake,make_dirct
+from src.utils import camel_to_snake, make_dirct
 from src.plots import scatter_plot
 import itertools
 
-def get_scatters(summary_folder,data_dict):
+
+def get_scatters(summary_folder, data_dict):
     scatter_folder = make_dirct(summary_folder + "/scatters")
     # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
     # combinations_pairs=itertools.combinations(combinations_list,2)
-    combinations_pairs=[["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"],
-                        ["clauseNumberAfterSimplification","clauseNumberAfterPruning"],
-                        ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification"],
-                        #["clauseNumberBeforeSimplification", "relationSymbolNumberBeforeSimplification"],
-                        #["clauseNumberAfterSimplification", "relationSymbolNumberAfterSimplification"],
-                        ["clauseNumberAfterSimplification","min_solving_time_cegar_interation_number"],
-                        ["clauseNumberAfterSimplification", "min_solving_time (s)"],
-                        ["CDHG_node_number", "min_solving_time (s)"],
-                        ["CG_node_number", "min_solving_time (s)"],
-                        ["clauseNumberAfterSimplification","CDHG_node_number"],
-                        ["clauseNumberAfterSimplification", "CDHG_label_number"],
-                        ["clauseNumberAfterSimplification", "CG_node_number"],
-                        ["clauseNumberAfterSimplification", "CG_label_number"],
-                        ["CDHG_node_number", "CG_node_number"],
-                        ]
-    z_data= data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"])!=10800 else []
-    data_text=data_dict["file_name"]
+    combinations_pairs = [["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification"],
+                          ["clauseNumberAfterSimplification", "clauseNumberAfterPruning"],
+                          ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification"],
+                          # ["clauseNumberBeforeSimplification", "relationSymbolNumberBeforeSimplification"],
+                          # ["clauseNumberAfterSimplification", "relationSymbolNumberAfterSimplification"],
+                          ["clauseNumberAfterSimplification", "min_solving_time_cegar_interation_number"],
+                          ["clauseNumberAfterSimplification", "min_solving_time (s)"],
+                          ["CDHG_node_number", "min_solving_time (s)"],
+                          ["CG_node_number", "min_solving_time (s)"],
+                          ["clauseNumberAfterSimplification", "CDHG_node_number"],
+                          ["clauseNumberAfterSimplification", "CDHG_label_number"],
+                          ["clauseNumberAfterSimplification", "CG_node_number"],
+                          ["clauseNumberAfterSimplification", "CG_label_number"],
+                          ["CDHG_node_number", "CG_node_number"],
+                          ]
+    z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
+    data_text = data_dict["file_name"]
     for pairs in combinations_pairs:
         x_key = pairs[0]
         y_key = pairs[1]
         try:
-            scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key],z_data=z_data,
-                         x_axis=x_key, y_axis=y_key, folder=scatter_folder,data_text=data_text, name=x_key + "-" + y_key)
+            scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key], z_data=z_data,
+                         x_axis=x_key, y_axis=y_key, folder=scatter_folder, data_text=data_text,
+                         name=x_key + "-" + y_key)
         except:
             print("no field", pairs)
+
 
 def filter_rows(data_dict, column):
     index_list = []
@@ -103,6 +106,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
     record_fields = ["satisfiability",
                      "satisfiability-CDHG",
                      "satisfiability-CG",
+                     "unsatCoreThreshold-CDHG",
+                     "unsatCoreThreshold-CG",
                      "min_solving_time_option", "min_solving_time (s)",
                      "min_solving_time_cegar_interation_number",
                      "min_solving_time_generated_predicate_number",
@@ -118,9 +123,9 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
             solvable_option_dict = {}
             for k in json_obj:
                 if "solvingTime" in k:
-                    solving_time_dict[k] = int(json_obj[k][0])
-                    if int(json_obj[k][0]) != 10800000:
-                        solvable_option_dict[k] = int(json_obj[k][0])
+                    solving_time_dict[k] = int(float(json_obj[k][0]))
+                    if int(float(json_obj[k][0])) != 10800000:
+                        solvable_option_dict[k] = int(float(json_obj[k][0]))
             if len(solving_time_dict) != 0:  # solvable with solvability file
                 min_solving_option = get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, min)
                 max_solving_option = get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, max)
@@ -128,8 +133,14 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 satisfiability = get_satisfiability(json_obj, min_solving_option)
                 statistic_dict["satisfiability"].append(satisfiability)
 
-                statistic_dict["satisfiability-CDHG"].append(decode_satisfiability(json_obj["satisfiability-CDHG"][0]))
-                statistic_dict["satisfiability-CG"].append(decode_satisfiability(json_obj["satisfiability-CG"][0]))
+                statistic_dict["satisfiability-CDHG"].append(
+                    decode_satisfiability(float(json_obj["satisfiability-CDHG"][0])))
+                statistic_dict["satisfiability-CG"].append(
+                    decode_satisfiability(float(json_obj["satisfiability-CG"][0])))
+                statistic_dict["unsatCoreThreshold-CDHG"].append(
+                    round(float(json_obj["unsatCoreThreshold-CDHG"][0]),2))
+                statistic_dict["unsatCoreThreshold-CG"].append(
+                    round(float(json_obj["unsatCoreThreshold-CG"][0]),2))
 
                 statistic_dict["solvable_option_list"].append(
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))
@@ -155,6 +166,7 @@ def get_satisfiability(json_obj, min_solving_option):
 
     return decode_satisfiability(satisfiability)
 
+
 def decode_satisfiability(satisfiability):
     if int(satisfiability) == 1:
         return "safe"
@@ -167,7 +179,7 @@ def decode_satisfiability(satisfiability):
 def get_fixed_filed_from_json_file(file_list, field):
     for x in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
         try:
-            yield int(x[field][0])
+            yield int(float(x[field][0]))
         except:
             yield 10800000
 
@@ -178,7 +190,7 @@ def get_category_summary(data_dict):
     target_column_list = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification", "min_solving_time (s)"]
     category_summary_columns = []
     for t in target_column_list:
-        for x in ["min", "max", "mean","sorted_mid"]:
+        for x in ["min", "max", "mean", "sorted_mid"]:
             category_summary_columns.append(x + "_" + camel_to_snake(t))
     columns = basic_info_columns + category_summary_columns
 
@@ -212,15 +224,17 @@ def get_category_summary(data_dict):
 
 def min_max_mean_one_column_by_row(data_dict, target_dict, column, one_row, terget_column):
     terget_column_in_one_category = get_target_row_by_condition(data_dict, column, one_row,
-                                                                                      terget_column)
+                                                                terget_column)
     terget_column_in_one_category = [float(x) for x in
-                                                           terget_column_in_one_category]
+                                     terget_column_in_one_category]
     for func in [min, max, mean, sorted_mid]:
         target_dict[func.__name__ + "_" + camel_to_snake(terget_column)].append(
             func(terget_column_in_one_category))
 
+
 def sorted_mid(l):
-    return sorted(l)[int(len(l)/2)]
+    return sorted(l)[int(len(l) / 2)]
+
 
 def get_statistic_summary(data_dict):
     summary = {"statistic_name": [], "statistic_value": []}
@@ -259,9 +273,8 @@ def write_min_max_mean_to_dict(summary_dict, target_list, prefix, suffix):
     suffix = camel_to_snake(suffix)
     target_list = [0] if len(target_list) == 0 else target_list
     target_list = [float(x) for x in target_list]
-    for func in [min,max,mean,sorted_mid]:
-        summary_dict[prefix + "_"+func.__name__+"_" + suffix] = func(target_list)
-
+    for func in [min, max, mean, sorted_mid]:
+        summary_dict[prefix + "_" + func.__name__ + "_" + suffix] = func(target_list)
 
 
 def get_target_row_by_condition(data_dict, condition_column, condition, target_column):

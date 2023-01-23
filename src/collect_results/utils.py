@@ -71,14 +71,13 @@ def copy_relative_files(file_name, folder):
 
 def get_min_max_solving_time(solving_time_dict, data_dict, object, func=min):
     solving_option, solving_time = select_key_with_value_condition(solving_time_dict, func)
-    solving_time_cegar_interation_number = int(
-        object[solving_option.replace("solvingTime", "cegarIterationNumber")][0])
+    solving_time_cegar_interation_number = int(float(object[solving_option.replace("solvingTime", "cegarIterationNumber")][0]))
     solving_time_generated_predicate_number = int(
-        object[solving_option.replace("solvingTime", "generatedPredicateNumber")][0])
+        float(object[solving_option.replace("solvingTime", "generatedPredicateNumber")][0]))
     solving_time_average_predicate_size = int(
-        object[solving_option.replace("solvingTime", "averagePredicateSize")][0])
+        float(object[solving_option.replace("solvingTime", "averagePredicateSize")][0]))
     solving_time_predicate_generator_time = int(
-        object[solving_option.replace("solvingTime", "predicateGeneratorTime")][0])
+        float(object[solving_option.replace("solvingTime", "predicateGeneratorTime")][0]))
 
     data_dict[func.__name__ + "_solving_time_option"].append(solving_option.replace("solvingTime_", ""))
     data_dict[func.__name__ + "_solving_time (s)"].append(solving_time / 1000)
