@@ -17,20 +17,26 @@ plt.style.use("ggplot")
 def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name):
     fig = go.Figure()
     if len(z_data) != 0:
-        x_data_1, y_data_1, text_data_1, x_data_2, y_data_2, text_data_2 = [], [], [], [], [], []
+        x_data_1, y_data_1, text_data_1, x_data_2, y_data_2, text_data_2, x_data_3, y_data_3, text_data_3 = [], [], [], [], [], [], [], [], []
         for x, y, z, t in zip(x_data, y_data, z_data, data_text):
-            if z != 10800:
+            if z == "safe":  # z != 10800:
                 x_data_1.append(x)
                 y_data_1.append(y)
                 text_data_1.append(t)
-            else:
+            elif z == "unsafe":
                 x_data_2.append(x)
                 y_data_2.append(y)
                 text_data_2.append(t)
-        fig.add_trace(go.Scatter(x=x_data_1, y=y_data_1, text=text_data_1, marker=dict(color='blue'), mode='markers',
-                                 name='solvable'))
-        fig.add_trace(go.Scatter(x=x_data_2, y=y_data_2, text=text_data_2, marker=dict(color='red'), mode='markers',
-                                 name='unsolvable'))
+            else:
+                x_data_3.append(x)
+                y_data_3.append(y)
+                text_data_3.append(t)
+        fig.add_trace(go.Scatter(x=x_data_1, y=y_data_1, text=text_data_1, marker=dict(color='green'), mode='markers',
+                                 name='safe'))
+        fig.add_trace(go.Scatter(x=x_data_2, y=y_data_2, text=text_data_2, marker=dict(color='blue',size=10,symbol="diamond"), mode='markers',
+                                 name='unsafe'))
+        fig.add_trace(go.Scatter(x=x_data_3, y=y_data_3, text=text_data_3, marker=dict(color='red'), mode='markers',
+                                 name='unknown'))
     else:
         fig.add_trace(go.Scatter(x=x_data, y=y_data, marker=dict(color='blue'), mode='markers', name='marker'))
 

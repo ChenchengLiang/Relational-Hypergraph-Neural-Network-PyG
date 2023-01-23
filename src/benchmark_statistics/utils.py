@@ -26,7 +26,15 @@ def get_scatters(summary_folder, data_dict):
                           ["clauseNumberAfterSimplification", "CG_label_number"],
                           ["CDHG_node_number", "CG_node_number"],
                           ]
-    z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
+    #z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
+    if data_dict["satisfiability-CDHG"] != "unknown":
+        z_data=data_dict["satisfiability-CDHG"]
+    elif data_dict["satisfiability-CG"] != "unknown":
+        z_data = data_dict["satisfiability-CG"]
+    elif data_dict["satisfiability"] != "unknown":
+        z_data = data_dict["satisfiability"]
+    else:
+        z_data="unknown"
     data_text = data_dict["file_name"]
     for pairs in combinations_pairs:
         x_key = pairs[0]
