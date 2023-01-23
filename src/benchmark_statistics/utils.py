@@ -12,7 +12,7 @@ def get_scatters(summary_folder, data_dict):
     # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
     # combinations_pairs=itertools.combinations(combinations_list,2)
     combinations_pairs = [["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification"],
-                          ["clauseNumberAfterSimplification", "clauseNumberAfterPruning"],
+                          #["clauseNumberAfterSimplification", "clauseNumberAfterPruning"],#todo draw scatter with best threshold
                           ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification"],
                           # ["clauseNumberBeforeSimplification", "relationSymbolNumberBeforeSimplification"],
                           # ["clauseNumberAfterSimplification", "relationSymbolNumberAfterSimplification"],
@@ -37,9 +37,9 @@ def get_scatters(summary_folder, data_dict):
         z_data = "unknown"
 
     data_text = []
-    for f, t1, t2 in zip(data_dict["file_name"], data_dict["unsatCoreThreshold-CDHG"],
-                         data_dict["unsatCoreThreshold-CG"]):
-        data_text.append(f + "\n" + "unsatCoreThreshold-CDHG:" + str(t1) + "\n" + "unsatCoreThreshold-CG:" + str(t2))
+    for f, t1, t2 in zip(data_dict["file_name"], data_dict["threshold_list_CDHG"],
+                         data_dict["threshold_list_CG"]):
+        data_text.append(f + "\n" + "threshold_list_CDHG:" + str(t1) + "\n" + "threshold_list_CG:" + str(t2))
     for pairs in combinations_pairs:
         x_key = pairs[0]
         y_key = pairs[1]
@@ -70,8 +70,11 @@ def filter_rows(data_dict, column):
 def filter_columns(data_dict):
     meaningless_keys = []
     for k in data_dict:
-        if len(set(data_dict[k])) == 1:
-            meaningless_keys.append(k)
+        if isinstance(data_dict[k][0],list):
+            pass
+        else:
+            if len(set(data_dict[k])) == 1:
+                meaningless_keys.append(k)
     for k in meaningless_keys:
         data_dict.pop(k)
 
@@ -115,21 +118,22 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
 
 
 def read_solving_time_from_json_file(file_list, statistic_dict):
-    record_fields = ["clauseNumberAfterPruning",
-                     "pruned_clauses_number",
-                     "satisfiability",  # todo include threshold
-                     "satisfiability-CDHG",  # todo include threshold
-                     "satisfiability-CG",
-                     "unsatCoreThreshold-CDHG",
-                     "unsatCoreThreshold-CG",
-                     "min_solving_time_option", "min_solving_time (s)",
-                     "min_solving_time_cegar_interation_number",
-                     "min_solving_time_generated_predicate_number",
-                     "min_solving_time_average_predicate_size", "min_solving_time_predicate_generator_time",
-                     "max_solving_time_option", "max_solving_time (s)",
-                     "max_solving_time_cegar_interation_number", "max_solving_time_generated_predicate_number",
-                     "max_solving_time_average_predicate_size", "max_solving_time_predicate_generator_time",
-                     "solvable_option_list"]
+    record_fields = [
+        "satisfiability",
+        "satisfiability-CDHG",
+        "satisfiability-CG",
+        "clause_number_after_pruning_list_CDHG",
+        "clause_number_after_pruning_list_CG",
+        "threshold_list_CDHG",
+        "threshold_list_CG",
+        "min_solving_time_option", "min_solving_time (s)",
+        "min_solving_time_cegar_interation_number",
+        "min_solving_time_generated_predicate_number",
+        "min_solving_time_average_predicate_size", "min_solving_time_predicate_generator_time",
+        "max_solving_time_option", "max_solving_time (s)",
+        "max_solving_time_cegar_interation_number", "max_solving_time_generated_predicate_number",
+        "max_solving_time_average_predicate_size", "max_solving_time_predicate_generator_time",
+        "solvable_option_list"]
     assign_dict_key_empty_list(statistic_dict, record_fields)
     for json_obj in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
         if len(json_obj) > 1:  # has solvability file
@@ -147,17 +151,17 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 satisfiability = get_satisfiability(json_obj, min_solving_option)
                 statistic_dict["satisfiability"].append(satisfiability)
 
-                statistic_dict["satisfiability-CDHG"].append(
-                    decode_satisfiability(float(json_obj["satisfiability-CDHG"][0])))
-                statistic_dict["satisfiability-CG"].append(
-                    decode_satisfiability(float(json_obj["satisfiability-CG"][0])))
-                statistic_dict["unsatCoreThreshold-CDHG"].append(
-                    round(float(json_obj["unsatCoreThreshold-CDHG"][0]), 2))
-                statistic_dict["unsatCoreThreshold-CG"].append(
-                    round(float(json_obj["unsatCoreThreshold-CG"][0]), 2))
+                satisfiability_CDHG, clause_number_after_pruning_list_CDHG, threshold_list_CDHG = get_satisfiability_pruned_clauses_by_threshold(
+                    json_obj, "CDHG")
+                satisfiability_CG, clause_number_after_pruning_list_CG, threshold_list_CG = get_satisfiability_pruned_clauses_by_threshold(
+                    json_obj, "CG")
 
-                statistic_dict["pruned_clauses_number"].append(
-                    int(json_obj["clauseNumberAfterSimplification"][0]) - int(json_obj["clauseNumberAfterPruning"][0]))
+                statistic_dict["satisfiability-CDHG"].append(satisfiability_CDHG)
+                statistic_dict["satisfiability-CG"].append(satisfiability_CDHG)
+                statistic_dict["clause_number_after_pruning_list_CDHG"].append(clause_number_after_pruning_list_CDHG)
+                statistic_dict["clause_number_after_pruning_list_CG"].append(clause_number_after_pruning_list_CG)
+                statistic_dict["threshold_list_CDHG"].append(threshold_list_CDHG)
+                statistic_dict["threshold_list_CG"].append(threshold_list_CG)
 
                 statistic_dict["solvable_option_list"].append(
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))
@@ -171,18 +175,17 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 
 def get_satisfiability_pruned_clauses_by_threshold(json_obj, graph_type,
                                                    threshold_list=[0.1, 0.2, .3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]):
-    satisfiability_dict_key_list=[]
+    satisfiability_dict_key_list = []
     for x in ["safe", "unsafe", "unknown"]:
-        satisfiability_dict_key_list.append(x+"satisfiability_list")
-        satisfiability_dict_key_list.append(x + "clause_number_after_pruning_list")
-        satisfiability_dict_key_list.append(x + "threshold_list")
-
-    satisfiability_dict=assign_dict_key_empty_list(satisfiability_dict_key_list)
-
+        satisfiability_dict_key_list.append(x + "_" + "satisfiability_list")
+        satisfiability_dict_key_list.append(x + "_" + "clause_number_after_pruning_list")
+        satisfiability_dict_key_list.append(x + "_" + "threshold_list")
+    satisfiability_dict = {}
+    assign_dict_key_empty_list(satisfiability_dict, satisfiability_dict_key_list)
     for t in threshold_list:
         suffix = "-" + graph_type + "-" + str(t)
-        satisfiability=decode_satisfiability(float(json_obj["satisfiability" + suffix][0]))
-        clause_number_after_pruning=int(json_obj["clauseNumberAfterPruning" + suffix][0])
+        satisfiability = decode_satisfiability(float(json_obj["satisfiability" + suffix][0]))
+        clause_number_after_pruning = int(json_obj["clauseNumberAfterPruning" + suffix][0])
         if satisfiability == "safe":
             satisfiability_dict["safe_satisfiability_list"].append(satisfiability)
             satisfiability_dict["safe_clause_number_after_pruning_list"].append(clause_number_after_pruning)
@@ -196,6 +199,17 @@ def get_satisfiability_pruned_clauses_by_threshold(json_obj, graph_type,
             satisfiability_dict["unknown_satisfiability_list"].append(satisfiability)
             satisfiability_dict["unknown_clause_number_after_pruning_list"].append(clause_number_after_pruning)
             satisfiability_dict["unknown_threshold_list"].append(t)
+
+    if len(satisfiability_dict["unsafe_satisfiability_list"]) != 0:
+        return "unsafe", satisfiability_dict["unsafe_clause_number_after_pruning_list"], satisfiability_dict[
+            "unsafe_threshold_list"]
+    elif len(satisfiability_dict["safe_satisfiability_list"]) != 0:
+        return "safe", satisfiability_dict["safe_clause_number_after_pruning_list"], satisfiability_dict[
+            "safe_threshold_list"]
+    else:
+        return "unknown", satisfiability_dict["unknown_clause_number_after_pruning_list"], satisfiability_dict[
+            "unknown_threshold_list"]
+
 
 def assign_values_to_unsolvable_problem(statistic_dict, record_fields):
     for rf in record_fields:
