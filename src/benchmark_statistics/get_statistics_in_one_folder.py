@@ -10,7 +10,7 @@ from src.collect_results.utils import read_files, read_smt2_category, get_sumary
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/2-uppmax-unsatcore-linear-predicted-unsolvable-part-1-divided-324/temp"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/3-uppmax-unsatcore-linear-predicted-unsolvable-part-1-divided-324/train_data"
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
@@ -56,7 +56,7 @@ def main():
     statistic_summary = get_statistic_summary(data_dict)
 
     # filter list that has the same value
-    filter_columns(data_dict)
+    #filter_columns(data_dict)
     filter_columns(category_summary)
     statistic_summary = filter_rows(statistic_summary, "statistic_value")
 

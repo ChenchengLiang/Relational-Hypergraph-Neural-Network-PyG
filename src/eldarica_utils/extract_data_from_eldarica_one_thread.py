@@ -34,11 +34,10 @@ def main():
     # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
 
     # unsatcore: check solvability differernt threshold # 10*2*1 hours
-    threshold_list=[0.9, 0.8, 0.7, 0.6, 0.5,0.4,0.3,0.2,0.1,0.05] # normalize the logit value, then if the normalized value > threshold, then keep the clause
-    #threshold means how many percentage is chop down.
+    threshold_list=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9] # rank above this value remains
     for g in ["CDHG","CG"]:
         for threshold in threshold_list: #reverse this list
-            parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:"+str(threshold)+" -hornGraphType:"+g+" -log ")
+            parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:"+str(threshold)+" -hornGraphType:"+g)
 
     # template_selection: get labeled templates # 3 hours
     #parameters_pipeline.append(" -mineTemplates -log ")

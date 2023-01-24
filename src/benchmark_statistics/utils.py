@@ -121,10 +121,10 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
     record_fields = [
         "satisfiability",
         "satisfiability-CDHG",
-        "satisfiability-CG",
         "clause_number_after_pruning_list_CDHG",
-        "clause_number_after_pruning_list_CG",
         "threshold_list_CDHG",
+        "satisfiability-CG",
+        "clause_number_after_pruning_list_CG",
         "threshold_list_CG",
         "min_solving_time_option", "min_solving_time (s)",
         "min_solving_time_cegar_interation_number",
@@ -155,6 +155,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     json_obj, "CDHG")
                 satisfiability_CG, clause_number_after_pruning_list_CG, threshold_list_CG = get_satisfiability_pruned_clauses_by_threshold(
                     json_obj, "CG")
+
 
                 statistic_dict["satisfiability-CDHG"].append(satisfiability_CDHG)
                 statistic_dict["satisfiability-CG"].append(satisfiability_CDHG)
@@ -199,6 +200,7 @@ def get_satisfiability_pruned_clauses_by_threshold(json_obj, graph_type,
             satisfiability_dict["unknown_satisfiability_list"].append(satisfiability)
             satisfiability_dict["unknown_clause_number_after_pruning_list"].append(clause_number_after_pruning)
             satisfiability_dict["unknown_threshold_list"].append(t)
+
 
     if len(satisfiability_dict["unsafe_satisfiability_list"]) != 0:
         return "unsafe", satisfiability_dict["unsafe_clause_number_after_pruning_list"], satisfiability_dict[
