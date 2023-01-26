@@ -1,8 +1,10 @@
 import sys
+
 sys.path.append("../..")
-from src.utils import make_dirct,get_file_list
+from src.utils import make_dirct, get_file_list
 import os
 from extract_data_utils import run_eldarica_with_shell
+
 
 def main():
     parameters_pipeline = []
@@ -10,15 +12,15 @@ def main():
     eldarica_timeout = 60 * 60 * 1
     manual_abstract_options = ["empty", "term", "oct", "relEqs", "relIneqs"]
     predicted_abstract_options = ["predictedCG", "predictedCDHG"]
-    other_abstract_options = [ "unlabeled", "random","mined"]
+    other_abstract_options = ["unlabeled", "random", "mined"]
     cost_type = ["same", "shape", "logit"]
     split_clause_option = ["1"]  # ["0","1"]
-    exploration_rate=[0.5]
+    exploration_rate = [0.5]
     data_fold = ["train_data", "valid_data", "test_data"]
     file_type = "smt2"
 
     # analysisClauses
-    #parameters_pipeline.append(" -analysisClauses ")
+    # parameters_pipeline.append(" -analysisClauses ")
 
     # description: get getSolvability # 15 hours
     # for a in manual_abstract_options:
@@ -27,30 +29,29 @@ def main():
     #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) )
 
     # unsatcore: get labeled data # 3 hours
-    #parameters_pipeline.append(" -mineCounterExample:union -useUnsimplifiedClauses ")
+    # parameters_pipeline.append(" -mineCounterExample:union -useUnsimplifiedClauses ")
 
     # unsatcore: construct graphs # 6 hours
     # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
     # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
 
-    # unsatcore: check solvability differernt threshold # 10*2*1 hours
-    threshold_list=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9] # rank above this value remains
-    for g in ["CDHG","CG"]:
-        for threshold in threshold_list: #reverse this list
-            parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:"+str(threshold)+" -hornGraphType:"+g)
+    # unsatcore: check solvability differernt threshold # 11*2*1 hours
+    #need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
+    threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]  # rank above this value remains
+    for g in ["CDHG", "CG"]:
+        for threshold in threshold_list:  # reverse this list
+            parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
+                threshold) + " -hornGraphType:" + g)
 
     # template_selection: get labeled templates # 3 hours
-    #parameters_pipeline.append(" -mineTemplates -log ")
-
+    # parameters_pipeline.append(" -mineTemplates -log ")
 
     # template_selection: for unsolvable set get unlabeled templates # 3 hours
-    #parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
+    # parameters_pipeline.append(" -generateTemplates -abstract:unlabeled -log ")
 
     # template_selection: construct graphs # 6 hours
     # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:template -log ")
     # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:template -log ")
-
-
 
     # # template_selection: check solvability for sinlge template set # 15 hours
     # for s in split_clause_option:
@@ -85,7 +86,6 @@ def main():
     #                     parameters_pipeline.append(" -getSolvability " + " -fixRandomSeed " + " -combineTemplateStrategy:random " +" -hornGraphType:"+g+
     #                                                " -abstract:" + ao + " -readCostType:" + c + " -explorationRate:"+str(e) +" -splitClauses:" + s + " -t:" + str(eldarica_timeout))
 
-
     benchmark_name = "../../benchmarks/" + sys.argv[1]
     shell_folder = os.path.join(benchmark_name, "shell_files")
     make_dirct(shell_folder)
@@ -94,6 +94,7 @@ def main():
             file_list = get_file_list(os.path.join(benchmark_name, fold), file_type)
             for file in file_list:
                 run_eldarica_with_shell(file, shell_timeout, eldarica_parameters, shell_folder)
+
 
 if __name__ == '__main__':
     main()
