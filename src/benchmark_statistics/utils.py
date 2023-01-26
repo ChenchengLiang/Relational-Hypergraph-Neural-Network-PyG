@@ -151,8 +151,9 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 satisfiability = get_satisfiability(json_obj, min_solving_option)
                 statistic_dict["satisfiability"].append(satisfiability)
 
-                threshold_list = [0.0,0.01, 0.05]
-                #0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5
+                #todo get threhold list from json
+
+                threshold_list = get_unsatcore_threshold_list(json_obj)
                 satisfiability_CDHG, clause_number_after_pruning_list_CDHG, threshold_list_CDHG = get_satisfiability_pruned_clauses_by_threshold(
                     json_obj, "CDHG", threshold_list=threshold_list)
                 satisfiability_CG, clause_number_after_pruning_list_CG, threshold_list_CG = get_satisfiability_pruned_clauses_by_threshold(
@@ -212,6 +213,17 @@ def get_satisfiability_pruned_clauses_by_threshold(json_obj, graph_type,
     else:
         return "unknown", satisfiability_dict["unknown_clause_number_after_pruning_list"], satisfiability_dict[
             "unknown_threshold_list"]
+def get_unsatcore_threshold_list(json_obj):
+    total_threshold_list= [round(0.01*i,2) for i in range(0,100)]
+    threshold_list=[]
+    for t in total_threshold_list:
+        try:
+            x=json_obj["clauseNumberAfterPruning-CG-"+str(t)]
+            threshold_list.append(t)
+        except:
+            pass
+    return threshold_list
+
 
 
 def assign_values_to_unsolvable_problem(statistic_dict, record_fields):
