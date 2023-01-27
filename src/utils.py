@@ -115,6 +115,12 @@ def make_dirct(d):
 def count_generator(iter):
     return sum(1 for _ in iter)
 
+def read_a_json_field(json_obj,filed_name):
+    try:
+        return json_obj[filed_name][0]
+    except:
+        print("no field in json file:",filed_name)
+        return -1
 
 # calculate file size in KB, MB, GB
 def convert_bytes(size):

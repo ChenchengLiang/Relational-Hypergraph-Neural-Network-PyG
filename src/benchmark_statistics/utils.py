@@ -2,7 +2,7 @@ from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean
-from src.utils import camel_to_snake, make_dirct
+from src.utils import camel_to_snake, make_dirct,read_a_json_field
 from src.plots import scatter_plot
 import itertools
 
@@ -191,9 +191,11 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
     assign_dict_key_empty_list(satisfiability_dict, satisfiability_dict_key_list)
     for t in threshold_list:
         suffix = "-" + graph_type + "-" + str(t)
-        satisfiability = decode_satisfiability(float(json_obj["satisfiability" + suffix][0]))
-        clause_number_after_pruning = int(json_obj["clauseNumberAfterPruning" + suffix][0])
-        solving_time = int(float(json_obj["SolvingTime" + suffix][0])) / 1000
+        satisfiability = decode_satisfiability(float(read_a_json_field(json_obj,"satisfiability" + suffix)))
+        clause_number_after_pruning = int(read_a_json_field(json_obj,"clauseNumberAfterPruning" + suffix))
+        solving_time = int(float(read_a_json_field(json_obj,"SolvingTime" + suffix))) / 1000
+
+
         if satisfiability == "safe":
             satisfiability_dict["safe_satisfiability_list"].append(satisfiability)
             satisfiability_dict["safe_clause_number_after_pruning_list"].append(clause_number_after_pruning)
