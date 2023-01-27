@@ -129,6 +129,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "solving_time_list_CG (s)",
         "threshold_list_CG",
         "improved_solving_time",
+        "improved_solving_time_solvability",
         "min_solving_time_option", "min_solving_time (s)",
         "min_solving_time_cegar_interation_number",
         "min_solving_time_generated_predicate_number",
@@ -173,10 +174,18 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["threshold_list_CDHG"].append(threshold_list_CDHG)
                 statistic_dict["threshold_list_CG"].append(threshold_list_CG)
 
-                #compute improved solving time by unsatcore
+                #compute improved solving time from previous solvability value
                 unsatcore_min_solving_time = min(solving_time_list_CDHG+solving_time_list_CG)
                 if unsatcore_min_solving_time!=-0.001 and unsatcore_min_solving_time < min_solving_time:
                     improved_solving_time=min_solving_time - unsatcore_min_solving_time
+                else:
+                    improved_solving_time=0
+                statistic_dict["improved_solving_time_solvability"].append(improved_solving_time)
+                #compute improved solving time using threshold 0 and other threshold
+                not_pruned_solving_time=min([solving_time_list_CDHG[0],solving_time_list_CG[0]])
+                pruned_unsatcore_min_solving_time = min(solving_time_list_CDHG[1:] + solving_time_list_CG[1:])
+                if pruned_unsatcore_min_solving_time!=-0.001 and pruned_unsatcore_min_solving_time < not_pruned_solving_time:
+                    improved_solving_time=not_pruned_solving_time - pruned_unsatcore_min_solving_time
                 else:
                     improved_solving_time=0
                 statistic_dict["improved_solving_time"].append(improved_solving_time)
