@@ -121,6 +121,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
     record_fields = [
         "satisfiability",
         "no-pruning-satisfiability",
+        "no-pruning-solving-time (s)",
+        "improved_solving_time (s)",
         "satisfiability-CDHG",
         "clause_number_after_pruning_list_CDHG",
         "solving_time_list_CDHG (s)",
@@ -129,7 +131,6 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "clause_number_after_pruning_list_CG",
         "solving_time_list_CG (s)",
         "threshold_list_CG",
-        "improved_solving_time (s)",
         # "improved_solving_time_solvability",
         "min_solving_time_option", "min_solving_time (s)",
         "min_solving_time_cegar_interation_number",
@@ -168,6 +169,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 satisfiability_CG, clause_number_after_pruning_list_CG, threshold_list_CG, solving_time_list_CG, non_pruning_satisfiability_CG, non_pruning_solving_time_CG = get_fields_by_unsatcore_threshold(
                     json_obj, "CG", threshold_list=threshold_list)
 
+                not_pruned_solving_time = min([non_pruning_solving_time_CDHG, non_pruning_solving_time_CG])
+                statistic_dict["no-pruning-solving-time (s)"].append(non_pruning_satisfiability_CDHG)
                 statistic_dict["no-pruning-satisfiability"].append(non_pruning_satisfiability_CDHG)
                 statistic_dict["satisfiability-CDHG"].append(satisfiability_CDHG)
                 statistic_dict["satisfiability-CG"].append(satisfiability_CG)
@@ -179,7 +182,6 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["threshold_list_CG"].append(threshold_list_CG)
 
                 # compute improved solving time using threshold 0 and other threshold
-                not_pruned_solving_time = min([non_pruning_solving_time_CDHG, non_pruning_solving_time_CG])
                 pruned_unsatcore_min_solving_time = min(solving_time_list_CDHG + solving_time_list_CG)
                 if pruned_unsatcore_min_solving_time != -0.001 and pruned_unsatcore_min_solving_time < not_pruned_solving_time:
                     improved_solving_time = not_pruned_solving_time - pruned_unsatcore_min_solving_time
