@@ -32,16 +32,16 @@ def main():
     # parameters_pipeline.append(" -mineCounterExample:union -useUnsimplifiedClauses ")
 
     # unsatcore: construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
-    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -useUnsimplifiedClauses -log ")
+    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore ")
+    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore ")
 
     # unsatcore: check solvability differernt threshold # 11*2*1 hours
     #need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
-    threshold_list = [0.0, 0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]  # rank above this value remains
-    for g in ["CDHG", "CG"]:
-        for threshold in threshold_list:  # reverse this list
-            parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
-                threshold) + " -hornGraphType:" + g)
+    # threshold_list = [0.0, 0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]  # rank above this value remains
+    # for g in ["CDHG", "CG"]:
+    #     for threshold in threshold_list:  # reverse this list
+    #         parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
+    #             threshold) + " -hornGraphType:" + g)
 
     # template_selection: get labeled templates # 3 hours
     # parameters_pipeline.append(" -mineTemplates -log ")

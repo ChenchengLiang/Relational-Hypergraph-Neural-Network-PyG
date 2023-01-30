@@ -247,18 +247,29 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
             satisfiability_dict["unknown_solving_time_list"].append(solving_time)
             satisfiability_dict["unknown_threshold_list"].append(t)
 
-    if len(satisfiability_dict["unsafe_satisfiability_list"]) != 0:
-        return "unsafe", satisfiability_dict["unsafe_clause_number_after_pruning_list"], satisfiability_dict[
-            "unsafe_threshold_list"], satisfiability_dict[
-            "unsafe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
-    elif len(satisfiability_dict["safe_satisfiability_list"]) != 0:
-        return "safe", satisfiability_dict["safe_clause_number_after_pruning_list"], satisfiability_dict[
-            "safe_threshold_list"], satisfiability_dict[
-            "safe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
-    else:
-        return "unknown", satisfiability_dict["unknown_clause_number_after_pruning_list"], satisfiability_dict[
-            "unknown_threshold_list"], satisfiability_dict[
-            "unknown_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+
+    if non_pruning_satisfiability=="unsafe" or non_pruning_satisfiability=="unknown":
+        if len(satisfiability_dict["unsafe_satisfiability_list"]) != 0:
+            return "unsafe", satisfiability_dict["unsafe_clause_number_after_pruning_list"], satisfiability_dict[
+                "unsafe_threshold_list"], satisfiability_dict[
+                "unsafe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+        elif len(satisfiability_dict["safe_satisfiability_list"]) != 0:
+            return "safe", satisfiability_dict["safe_clause_number_after_pruning_list"], satisfiability_dict[
+                "safe_threshold_list"], satisfiability_dict[
+                "safe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+    if non_pruning_satisfiability == "safe":
+        if len(satisfiability_dict["safe_satisfiability_list"]) != 0:
+            return "safe", satisfiability_dict["safe_clause_number_after_pruning_list"], satisfiability_dict[
+                "safe_threshold_list"], satisfiability_dict[
+                "safe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+        elif len(satisfiability_dict["unsafe_satisfiability_list"]) != 0:
+            return "unsafe", satisfiability_dict["unsafe_clause_number_after_pruning_list"], satisfiability_dict[
+                "unsafe_threshold_list"], satisfiability_dict[
+                "unsafe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+
+    return "unknown", satisfiability_dict["unknown_clause_number_after_pruning_list"], satisfiability_dict[
+        "unknown_threshold_list"], satisfiability_dict[
+        "unknown_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
 
 
 def get_unsatcore_threshold_list(json_obj):
