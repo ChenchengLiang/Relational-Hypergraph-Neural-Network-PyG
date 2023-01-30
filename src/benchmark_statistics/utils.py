@@ -2,7 +2,7 @@ from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean
-from src.utils import camel_to_snake, make_dirct,read_a_json_field
+from src.utils import camel_to_snake, make_dirct, read_a_json_field
 from src.plots import scatter_plot
 import itertools
 
@@ -120,6 +120,7 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
 def read_solving_time_from_json_file(file_list, statistic_dict):
     record_fields = [
         "satisfiability",
+        "no-pruning-satisfiability",
         "satisfiability-CDHG",
         "clause_number_after_pruning_list_CDHG",
         "solving_time_list_CDHG (s)",
@@ -128,8 +129,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "clause_number_after_pruning_list_CG",
         "solving_time_list_CG (s)",
         "threshold_list_CG",
-        "improved_solving_time",
-        "improved_solving_time_solvability",
+        "improved_solving_time (s)",
+        # "improved_solving_time_solvability",
         "min_solving_time_option", "min_solving_time (s)",
         "min_solving_time_cegar_interation_number",
         "min_solving_time_generated_predicate_number",
@@ -149,8 +150,10 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     if int(float(json_obj[k][0])) != 10800000:
                         solvable_option_dict[k] = int(float(json_obj[k][0]))
             if len(solving_time_dict) != 0:  # solvable with solvability file
-                min_solving_option,min_solving_time = get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, min)
-                max_solving_option,max_solving_time = get_min_max_solving_time(solving_time_dict, statistic_dict, json_obj, max)
+                min_solving_option, min_solving_time = get_min_max_solving_time(solving_time_dict, statistic_dict,
+                                                                                json_obj, min)
+                max_solving_option, max_solving_time = get_min_max_solving_time(solving_time_dict, statistic_dict,
+                                                                                json_obj, max)
 
                 satisfiability = get_satisfiability(json_obj, min_solving_option)
                 statistic_dict["satisfiability"].append(satisfiability)
@@ -158,13 +161,14 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["solvable_option_list"].append(
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))
 
-                #record unsatcore reulsts
+                # record unsatcore reulsts
                 threshold_list = get_unsatcore_threshold_list(json_obj)
-                satisfiability_CDHG, clause_number_after_pruning_list_CDHG, threshold_list_CDHG, solving_time_list_CDHG = get_fields_by_unsatcore_threshold(
+                satisfiability_CDHG, clause_number_after_pruning_list_CDHG, threshold_list_CDHG, solving_time_list_CDHG, non_pruning_satisfiability_CDHG, non_pruning_solving_time_CDHG = get_fields_by_unsatcore_threshold(
                     json_obj, "CDHG", threshold_list=threshold_list)
-                satisfiability_CG, clause_number_after_pruning_list_CG, threshold_list_CG, solving_time_list_CG = get_fields_by_unsatcore_threshold(
+                satisfiability_CG, clause_number_after_pruning_list_CG, threshold_list_CG, solving_time_list_CG, non_pruning_satisfiability_CG, non_pruning_solving_time_CG = get_fields_by_unsatcore_threshold(
                     json_obj, "CG", threshold_list=threshold_list)
 
+                statistic_dict["no-pruning-satisfiability"].append(non_pruning_satisfiability_CDHG)
                 statistic_dict["satisfiability-CDHG"].append(satisfiability_CDHG)
                 statistic_dict["satisfiability-CG"].append(satisfiability_CG)
                 statistic_dict["clause_number_after_pruning_list_CDHG"].append(clause_number_after_pruning_list_CDHG)
@@ -174,21 +178,23 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["threshold_list_CDHG"].append(threshold_list_CDHG)
                 statistic_dict["threshold_list_CG"].append(threshold_list_CG)
 
-                #compute improved solving time from previous solvability value
-                unsatcore_min_solving_time = min(solving_time_list_CDHG+solving_time_list_CG)
-                if unsatcore_min_solving_time!=-0.001 and unsatcore_min_solving_time < min_solving_time:
-                    improved_solving_time=min_solving_time - unsatcore_min_solving_time
+                # compute improved solving time using threshold 0 and other threshold
+                not_pruned_solving_time = min([non_pruning_solving_time_CDHG, non_pruning_solving_time_CG])
+                pruned_unsatcore_min_solving_time = min(solving_time_list_CDHG + solving_time_list_CG)
+                if pruned_unsatcore_min_solving_time != -0.001 and pruned_unsatcore_min_solving_time < not_pruned_solving_time:
+                    improved_solving_time = not_pruned_solving_time - pruned_unsatcore_min_solving_time
                 else:
-                    improved_solving_time=0
-                statistic_dict["improved_solving_time_solvability"].append(improved_solving_time)
-                #compute improved solving time using threshold 0 and other threshold
-                not_pruned_solving_time=min([solving_time_list_CDHG[0],solving_time_list_CG[0]])
-                pruned_unsatcore_min_solving_time = min(solving_time_list_CDHG[1:] + solving_time_list_CG[1:])
-                if pruned_unsatcore_min_solving_time!=-0.001 and pruned_unsatcore_min_solving_time < not_pruned_solving_time:
-                    improved_solving_time=not_pruned_solving_time - pruned_unsatcore_min_solving_time
-                else:
-                    improved_solving_time=0
-                statistic_dict["improved_solving_time"].append(improved_solving_time)
+                    improved_solving_time = 0
+                statistic_dict["improved_solving_time (s)"].append(improved_solving_time)
+
+                # compute improved solving time from previous solvability value
+                # unsatcore_min_solving_time = min(solving_time_list_CDHG+solving_time_list_CG)
+                # if unsatcore_min_solving_time!=-0.001 and unsatcore_min_solving_time < min_solving_time:
+                #     improved_solving_time=min_solving_time - unsatcore_min_solving_time
+                # else:
+                #     improved_solving_time=0
+                # statistic_dict["improved_solving_time_solvability"].append(improved_solving_time)
+
 
 
 
@@ -200,9 +206,10 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 
 
 def get_fields_by_unsatcore_threshold(json_obj, graph_type,
-                                                   threshold_list=[0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
-                                                                   0.6]):
-    measurement_list=["satisfiability_list","clause_number_after_pruning_list","threshold_list","solving_time_list"]
+                                      threshold_list=[0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
+                                                      0.6]):
+    measurement_list = ["satisfiability_list", "clause_number_after_pruning_list", "threshold_list",
+                        "solving_time_list"]
     satisfiability_dict_key_list = []
     for x in ["safe", "unsafe", "unknown"]:
         for measure in measurement_list:
@@ -210,12 +217,16 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
 
     satisfiability_dict = {}
     assign_dict_key_empty_list(satisfiability_dict, satisfiability_dict_key_list)
+    non_pruning_satisfiability = -1
+    non_pruning_solving_time = -1
     for t in threshold_list:
         suffix = "-" + graph_type + "-" + str(t)
-        satisfiability = decode_satisfiability(float(read_a_json_field(json_obj,"satisfiability" + suffix)))
-        clause_number_after_pruning = int(read_a_json_field(json_obj,"clauseNumberAfterPruning" + suffix))
-        solving_time = int(float(read_a_json_field(json_obj,"solvingTime" + suffix))) / 1000
-
+        satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
+        clause_number_after_pruning = int(read_a_json_field(json_obj, "clauseNumberAfterPruning" + suffix))
+        solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix))) / 1000
+        if t == 0:
+            non_pruning_satisfiability = satisfiability
+            non_pruning_solving_time = solving_time
 
         if satisfiability == "safe":
             satisfiability_dict["safe_satisfiability_list"].append(satisfiability)
@@ -236,24 +247,28 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
 
     if len(satisfiability_dict["unsafe_satisfiability_list"]) != 0:
         return "unsafe", satisfiability_dict["unsafe_clause_number_after_pruning_list"], satisfiability_dict[
-            "unsafe_threshold_list"],satisfiability_dict["unsafe_solving_time_list"]
+            "unsafe_threshold_list"], satisfiability_dict[
+            "unsafe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
     elif len(satisfiability_dict["safe_satisfiability_list"]) != 0:
         return "safe", satisfiability_dict["safe_clause_number_after_pruning_list"], satisfiability_dict[
-            "safe_threshold_list"],satisfiability_dict["safe_solving_time_list"]
+            "safe_threshold_list"], satisfiability_dict[
+            "safe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
     else:
         return "unknown", satisfiability_dict["unknown_clause_number_after_pruning_list"], satisfiability_dict[
-            "unknown_threshold_list"],satisfiability_dict["unknown_solving_time_list"]
+            "unknown_threshold_list"], satisfiability_dict[
+            "unknown_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+
+
 def get_unsatcore_threshold_list(json_obj):
-    total_threshold_list= [round(0.01*i,2) for i in range(0,100)]
-    threshold_list=[]
+    total_threshold_list = [round(0.01 * i, 2) for i in range(0, 100)]
+    threshold_list = []
     for t in total_threshold_list:
         try:
-            x=json_obj["clauseNumberAfterPruning-CG-"+str(t)]
+            x = json_obj["clauseNumberAfterPruning-CG-" + str(t)]
             threshold_list.append(t)
         except:
             pass
     return threshold_list
-
 
 
 def assign_values_to_unsolvable_problem(statistic_dict, record_fields):
