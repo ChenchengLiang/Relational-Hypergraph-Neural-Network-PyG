@@ -10,7 +10,7 @@ from src.collect_results.utils import read_files, read_smt2_category, get_sumary
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-safe-infer-solvability/train_data"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-unsatcore-linear-safe-infer-divided-1553/train_data"
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
