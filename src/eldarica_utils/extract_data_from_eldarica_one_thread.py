@@ -44,6 +44,13 @@ def main():
             parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
                 threshold) + " -hornGraphType:" + g)
 
+    # unsatcore: check solvability for prioritized clauses 6 + 3 hours
+    parameters_pipeline.append(
+        " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG ")
+    for g in ["CDHG", "CG"]:
+        parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank " )
+
+
     # template_selection: get labeled templates # 3 hours
     # parameters_pipeline.append(" -mineTemplates -log ")
 
