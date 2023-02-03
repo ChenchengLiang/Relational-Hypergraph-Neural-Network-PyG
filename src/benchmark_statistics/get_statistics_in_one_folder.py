@@ -10,7 +10,7 @@ from src.collect_results.utils import read_files, read_smt2_category, get_sumary
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-unsatcore-linear-safe-infer-divided-1553/train_data"
+    folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/prioritize-solvabilit-test/train_data"
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
@@ -30,7 +30,7 @@ def main():
         # get fix clause attributes
     fixed_clause_measurements = ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
                                  "clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
-                                 #"clauseNumberAfterPruning",
+                                 # "clauseNumberAfterPruning",
                                  # "minedSingleVariableTemplatesNumber", "minedBinaryVariableTemplatesNumber",
                                  # "minedTemplateNumber", "minedTemplateRelationSymbolNumber",
                                  # "labeledSingleVariableTemplatesNumber", "labeledBinaryVariableTemplatesNumber",
@@ -55,8 +55,19 @@ def main():
 
     statistic_summary = get_statistic_summary(data_dict)
 
+    clause_prioritize_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
+                                                                  "clauseNumberAfterSimplification", "satisfiability",
+                                                                  "no-pruning-satisfiability",
+                                                                  "no-pruning-solving-time (s)",
+                                                                  "improved_solving_time_prioritize_clauses (s)",
+                                                                  "satisfiability-prioritize-clauses-CDHG",
+                                                                  "solving-time-prioritize-clauses-CDHG",
+                                                                  "satisfiability-prioritize-clauses-CG",
+                                                                  "solving-time-prioritize-clauses-CG",
+                                                                  "CDHG_node_number", "CG_node_number"])
+
     # filter list that has the same value
-    #filter_columns(data_dict)
+    # filter_columns(data_dict)
     filter_columns(category_summary)
     statistic_summary = filter_rows(statistic_summary, "statistic_value")
 
@@ -65,6 +76,7 @@ def main():
         pd.DataFrame(pd.DataFrame(data_dict)).to_excel(writer, sheet_name=folder_basename)
         pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
         pd.DataFrame(pd.DataFrame(statistic_summary)).to_excel(writer, sheet_name="statistic_summary")
+        pd.DataFrame(pd.DataFrame(clause_prioritize_summary)).to_excel(writer, sheet_name="clause_prioritize_summary")
 
 
 if __name__ == '__main__':
