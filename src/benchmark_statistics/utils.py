@@ -176,7 +176,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     non_pruning_satisfiability_CG, non_pruning_solving_time_CG = get_fields_by_unsatcore_threshold(
                     json_obj, "CG", threshold_list=threshold_list)
 
-                not_pruned_solving_time=get_min_solving_time_from_list([non_pruning_solving_time_CDHG, non_pruning_solving_time_CG])
+                not_pruned_solving_time=get_min_solvable_solving_time_from_list([non_pruning_solving_time_CDHG, non_pruning_solving_time_CG])
 
                 statistic_dict["no-pruning-solving-time (s)"].append(not_pruned_solving_time)
                 statistic_dict["no-pruning-satisfiability"].append(non_pruning_satisfiability_CDHG)
@@ -190,7 +190,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["threshold_list_CG"].append(threshold_list_CG)
 
                 # compute improved solving time using threshold 0 and other threshold
-                pruned_unsatcore_min_solving_time=get_min_solving_time_from_list(solving_time_list_CDHG + solving_time_list_CG)
+                pruned_unsatcore_min_solving_time=get_min_solvable_solving_time_from_list(solving_time_list_CDHG + solving_time_list_CG)
 
                 if pruned_unsatcore_min_solving_time != -0.001 and pruned_unsatcore_min_solving_time < not_pruned_solving_time:
                     improved_solving_time = not_pruned_solving_time - pruned_unsatcore_min_solving_time
@@ -209,7 +209,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["solving-time-prioritize-clauses-CDHG"].append(solving_time_prioritize_clauses_CDHG)
                 statistic_dict["solving-time-prioritize-clauses-CG"].append(solving_time_prioritize_clauses_CG)
                 # compute improved solving time using threshold 0 and prioritize-clauses
-                prioritize_clauses_min_solving_time=get_min_solving_time_from_list([solving_time_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CG])
+                prioritize_clauses_min_solving_time=get_min_solvable_solving_time_from_list([solving_time_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CG])
 
 
                 if prioritize_clauses_min_solving_time != -0.001 and prioritize_clauses_min_solving_time < not_pruned_solving_time:
@@ -303,7 +303,7 @@ def get_unsatcore_threshold_list(json_obj):
             pass
     return threshold_list
 
-def get_min_solving_time_from_list(l):
+def get_min_solvable_solving_time_from_list(l):
     min_solving_time_list = [x for x in l if x != -0.001]
     if len(min_solving_time_list) == 0:
         min_solving_time = -0.001
