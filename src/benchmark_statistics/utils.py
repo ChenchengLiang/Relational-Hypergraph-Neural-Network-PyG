@@ -398,6 +398,32 @@ def get_summary_by_fields(data_dict, fields):
     summary = {}
     for f in fields:
         summary[f] = data_dict[f]
+
+    summary["satisfiability-common"]=[0 for x in summary["file_name"]]
+    summary["satisfiability-unique-CDHG"] =[0 for x in summary["file_name"]]
+    summary["satisfiability-unique-CG"] = [0 for x in summary["file_name"]]
+    summary["satisfiability-total"] = [0 for x in summary["file_name"]]
+    try:
+        for c1,c2 in zip(summary["satisfiability-threshold-CDHG"],summary["satisfiability-threshold-CG"]):
+            if c1==c2 and c1=="unsafe":
+                summary["satisfiability-common"][0]+=1
+            elif c1=="unsafe" and c2!="unsafe":
+                summary["satisfiability-unique-CDHG"][0] += 1
+            elif c2 == "unsafe" and c1 != "unsafe":
+                summary["satisfiability-unique-CG"][0] += 1
+    except:
+        pass
+    try:
+        for c1,c2 in zip(summary["satisfiability-prioritize-clauses-CDHG"],summary["satisfiability-prioritize-clauses-CG"]):
+            if c1==c2 and c1=="unsafe":
+                summary["satisfiability-common"][0]+=1
+            elif c1=="unsafe" and c2!="unsafe":
+                summary["satisfiability-unique-CDHG"][0] += 1
+            elif c2 == "unsafe" and c1 != "unsafe":
+                summary["satisfiability-unique-CG"][0] += 1
+    except:
+        pass
+    summary["satisfiability-total"][0] = summary["satisfiability-unique-CDHG"][0]+summary["satisfiability-unique-CG"][0]
     return summary
 
 

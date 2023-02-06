@@ -10,7 +10,7 @@ from src.collect_results.utils import read_files, read_smt2_category, get_sumary
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/prioritize-solvabilit-test/train_data"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax/uppmax-unsatcore-linear-infer-1-divided-324/train_data"
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
@@ -65,6 +65,19 @@ def main():
                                                                   "satisfiability-prioritize-clauses-CG",
                                                                   "solving-time-prioritize-clauses-CG",
                                                                   "CDHG_node_number", "CG_node_number"])
+    clause_pruning_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
+                                                               "clauseNumberAfterSimplification", "satisfiability",
+                                                               "no-pruning-satisfiability",
+                                                               "no-pruning-solving-time (s)",
+                                                               "improved_solving_time_threshold (s)",
+                                                               "satisfiability-threshold-CDHG",
+                                                               "clause_number_after_pruning_list_CDHG",
+                                                               "solving_time_list_CDHG (s)",
+                                                               "threshold_list_CDHG",
+                                                               "satisfiability-threshold-CG",
+                                                               "clause_number_after_pruning_list_CG",
+                                                               "solving_time_list_CG (s)",
+                                                               "threshold_list_CG" ])
 
     # filter list that has the same value
     # filter_columns(data_dict)
@@ -77,6 +90,7 @@ def main():
         pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
         pd.DataFrame(pd.DataFrame(statistic_summary)).to_excel(writer, sheet_name="statistic_summary")
         pd.DataFrame(pd.DataFrame(clause_prioritize_summary)).to_excel(writer, sheet_name="clause_prioritize_summary")
+        pd.DataFrame(pd.DataFrame(clause_pruning_summary)).to_excel(writer, sheet_name="clause_pruning_summary")
 
 
 if __name__ == '__main__':
