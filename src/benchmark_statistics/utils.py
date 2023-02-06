@@ -43,7 +43,10 @@ def get_scatters(summary_folder, data_dict):
     data_text = []
     for f, t1, t2 in zip(data_dict["file_name"], data_dict["threshold_list_CDHG"],
                          data_dict["threshold_list_CG"]):
+        if len(t2)>50:
+            t2="unknown"
         data_text.append(f + "\n" + "threshold_list_CDHG:" + str(t1) + "\n" + "threshold_list_CG:" + str(t2) + "\n")
+
     for pairs in combinations_pairs:
         x_key = pairs[0]
         y_key = pairs[1]
