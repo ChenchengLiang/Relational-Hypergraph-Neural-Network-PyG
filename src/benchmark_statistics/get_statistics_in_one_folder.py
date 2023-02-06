@@ -10,7 +10,7 @@ from src.collect_results.utils import read_files, read_smt2_category, get_sumary
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax/uppmax-unsatcore-linear-infer-1-divided-324/train_data"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-unsafe-shuffled-test-set/priority-control-results/uppmax-unsatcore-linear-unsafe-testset-predicted-divided-97/train_data"
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
@@ -63,7 +63,7 @@ def main():
                                                                   "satisfiability-prioritize-clauses-CDHG",
                                                                   "solving-time-prioritize-clauses-CDHG",
                                                                   "satisfiability-prioritize-clauses-CG",
-                                                                  "solving-time-prioritize-clauses-CG",
+                                                                  "solving-time-prioritize-clauses-CG","prioritize_clauses_min_solving_time (s)",
                                                                   "CDHG_node_number", "CG_node_number"])
     clause_pruning_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
                                                                "clauseNumberAfterSimplification", "satisfiability",
@@ -76,7 +76,7 @@ def main():
                                                                "threshold_list_CDHG",
                                                                "satisfiability-threshold-CG",
                                                                "clause_number_after_pruning_list_CG",
-                                                               "solving_time_list_CG (s)",
+                                                               "solving_time_list_CG (s)","pruned_unsatcore_min_solving_time (s)",
                                                                "threshold_list_CG" ])
 
     # filter list that has the same value

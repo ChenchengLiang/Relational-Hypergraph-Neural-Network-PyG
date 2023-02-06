@@ -25,6 +25,10 @@ def get_scatters(summary_folder, data_dict):
                           ["clauseNumberAfterSimplification", "CG_node_number"],
                           ["clauseNumberAfterSimplification", "CG_label_number"],
                           ["CDHG_node_number", "CG_node_number"],
+                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CDHG"],
+                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CG"],
+                          ["no-pruning-solving-time (s)", "prioritize_clauses_min_solving_time (s)"],
+                          ["no-pruning-solving-time (s)", "pruned_unsatcore_min_solving_time (s)"],
                           ]
     # z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
     if data_dict["satisfiability-threshold-CDHG"] != "unknown":
@@ -39,7 +43,7 @@ def get_scatters(summary_folder, data_dict):
     data_text = []
     for f, t1, t2 in zip(data_dict["file_name"], data_dict["threshold_list_CDHG"],
                          data_dict["threshold_list_CG"]):
-        data_text.append(f + "\n" + "threshold_list_CDHG:" + str(t1) + "\n" + "threshold_list_CG:" + str(t2))
+        data_text.append(f + "\n" + "threshold_list_CDHG:" + str(t1) + "\n" + "threshold_list_CG:" + str(t2) + "\n")
     for pairs in combinations_pairs:
         x_key = pairs[0]
         y_key = pairs[1]
@@ -122,11 +126,14 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "satisfiability",
         "no-pruning-satisfiability",
         "no-pruning-solving-time (s)",
+        # prioritized
         "improved_solving_time_prioritize_clauses (s)",
         "satisfiability-prioritize-clauses-CDHG",
         "solving-time-prioritize-clauses-CDHG",
         "satisfiability-prioritize-clauses-CG",
         "solving-time-prioritize-clauses-CG",
+        "prioritize_clauses_min_solving_time (s)",
+        # threshold
         "improved_solving_time_threshold (s)",
         "satisfiability-threshold-CDHG",
         "clause_number_after_pruning_list_CDHG",
@@ -136,7 +143,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "clause_number_after_pruning_list_CG",
         "solving_time_list_CG (s)",
         "threshold_list_CG",
-        # "improved_solving_time_solvability",
+        "pruned_unsatcore_min_solving_time (s)",
+        # templates
         "min_solving_time_option", "min_solving_time (s)",
         "min_solving_time_cegar_interation_number",
         "min_solving_time_generated_predicate_number",
@@ -176,7 +184,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     non_pruning_satisfiability_CG, non_pruning_solving_time_CG = get_fields_by_unsatcore_threshold(
                     json_obj, "CG", threshold_list=threshold_list)
 
-                not_pruned_solving_time=get_min_solvable_solving_time_from_list([non_pruning_solving_time_CDHG, non_pruning_solving_time_CG])
+                not_pruned_solving_time = get_min_solvable_solving_time_from_list(
+                    [non_pruning_solving_time_CDHG, non_pruning_solving_time_CG])
 
                 statistic_dict["no-pruning-solving-time (s)"].append(not_pruned_solving_time)
                 statistic_dict["no-pruning-satisfiability"].append(non_pruning_satisfiability_CDHG)
@@ -190,13 +199,15 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["threshold_list_CG"].append(threshold_list_CG)
 
                 # compute improved solving time using threshold 0 and other threshold
-                pruned_unsatcore_min_solving_time=get_min_solvable_solving_time_from_list(solving_time_list_CDHG + solving_time_list_CG)
+                pruned_unsatcore_min_solving_time = get_min_solvable_solving_time_from_list(
+                    solving_time_list_CDHG + solving_time_list_CG)
 
                 if pruned_unsatcore_min_solving_time != -0.001 and pruned_unsatcore_min_solving_time < not_pruned_solving_time:
                     improved_solving_time = not_pruned_solving_time - pruned_unsatcore_min_solving_time
                 else:
                     improved_solving_time = 0
                 statistic_dict["improved_solving_time_threshold (s)"].append(improved_solving_time)
+                statistic_dict["pruned_unsatcore_min_solving_time (s)"].append(pruned_unsatcore_min_solving_time)
 
                 # record unsatcore clause prioritize reulsts
                 satisfiability_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CDHG = get_fields_by_unsatcore_prioritize_clauses(
@@ -209,8 +220,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["solving-time-prioritize-clauses-CDHG"].append(solving_time_prioritize_clauses_CDHG)
                 statistic_dict["solving-time-prioritize-clauses-CG"].append(solving_time_prioritize_clauses_CG)
                 # compute improved solving time using threshold 0 and prioritize-clauses
-                prioritize_clauses_min_solving_time=get_min_solvable_solving_time_from_list([solving_time_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CG])
-
+                prioritize_clauses_min_solving_time = get_min_solvable_solving_time_from_list(
+                    [solving_time_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CG])
 
                 if prioritize_clauses_min_solving_time != -0.001 and prioritize_clauses_min_solving_time < not_pruned_solving_time:
                     prioritize_clauses_improved_solving_time = not_pruned_solving_time - prioritize_clauses_min_solving_time
@@ -218,6 +229,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     prioritize_clauses_improved_solving_time = 0
                 statistic_dict["improved_solving_time_prioritize_clauses (s)"].append(
                     prioritize_clauses_improved_solving_time)
+                statistic_dict["prioritize_clauses_min_solving_time (s)"].append(
+                    prioritize_clauses_min_solving_time)
 
 
 
@@ -303,6 +316,7 @@ def get_unsatcore_threshold_list(json_obj):
             pass
     return threshold_list
 
+
 def get_min_solvable_solving_time_from_list(l):
     min_solving_time_list = [x for x in l if x != -0.001]
     if len(min_solving_time_list) == 0:
@@ -310,6 +324,7 @@ def get_min_solvable_solving_time_from_list(l):
     else:
         min_solving_time = min(min_solving_time_list)
     return min_solving_time
+
 
 def assign_values_to_unsolvable_problem(statistic_dict, record_fields):
     for rf in record_fields:
@@ -399,31 +414,33 @@ def get_summary_by_fields(data_dict, fields):
     for f in fields:
         summary[f] = data_dict[f]
 
-    summary["satisfiability-common"]=[0 for x in summary["file_name"]]
-    summary["satisfiability-unique-CDHG"] =[0 for x in summary["file_name"]]
-    summary["satisfiability-unique-CG"] = [0 for x in summary["file_name"]]
-    summary["satisfiability-total"] = [0 for x in summary["file_name"]]
+    summary["unsafe-common"] = [0 for x in summary["file_name"]]
+    summary["unsafe-unique-CDHG"] = [0 for x in summary["file_name"]]
+    summary["unsafe-unique-CG"] = [0 for x in summary["file_name"]]
+    summary["unsafe-total"] = [0 for x in summary["file_name"]]
     try:
-        for c1,c2 in zip(summary["satisfiability-threshold-CDHG"],summary["satisfiability-threshold-CG"]):
-            if c1==c2 and c1=="unsafe":
-                summary["satisfiability-common"][0]+=1
-            elif c1=="unsafe" and c2!="unsafe":
-                summary["satisfiability-unique-CDHG"][0] += 1
+        for c1, c2 in zip(summary["satisfiability-threshold-CDHG"], summary["satisfiability-threshold-CG"]):
+            if c1 == c2 and c1 == "unsafe":
+                summary["unsafe-common"][0] += 1
+            elif c1 == "unsafe" and c2 != "unsafe":
+                summary["unsafe-unique-CDHG"][0] += 1
             elif c2 == "unsafe" and c1 != "unsafe":
-                summary["satisfiability-unique-CG"][0] += 1
+                summary["unsafe-unique-CG"][0] += 1
     except:
         pass
     try:
-        for c1,c2 in zip(summary["satisfiability-prioritize-clauses-CDHG"],summary["satisfiability-prioritize-clauses-CG"]):
-            if c1==c2 and c1=="unsafe":
-                summary["satisfiability-common"][0]+=1
-            elif c1=="unsafe" and c2!="unsafe":
-                summary["satisfiability-unique-CDHG"][0] += 1
+        for c1, c2 in zip(summary["satisfiability-prioritize-clauses-CDHG"],
+                          summary["satisfiability-prioritize-clauses-CG"]):
+            if c1 == c2 and c1 == "unsafe":
+                summary["unsafe-common"][0] += 1
+            elif c1 == "unsafe" and c2 != "unsafe":
+                summary["unsafe-unique-CDHG"][0] += 1
             elif c2 == "unsafe" and c1 != "unsafe":
-                summary["satisfiability-unique-CG"][0] += 1
+                summary["unsafe-unique-CG"][0] += 1
     except:
         pass
-    summary["satisfiability-total"][0] = summary["satisfiability-unique-CDHG"][0]+summary["satisfiability-unique-CG"][0]
+    summary["unsafe-total"][0] = summary["unsafe-unique-CDHG"][0] + summary["unsafe-unique-CG"][
+        0] + summary["unsafe-common"][0]
     return summary
 
 
