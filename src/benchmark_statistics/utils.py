@@ -417,33 +417,40 @@ def get_summary_by_fields(data_dict, fields):
     for f in fields:
         summary[f] = data_dict[f]
 
-    summary["unsafe-common"] = [0 for x in summary["file_name"]]
-    summary["unsafe-unique-CDHG"] = [0 for x in summary["file_name"]]
-    summary["unsafe-unique-CG"] = [0 for x in summary["file_name"]]
-    summary["unsafe-total"] = [0 for x in summary["file_name"]]
+    summary = get_summary_by_satisfiability(summary, "unsafe")
+    summary=get_summary_by_satisfiability(summary,"safe")
+    return summary
+
+
+def get_summary_by_satisfiability(summary,satisfiability="unsafe"):
+    summary[satisfiability+"-common"] = [0 for x in summary["file_name"]]
+    summary[satisfiability+"-unique-CDHG"] = [0 for x in summary["file_name"]]
+    summary[satisfiability+"-unique-CG"] = [0 for x in summary["file_name"]]
+    summary[satisfiability+"-total"] = [0 for x in summary["file_name"]]
     try:
         for c1, c2 in zip(summary["satisfiability-threshold-CDHG"], summary["satisfiability-threshold-CG"]):
-            if c1 == c2 and c1 == "unsafe":
-                summary["unsafe-common"][0] += 1
-            elif c1 == "unsafe" and c2 != "unsafe":
-                summary["unsafe-unique-CDHG"][0] += 1
-            elif c2 == "unsafe" and c1 != "unsafe":
-                summary["unsafe-unique-CG"][0] += 1
+            if c1 == c2 and c1 == satisfiability:
+                summary[satisfiability+"-common"][0] += 1
+            elif c1 == satisfiability and c2 != satisfiability:
+                summary[satisfiability+"-unique-CDHG"][0] += 1
+            elif c2 == satisfiability and c1 != satisfiability:
+                summary[satisfiability+"-unique-CG"][0] += 1
     except:
         pass
     try:
         for c1, c2 in zip(summary["satisfiability-prioritize-clauses-CDHG"],
                           summary["satisfiability-prioritize-clauses-CG"]):
-            if c1 == c2 and c1 == "unsafe":
-                summary["unsafe-common"][0] += 1
-            elif c1 == "unsafe" and c2 != "unsafe":
-                summary["unsafe-unique-CDHG"][0] += 1
-            elif c2 == "unsafe" and c1 != "unsafe":
-                summary["unsafe-unique-CG"][0] += 1
+            if c1 == c2 and c1 == satisfiability:
+                summary[satisfiability+"-common"][0] += 1
+            elif c1 == satisfiability and c2 != satisfiability:
+                summary[satisfiability+"-unique-CDHG"][0] += 1
+            elif c2 == satisfiability and c1 != satisfiability:
+                summary[satisfiability+"-unique-CG"][0] += 1
     except:
         pass
-    summary["unsafe-total"][0] = summary["unsafe-unique-CDHG"][0] + summary["unsafe-unique-CG"][
-        0] + summary["unsafe-common"][0]
+    summary[satisfiability+"-total"][0] = summary[satisfiability+"-unique-CDHG"][0] + summary[satisfiability+"-unique-CG"][
+        0] + summary[satisfiability+"-common"][0]
+
     return summary
 
 
