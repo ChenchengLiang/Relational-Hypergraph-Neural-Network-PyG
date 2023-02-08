@@ -10,7 +10,7 @@ from src.collect_results.utils import read_files, read_smt2_category, get_sumary
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-unsafe-shuffled-test-set/threshold-control-results/uppmax-2-unsatcore-linear-shuffled-test-set-predicted-divided-97/train_data"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-safe/priority-control-results/only-rank-1553/train_data"
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
