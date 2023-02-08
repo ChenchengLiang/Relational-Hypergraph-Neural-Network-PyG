@@ -53,7 +53,7 @@ def get_scatters(summary_folder, data_dict):
         try:
             scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key], z_data=z_data,
                          x_axis=x_key, y_axis=y_key, folder=scatter_folder, data_text=data_text,
-                         name=x_key + "-" + y_key)
+                         name=x_key + " vs. " + y_key)
         except:
             print("no field", pairs)
 
@@ -205,10 +205,10 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 pruned_unsatcore_min_solving_time = get_min_solvable_solving_time_from_list(
                     solving_time_list_CDHG + solving_time_list_CG)
 
-                if pruned_unsatcore_min_solving_time != -0.001 and pruned_unsatcore_min_solving_time < not_pruned_solving_time:
+                if pruned_unsatcore_min_solving_time != -0.001:
                     improved_solving_time = not_pruned_solving_time - pruned_unsatcore_min_solving_time
                 else:
-                    improved_solving_time = 0
+                    improved_solving_time = -1
                 statistic_dict["improved_solving_time_threshold (s)"].append(improved_solving_time)
                 statistic_dict["pruned_unsatcore_min_solving_time (s)"].append(pruned_unsatcore_min_solving_time)
 
@@ -226,10 +226,10 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 prioritize_clauses_min_solving_time = get_min_solvable_solving_time_from_list(
                     [solving_time_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CG])
 
-                if prioritize_clauses_min_solving_time != -0.001 and prioritize_clauses_min_solving_time < not_pruned_solving_time:
+                if prioritize_clauses_min_solving_time != -0.001:
                     prioritize_clauses_improved_solving_time = not_pruned_solving_time - prioritize_clauses_min_solving_time
                 else:
-                    prioritize_clauses_improved_solving_time = 0
+                    prioritize_clauses_improved_solving_time = -1
                 statistic_dict["improved_solving_time_prioritize_clauses (s)"].append(
                     prioritize_clauses_improved_solving_time)
                 statistic_dict["prioritize_clauses_min_solving_time (s)"].append(
