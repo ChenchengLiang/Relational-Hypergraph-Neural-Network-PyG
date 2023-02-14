@@ -29,11 +29,11 @@ def main():
     #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) )
 
     # unsatcore: get labeled data # 3 hours
-    # parameters_pipeline.append(" -mineCounterExample:union -useUnsimplifiedClauses ")
+    # parameters_pipeline.append(" -mineCounterExample:union -abstract:off")
 
     # unsatcore: construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore ")
-    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore ")
+    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off")
+    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -abstract:off")
 
     # unsatcore: check solvability differernt threshold # 13*2*3 hours
     # need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
@@ -42,13 +42,13 @@ def main():
     # for g in ["CDHG", "CG"]:
     #     for threshold in threshold_list:  # reverse this list
     #         parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
-    #             threshold) + " -hornGraphType:" + g)
+    #             threshold) + " -hornGraphType:" + g +" -abstract:off ")
 
     # unsatcore: check solvability for prioritized clauses 6 + 3 hours
-    parameters_pipeline.append(
-        " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG ")
-    for g in ["CDHG", "CG"]:
-        parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank " )
+    # parameters_pipeline.append(
+    #     " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:off ")
+    # for g in ["CDHG", "CG"]:
+    #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:off -lbe " )
 
 
     # template_selection: get labeled templates # 3 hours

@@ -8,8 +8,10 @@ def main():
     folder = sys.argv[1]
     cdhg_folder=make_dirct(folder+"-CDHG")
     cdhg_folder=make_dirct(os.path.join(cdhg_folder,"test_data"))
+    cdhg_folder = make_dirct(os.path.join(cdhg_folder, "raw"))
     cg_folder=make_dirct(folder + "-CG")
     cg_folder = make_dirct(os.path.join(cg_folder, "test_data"))
+    cg_folder = make_dirct(os.path.join(cg_folder, "raw"))
     for f in get_file_list(folder,"smt2"):
         file_name=f[:-len(".zip")]
         copy(f,cdhg_folder)

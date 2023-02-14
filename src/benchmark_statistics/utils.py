@@ -2,10 +2,96 @@ from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean
-from src.utils import camel_to_snake, make_dirct, read_a_json_field
+from src.utils import camel_to_snake, make_dirct, read_a_json_field,get_file_list
 from src.plots import scatter_plot
 import itertools
+import pandas as pd
+from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
+import os
 
+def get_statistiics_in_one_folder(folder):
+    summary_folder = get_sumary_folder(folder)
+    folder_basename = os.path.basename(folder)
+
+    file_list = get_file_list(folder, "smt2")
+    data_dict = {}
+
+    # get file names
+    data_dict["file_name"] = [os.path.basename(x["file_name"]) for x in
+                              read_files(file_list, file_type="",
+                                         read_function=read_smt2_category)]
+    # get fix smt attributes
+    smt_measurements = ["file_size", "file_size_h", "category"]
+    for sm in smt_measurements:
+        data_dict[sm] = [x[sm] for x in
+                         read_files(file_list, file_type="", read_function=read_smt2_category)]
+
+        # get fix clause attributes
+    fixed_clause_measurements = ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
+                                 "clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
+                                 # "clauseNumberAfterPruning",
+                                 # "minedSingleVariableTemplatesNumber", "minedBinaryVariableTemplatesNumber",
+                                 # "minedTemplateNumber", "minedTemplateRelationSymbolNumber",
+                                 # "labeledSingleVariableTemplatesNumber", "labeledBinaryVariableTemplatesNumber",
+                                 # "labeledTemplateNumber", "labeledTemplateRelationSymbolNumber",
+                                 # "unlabeledSingleVariableTemplatesNumber", "unlabeledBinaryVariableTemplatesNumber",
+                                 # "unlabeledTemplateNumber", "unlabeledTemplateRelationSymbolNumber"
+                                 ]
+    for cm in fixed_clause_measurements:
+        data_dict[cm] = list(get_fixed_filed_from_json_file(file_list, cm))
+
+    # get non-fix fields
+    read_solving_time_from_json_file(file_list, data_dict)
+
+    # get graph info
+    read_graph_info_from_json_file(file_list, data_dict)
+
+    get_scatters(summary_folder=summary_folder, data_dict=data_dict)
+
+    # get summaries
+
+    category_summary = get_category_summary(data_dict)
+
+    statistic_summary = get_statistic_summary(data_dict)
+
+    clause_prioritize_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
+                                                                  "clauseNumberAfterSimplification", "satisfiability",
+                                                                  "no-pruning-satisfiability",
+                                                                  "no-pruning-solving-time (s)",
+                                                                  "improved_solving_time_prioritize_clauses (s)",
+                                                                  "satisfiability-prioritize-clauses-CDHG",
+                                                                  "solving-time-prioritize-clauses-CDHG",
+                                                                  "satisfiability-prioritize-clauses-CG",
+                                                                  "solving-time-prioritize-clauses-CG",
+                                                                  "prioritize_clauses_min_solving_time (s)",
+                                                                  "CDHG_node_number", "CG_node_number"])
+    clause_pruning_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
+                                                               "clauseNumberAfterSimplification", "satisfiability",
+                                                               "no-pruning-satisfiability",
+                                                               "no-pruning-solving-time (s)",
+                                                               "improved_solving_time_threshold (s)",
+                                                               "satisfiability-threshold-CDHG",
+                                                               "clause_number_after_pruning_list_CDHG",
+                                                               "solving_time_list_CDHG (s)",
+                                                               "threshold_list_CDHG",
+                                                               "satisfiability-threshold-CG",
+                                                               "clause_number_after_pruning_list_CG",
+                                                               "solving_time_list_CG (s)",
+                                                               "pruned_unsatcore_min_solving_time (s)",
+                                                               "threshold_list_CG"])
+
+    # filter list that has the same value
+    # filter_columns(data_dict)
+    filter_columns(category_summary)
+    statistic_summary = filter_rows(statistic_summary, "statistic_value")
+
+    # write to excel
+    with pd.ExcelWriter(summary_folder + "/" + folder_basename + "_statistics_split_clauses_1.xlsx") as writer:
+        pd.DataFrame(pd.DataFrame(data_dict)).to_excel(writer, sheet_name=folder_basename)
+        pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
+        pd.DataFrame(pd.DataFrame(statistic_summary)).to_excel(writer, sheet_name="statistic_summary")
+        pd.DataFrame(pd.DataFrame(clause_prioritize_summary)).to_excel(writer, sheet_name="clause_prioritize_summary")
+        pd.DataFrame(pd.DataFrame(clause_pruning_summary)).to_excel(writer, sheet_name="clause_pruning_summary")
 
 def get_scatters(summary_folder, data_dict):
     scatter_folder = make_dirct(summary_folder + "/scatters")
@@ -43,8 +129,8 @@ def get_scatters(summary_folder, data_dict):
     data_text = []
     for f, t1, t2 in zip(data_dict["file_name"], data_dict["threshold_list_CDHG"],
                          data_dict["threshold_list_CG"]):
-        if len(t2)>50:
-            t2="unknown"
+        if len(t2) > 50:
+            t2 = "unknown"
         data_text.append(f + "\n" + "threshold_list_CDHG:" + str(t1) + "\n" + "threshold_list_CG:" + str(t2) + "\n")
 
     for pairs in combinations_pairs:
@@ -249,7 +335,8 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
     satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
-    solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix))) / 1000
+    solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
+    solving_time = 10800 if solving_time == -1 else solving_time / 1000
     return satisfiability, solving_time
 
 
@@ -265,13 +352,14 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
 
     satisfiability_dict = {}
     assign_dict_key_empty_list(satisfiability_dict, satisfiability_dict_key_list)
-    non_pruning_satisfiability = -1
-    non_pruning_solving_time = -1
+    non_pruning_satisfiability = 10800
+    non_pruning_solving_time = 10800
     for t in threshold_list:
         suffix = "-" + graph_type + "-" + str(t)
         satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
         clause_number_after_pruning = int(read_a_json_field(json_obj, "clauseNumberAfterPruning" + suffix))
-        solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix))) / 1000
+        solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
+        solving_time = 10800 if solving_time == -1 else solving_time / 1000
         if t == 0:
             non_pruning_satisfiability = satisfiability
             non_pruning_solving_time = solving_time
@@ -418,38 +506,39 @@ def get_summary_by_fields(data_dict, fields):
         summary[f] = data_dict[f]
 
     summary = get_summary_by_satisfiability(summary, "unsafe")
-    summary=get_summary_by_satisfiability(summary,"safe")
+    summary = get_summary_by_satisfiability(summary, "safe")
     return summary
 
 
-def get_summary_by_satisfiability(summary,satisfiability="unsafe"):
-    summary[satisfiability+"-common"] = [0 for x in summary["file_name"]]
-    summary[satisfiability+"-unique-CDHG"] = [0 for x in summary["file_name"]]
-    summary[satisfiability+"-unique-CG"] = [0 for x in summary["file_name"]]
-    summary[satisfiability+"-total"] = [0 for x in summary["file_name"]]
+def get_summary_by_satisfiability(summary, satisfiability="unsafe"):
+    summary[satisfiability + "-common"] = [0 for x in summary["file_name"]]
+    summary[satisfiability + "-unique-CDHG"] = [0 for x in summary["file_name"]]
+    summary[satisfiability + "-unique-CG"] = [0 for x in summary["file_name"]]
+    summary[satisfiability + "-total"] = [0 for x in summary["file_name"]]
     try:
         for c1, c2 in zip(summary["satisfiability-threshold-CDHG"], summary["satisfiability-threshold-CG"]):
             if c1 == c2 and c1 == satisfiability:
-                summary[satisfiability+"-common"][0] += 1
+                summary[satisfiability + "-common"][0] += 1
             elif c1 == satisfiability and c2 != satisfiability:
-                summary[satisfiability+"-unique-CDHG"][0] += 1
+                summary[satisfiability + "-unique-CDHG"][0] += 1
             elif c2 == satisfiability and c1 != satisfiability:
-                summary[satisfiability+"-unique-CG"][0] += 1
+                summary[satisfiability + "-unique-CG"][0] += 1
     except:
         pass
     try:
         for c1, c2 in zip(summary["satisfiability-prioritize-clauses-CDHG"],
                           summary["satisfiability-prioritize-clauses-CG"]):
             if c1 == c2 and c1 == satisfiability:
-                summary[satisfiability+"-common"][0] += 1
+                summary[satisfiability + "-common"][0] += 1
             elif c1 == satisfiability and c2 != satisfiability:
-                summary[satisfiability+"-unique-CDHG"][0] += 1
+                summary[satisfiability + "-unique-CDHG"][0] += 1
             elif c2 == satisfiability and c1 != satisfiability:
-                summary[satisfiability+"-unique-CG"][0] += 1
+                summary[satisfiability + "-unique-CG"][0] += 1
     except:
         pass
-    summary[satisfiability+"-total"][0] = summary[satisfiability+"-unique-CDHG"][0] + summary[satisfiability+"-unique-CG"][
-        0] + summary[satisfiability+"-common"][0]
+    summary[satisfiability + "-total"][0] = summary[satisfiability + "-unique-CDHG"][0] + \
+                                            summary[satisfiability + "-unique-CG"][
+                                                0] + summary[satisfiability + "-common"][0]
 
     return summary
 
