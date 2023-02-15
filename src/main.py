@@ -5,8 +5,8 @@ from cluster_utils.utils import get_task_by_folder_name
 
 
 def main():
-    benchmarks = ["../benchmarks/template-selection-one-CDHG",
-                  "../benchmarks/template-selection-one-CG",
+    benchmarks = ["../benchmarks/unsatcore_pipeline_small-train-CDHG",
+                  "../benchmarks/unsatcore_pipeline_small-train-CG",
                   ]
 
     # load data

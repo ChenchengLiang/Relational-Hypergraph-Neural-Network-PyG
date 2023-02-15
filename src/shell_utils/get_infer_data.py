@@ -15,9 +15,12 @@ def main():
     for f in get_file_list(folder,"smt2"):
         file_name=f[:-len(".zip")]
         copy(f,cdhg_folder)
+        copy(file_name+".simplified.zip",cdhg_folder)
         copy(file_name+".hyperEdgeGraph.JSON.zip", cdhg_folder)
         copy(f, cg_folder)
+        copy(file_name + ".simplified.zip", cdhg_folder)
         copy(file_name + ".monoDirectionLayerGraph.JSON.zip", cg_folder)
+
 
 if __name__ == '__main__':
     main()

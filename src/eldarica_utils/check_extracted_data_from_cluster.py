@@ -59,7 +59,7 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "1-has-simplified-clauses",
                                                                        "1-no_simplified_clauses",
                                                                        separate_no_simplified_clauses)
-    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "2-has_template",
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "2-has_label",
                                                                        "2-no_labels", separate_no_label_cases)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-labels_indices_match",
                                                                        "3-labels_indices_mismatch", separate_mismatch_indices_and_label_cases)
