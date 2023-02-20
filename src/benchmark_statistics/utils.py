@@ -117,20 +117,28 @@ def get_scatters(summary_folder, data_dict):
                           ["no-pruning-solving-time (s)", "pruned_unsatcore_min_solving_time (s)"],
                           ]
     # z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
-    if data_dict["satisfiability-threshold-CDHG"] != "unknown":
-        z_data = data_dict["satisfiability-threshold-CDHG"]
-    elif data_dict["satisfiability-threshold-CG"] != "unknown":
-        z_data = data_dict["satisfiability-threshold-CG"]
-    elif data_dict["satisfiability"] != "unknown":
-        z_data = data_dict["satisfiability"]
-    else:
-        z_data = "unknown"
+    z_data=[]
+    for p_cdhg,p_cg,t_cdhg,t_cg,s in zip(data_dict["satisfiability-prioritize-clauses-CDHG"],data_dict["satisfiability-prioritize-clauses-CG"],data_dict["satisfiability-threshold-CDHG"],data_dict["satisfiability-threshold-CG"],data_dict["satisfiability"]):
+        if p_cdhg != "unknown":
+            z_data.append(p_cdhg)
+        elif p_cg != "unknown":
+            z_data.append(p_cg)
+        elif t_cdhg != "unknown":
+            z_data.append(t_cdhg)
+        elif t_cg != "unknown":
+            z_data.append(t_cdhg)
+        elif s != "unknown":
+            z_data.append(s)
+        else:
+            z_data.append("unknown")
 
     data_text = []
     for f, t1, t2 in zip(data_dict["file_name"], data_dict["threshold_list_CDHG"],
                          data_dict["threshold_list_CG"]):
-        if len(t2) > 50:
+        if len(t2) > 30:
             t2 = "unknown"
+        if len(t1) > 30:
+            t1 = "unknown"
         data_text.append(f + "\n" + "threshold_list_CDHG:" + str(t1) + "\n" + "threshold_list_CG:" + str(t2) + "\n")
 
     for pairs in combinations_pairs:
