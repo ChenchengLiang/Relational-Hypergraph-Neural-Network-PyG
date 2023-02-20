@@ -96,5 +96,7 @@ def get_solving_time_dict(object):
     solving_time_dict = {}
     for field in object:
         if "solvingTime" in field:
-            solving_time_dict[field] = int(object[field][0])
+            solving_time_dict[field] = int(float(object[field][0]))
+            if solving_time_dict[field]  == -1:
+                solving_time_dict[field]=10800000
     return solving_time_dict

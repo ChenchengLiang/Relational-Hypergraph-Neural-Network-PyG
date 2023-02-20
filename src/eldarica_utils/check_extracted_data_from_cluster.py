@@ -6,6 +6,7 @@ import glob
 import gzip
 from src.collect_results.utils import read_files, read_json_file, copy_relative_files,get_solving_time_dict
 from tqdm import tqdm
+from src.benchmark_statistics.utils import get_satisfiability
 from src.benchmark_statistics.utils import read_satisfiability
 
 
@@ -25,13 +26,16 @@ def separate_files_by_solvability_fields(folder):
     for object in solvability_object_list:
         if len(object) > 1: #has solvability file
             min_solving_option, min_solving_time = select_key_with_value_condition(get_solving_time_dict(object), min)
-            satisfiability = read_satisfiability(object, min_solving_option=min_solving_option)
-            if satisfiability==1: #sat
+            satisfiability=get_satisfiability(object,min_solving_option)
+            print("satisfiability",satisfiability)
+            print(min_solving_option,min_solving_time)
+
+            if satisfiability=="safe":
                 if int(object["clauseNumberAfterSimplification"][0])==0:
                     copy_relative_files(object["file_name"], sat_no_simplified_clauses_folder)
                 else:
                     copy_relative_files(object["file_name"], sat_has_simplified_clauses_folder)
-            elif satisfiability==0: #unsat
+            elif satisfiability=="unsafe":
                 if int(object["clauseNumberAfterSimplification"][0]) == 0:
                     copy_relative_files(object["file_name"], unsat_no_simplified_clauses_folder)
                 else:

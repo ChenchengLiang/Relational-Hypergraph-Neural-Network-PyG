@@ -1,13 +1,14 @@
 from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
-from statistics import mean
-from src.utils import camel_to_snake, make_dirct, read_a_json_field,get_file_list
+from statistics import mean, stdev
+from src.utils import camel_to_snake, make_dirct, read_a_json_field, get_file_list
 from src.plots import scatter_plot
 import itertools
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
 import os
+
 
 def get_statistiics_in_one_folder(folder):
     summary_folder = get_sumary_folder(folder)
@@ -93,6 +94,7 @@ def get_statistiics_in_one_folder(folder):
         pd.DataFrame(pd.DataFrame(clause_prioritize_summary)).to_excel(writer, sheet_name="clause_prioritize_summary")
         pd.DataFrame(pd.DataFrame(clause_pruning_summary)).to_excel(writer, sheet_name="clause_pruning_summary")
 
+
 def get_scatters(summary_folder, data_dict):
     scatter_folder = make_dirct(summary_folder + "/scatters")
     # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
@@ -117,8 +119,11 @@ def get_scatters(summary_folder, data_dict):
                           ["no-pruning-solving-time (s)", "pruned_unsatcore_min_solving_time (s)"],
                           ]
     # z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
-    z_data=[]
-    for p_cdhg,p_cg,t_cdhg,t_cg,s in zip(data_dict["satisfiability-prioritize-clauses-CDHG"],data_dict["satisfiability-prioritize-clauses-CG"],data_dict["satisfiability-threshold-CDHG"],data_dict["satisfiability-threshold-CG"],data_dict["satisfiability"]):
+    z_data = []
+    for p_cdhg, p_cg, t_cdhg, t_cg, s in zip(data_dict["satisfiability-prioritize-clauses-CDHG"],
+                                             data_dict["satisfiability-prioritize-clauses-CG"],
+                                             data_dict["satisfiability-threshold-CDHG"],
+                                             data_dict["satisfiability-threshold-CG"], data_dict["satisfiability"]):
         if p_cdhg != "unknown":
             z_data.append(p_cdhg)
         elif p_cg != "unknown":
@@ -185,7 +190,7 @@ def read_satisfiability(json_obj, min_solving_option):
         satisfiability = int(json_obj[min_solving_option.replace("solvingTime", "satisfiability")][0])
     except:
         try:
-            satisfiability = int(json_obj["satisfiability"][0])
+            satisfiability = int(float(json_obj["satisfiability"][0]))
         except:
             satisfiability = -1
     return satisfiability
@@ -227,8 +232,10 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "improved_solving_time_prioritize_clauses (s)",
         "satisfiability-prioritize-clauses-CDHG",
         "solving-time-prioritize-clauses-CDHG",
+        "cegar_iteration-prioritize-clauses-CDHG",
         "satisfiability-prioritize-clauses-CG",
         "solving-time-prioritize-clauses-CG",
+        "cegar_iteration-prioritize-clauses-CG",
         "prioritize_clauses_min_solving_time (s)",
         # threshold
         "improved_solving_time_threshold (s)",
@@ -236,10 +243,12 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "clause_number_after_pruning_list_CDHG",
         "solving_time_list_CDHG (s)",
         "threshold_list_CDHG",
+        "cegar_iteration_list_CDHG",
         "satisfiability-threshold-CG",
         "clause_number_after_pruning_list_CG",
         "solving_time_list_CG (s)",
         "threshold_list_CG",
+        "cegar_iteration_list_CG",
         "pruned_unsatcore_min_solving_time (s)",
         # templates
         "min_solving_time_option", "min_solving_time (s)",
@@ -274,17 +283,18 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 
                 # record unsatcore threhold reulsts
                 threshold_list = get_unsatcore_threshold_list(json_obj)
-                satisfiability_threshold_CDHG, clause_number_after_pruning_list_CDHG, threshold_list_CDHG, solving_time_list_CDHG, \
-                    non_pruning_satisfiability_CDHG, non_pruning_solving_time_CDHG = get_fields_by_unsatcore_threshold(
+                satisfiability_threshold_CDHG, clause_number_after_pruning_list_CDHG, threshold_list_CDHG, solving_time_list_CDHG,cegar_number_list_CDHG, \
+                    non_pruning_satisfiability_CDHG, non_pruning_solving_time_CDHG, non_pruning_cegar_iteration_CDHG = get_fields_by_unsatcore_threshold(
                     json_obj, "CDHG", threshold_list=threshold_list)
-                satisfiability_threshold_CG, clause_number_after_pruning_list_CG, threshold_list_CG, solving_time_list_CG, \
-                    non_pruning_satisfiability_CG, non_pruning_solving_time_CG = get_fields_by_unsatcore_threshold(
+                satisfiability_threshold_CG, clause_number_after_pruning_list_CG, threshold_list_CG, solving_time_list_CG,cegar_number_list_CG, \
+                    non_pruning_satisfiability_CG, non_pruning_solving_time_CG, non_pruning_cegar_iteration_CDHG = get_fields_by_unsatcore_threshold(
                     json_obj, "CG", threshold_list=threshold_list)
 
-                not_pruned_solving_time = get_min_solvable_solving_time_from_list(
+                non_pruning_solving_time = get_min_solvable_solving_time_from_list(
                     [non_pruning_solving_time_CDHG, non_pruning_solving_time_CG])
+                #todo compute get_min_interation_number_from_list
 
-                statistic_dict["no-pruning-solving-time (s)"].append(not_pruned_solving_time)
+                statistic_dict["no-pruning-solving-time (s)"].append(non_pruning_solving_time)
                 statistic_dict["no-pruning-satisfiability"].append(non_pruning_satisfiability_CDHG)
                 statistic_dict["satisfiability-threshold-CDHG"].append(satisfiability_threshold_CDHG)
                 statistic_dict["satisfiability-threshold-CG"].append(satisfiability_threshold_CG)
@@ -294,34 +304,38 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["solving_time_list_CG (s)"].append(solving_time_list_CG)
                 statistic_dict["threshold_list_CDHG"].append(threshold_list_CDHG)
                 statistic_dict["threshold_list_CG"].append(threshold_list_CG)
+                statistic_dict["cegar_iteration_list_CDHG"].append(cegar_number_list_CDHG)
+                statistic_dict["cegar_iteration_list_CG"].append(cegar_number_list_CG)
 
                 # compute improved solving time using threshold 0 and other threshold
                 pruned_unsatcore_min_solving_time = get_min_solvable_solving_time_from_list(
                     solving_time_list_CDHG + solving_time_list_CG)
 
                 if pruned_unsatcore_min_solving_time != -0.001:
-                    improved_solving_time = not_pruned_solving_time - pruned_unsatcore_min_solving_time
+                    improved_solving_time = non_pruning_solving_time - pruned_unsatcore_min_solving_time
                 else:
                     improved_solving_time = 10800
                 statistic_dict["improved_solving_time_threshold (s)"].append(improved_solving_time)
                 statistic_dict["pruned_unsatcore_min_solving_time (s)"].append(pruned_unsatcore_min_solving_time)
 
                 # record unsatcore clause prioritize reulsts
-                satisfiability_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CDHG = get_fields_by_unsatcore_prioritize_clauses(
+                satisfiability_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CDHG, cega_iteration_CDHG = get_fields_by_unsatcore_prioritize_clauses(
                     json_obj, "CDHG")
-                satisfiability_prioritize_clauses_CG, solving_time_prioritize_clauses_CG = get_fields_by_unsatcore_prioritize_clauses(
+                satisfiability_prioritize_clauses_CG, solving_time_prioritize_clauses_CG, cega_iteration_CG = get_fields_by_unsatcore_prioritize_clauses(
                     json_obj, "CG")
 
                 statistic_dict["satisfiability-prioritize-clauses-CDHG"].append(satisfiability_prioritize_clauses_CDHG)
                 statistic_dict["satisfiability-prioritize-clauses-CG"].append(satisfiability_prioritize_clauses_CG)
                 statistic_dict["solving-time-prioritize-clauses-CDHG"].append(solving_time_prioritize_clauses_CDHG)
                 statistic_dict["solving-time-prioritize-clauses-CG"].append(solving_time_prioritize_clauses_CG)
+                statistic_dict["cegar_iteration-prioritize-clauses-CDHG"].append(cega_iteration_CDHG)
+                statistic_dict["cegar_iteration-prioritize-clauses-CG"].append(cega_iteration_CG)
                 # compute improved solving time using threshold 0 and prioritize-clauses
                 prioritize_clauses_min_solving_time = get_min_solvable_solving_time_from_list(
                     [solving_time_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CG])
 
                 if prioritize_clauses_min_solving_time != -0.001:
-                    prioritize_clauses_improved_solving_time = not_pruned_solving_time - prioritize_clauses_min_solving_time
+                    prioritize_clauses_improved_solving_time = non_pruning_solving_time - prioritize_clauses_min_solving_time
                 else:
                     prioritize_clauses_improved_solving_time = 10800
                 statistic_dict["improved_solving_time_prioritize_clauses (s)"].append(
@@ -343,16 +357,17 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
     satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
+    cegar_iteration = decode_satisfiability(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
     solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
     solving_time = 10800 if solving_time == -1 else solving_time / 1000
-    return satisfiability, solving_time
+    return satisfiability, solving_time, cegar_iteration
 
 
 def get_fields_by_unsatcore_threshold(json_obj, graph_type,
                                       threshold_list=[0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
                                                       0.6]):
     measurement_list = ["satisfiability_list", "clause_number_after_pruning_list", "threshold_list",
-                        "solving_time_list"]
+                        "solving_time_list","cegar_iteration_list"]
     satisfiability_dict_key_list = []
     for x in ["safe", "unsafe", "unknown"]:
         for measure in measurement_list:
@@ -366,42 +381,47 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
         suffix = "-" + graph_type + "-" + str(t)
         satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
         clause_number_after_pruning = int(read_a_json_field(json_obj, "clauseNumberAfterPruning" + suffix))
+        cegar_iteration = int(float(read_a_json_field(json_obj, "clauseNumberAfterPruning" + suffix)))
         solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
         solving_time = 10800 if solving_time == -1 else solving_time / 1000
         if t == 0:
             non_pruning_satisfiability = satisfiability
             non_pruning_solving_time = solving_time
+            non_pruning_cegar_iteration = cegar_iteration
 
         if satisfiability == "safe":
             satisfiability_dict["safe_satisfiability_list"].append(satisfiability)
             satisfiability_dict["safe_clause_number_after_pruning_list"].append(clause_number_after_pruning)
             satisfiability_dict["safe_solving_time_list"].append(solving_time)
             satisfiability_dict["safe_threshold_list"].append(t)
+            satisfiability_dict["safe_cegar_iteration_list"].append(cegar_iteration)
 
         elif satisfiability == "unsafe":
             satisfiability_dict["unsafe_satisfiability_list"].append(satisfiability)
             satisfiability_dict["unsafe_clause_number_after_pruning_list"].append(clause_number_after_pruning)
             satisfiability_dict["unsafe_solving_time_list"].append(solving_time)
             satisfiability_dict["unsafe_threshold_list"].append(t)
+            satisfiability_dict["unsafe_cegar_iteration_list"].append(cegar_iteration)
         else:
             satisfiability_dict["unknown_satisfiability_list"].append(satisfiability)
             satisfiability_dict["unknown_clause_number_after_pruning_list"].append(clause_number_after_pruning)
             satisfiability_dict["unknown_solving_time_list"].append(solving_time)
             satisfiability_dict["unknown_threshold_list"].append(t)
+            satisfiability_dict["unknown_cegar_iteration_list"].append(cegar_iteration)
 
     # we should always output unsafe results, since safe and unknown means nothing in pruned CHCs
     if len(satisfiability_dict["unsafe_satisfiability_list"]) != 0:
         return "unsafe", satisfiability_dict["unsafe_clause_number_after_pruning_list"], satisfiability_dict[
             "unsafe_threshold_list"], satisfiability_dict[
-            "unsafe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+            "unsafe_solving_time_list"],satisfiability_dict["unsafe_cegar_iteration_list"], non_pruning_satisfiability, non_pruning_solving_time, non_pruning_cegar_iteration
     elif len(satisfiability_dict["safe_satisfiability_list"]) != 0:
         return "safe", satisfiability_dict["safe_clause_number_after_pruning_list"], satisfiability_dict[
             "safe_threshold_list"], satisfiability_dict[
-            "safe_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+            "safe_solving_time_list"],satisfiability_dict["safe_cegar_iteration_list"], non_pruning_satisfiability, non_pruning_solving_time, non_pruning_cegar_iteration
     else:
         return "unknown", satisfiability_dict["unknown_clause_number_after_pruning_list"], satisfiability_dict[
             "unknown_threshold_list"], satisfiability_dict[
-            "unknown_solving_time_list"], non_pruning_satisfiability, non_pruning_solving_time
+            "unknown_solving_time_list"],satisfiability_dict["unknown_cegar_iteration_list"], non_pruning_satisfiability, non_pruning_solving_time, non_pruning_cegar_iteration
 
 
 def get_unsatcore_threshold_list(json_obj):
