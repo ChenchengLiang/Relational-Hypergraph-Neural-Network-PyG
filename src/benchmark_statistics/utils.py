@@ -77,7 +77,7 @@ def get_statistiics_in_one_folder(folder):
                                                                "no-pruning-solving-time (s)",
                                                                "no-pruning-cegar_itartion",
                                                                "improved_solving_time_threshold (s)",
-                                                               "improved_cegar_iteartion_threshold"
+                                                               "improved_cegar_iteartion_threshold",
                                                                "satisfiability-threshold-CDHG",
                                                                "clause_number_after_pruning_list_CDHG",
                                                                "solving_time_list_CDHG (s)",
@@ -390,7 +390,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
     satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
-    cegar_iteration = decode_satisfiability(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
+    cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
     solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
     solving_time = 10800 if solving_time == -1 else solving_time / 1000
     return satisfiability, solving_time, cegar_iteration

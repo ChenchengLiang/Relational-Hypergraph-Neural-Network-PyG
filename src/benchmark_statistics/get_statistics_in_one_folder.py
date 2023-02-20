@@ -11,7 +11,7 @@ from utils import get_statistiics_in_one_folder
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-safe/threshold-control-results/uppmax-unsatcore-linear-safe-infer-divided-1553-1-hour-timeout/train_data"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test/train_data"
     get_statistiics_in_one_folder(folder)
 
 
