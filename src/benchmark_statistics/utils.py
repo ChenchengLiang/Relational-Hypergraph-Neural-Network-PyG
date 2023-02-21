@@ -387,10 +387,13 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
             assign_values_to_unsolvable_problem(statistic_dict, record_fields)
 
 
+
+
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
     satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
     cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
+    cegar_iteration = 10800 if cegar_iteration == -1 else cegar_iteration
     solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
     solving_time = 10800 if solving_time == -1 else solving_time / 1000
     return satisfiability, solving_time, cegar_iteration
@@ -410,11 +413,13 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
     assign_dict_key_empty_list(satisfiability_dict, satisfiability_dict_key_list)
     non_pruning_satisfiability = 10800
     non_pruning_solving_time = 10800
+    non_pruning_cegar_iteration = 10800
     for t in threshold_list:
         suffix = "-" + graph_type + "-" + str(t)
         satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
         clause_number_after_pruning = int(read_a_json_field(json_obj, "clauseNumberAfterPruning" + suffix))
-        cegar_iteration = int(float(read_a_json_field(json_obj, "clauseNumberAfterPruning" + suffix)))
+        cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
+        cegar_iteration = 10800 if cegar_iteration == -1 else cegar_iteration
         solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
         solving_time = 10800 if solving_time == -1 else solving_time / 1000
         if t == 0:
@@ -473,12 +478,14 @@ def get_unsatcore_threshold_list(json_obj):
 
 
 def get_min_number_from_list(l, except_number):
-    min_solving_time_list = [x for x in l if x != except_number]
-    if len(min_solving_time_list) == 0:
-        min_solving_time = except_number
+    number_list = [x for x in l if x != except_number]
+    if len(number_list) == 0:
+        min_number = except_number
     else:
-        min_solving_time = min(min_solving_time_list)
-    return min_solving_time
+        min_number = min(number_list)
+    if min_number == except_number:
+        min_number = 10800
+    return min_number
 
 
 def get_improved_field(non_pruning_filed, field, except_number):

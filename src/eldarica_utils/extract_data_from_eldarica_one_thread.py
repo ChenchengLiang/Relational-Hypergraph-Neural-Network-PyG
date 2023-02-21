@@ -27,7 +27,7 @@ def main():
     #     for s in split_clause_option:
     #         parameters_pipeline.append(
     #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) )
-    #parameters_pipeline.append(" -getSolvability " + " -abstract:off ")
+    parameters_pipeline.append(" -getSolvability " + " -abstract:off ")
 
     # unsatcore: get labeled data # 3 hours
     # parameters_pipeline.append(" -mineCounterExample:union -abstract:off")
@@ -46,10 +46,10 @@ def main():
     #             threshold) + " -hornGraphType:" + g +" -abstract:off ")
 
     # unsatcore: check solvability for prioritized clauses 6 + 3 hours
-    parameters_pipeline.append(
-        " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:off ")
-    for g in ["CDHG", "CG"]:
-        parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:off " )
+    # parameters_pipeline.append(
+    #     " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:off ")
+    # for g in ["CDHG", "CG"]:
+    #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:off " )
 
 
     # template_selection: get labeled templates # 3 hours
