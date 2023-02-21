@@ -149,6 +149,7 @@ def get_scatters(summary_folder, data_dict):
         else:
             z_data.append("unknown")
 
+    data_dict["satisfiability"] = z_data
     data_text = []
     for f, t1, t2 in zip(data_dict["file_name"], data_dict["threshold_list_CDHG"],
                          data_dict["threshold_list_CG"]):
@@ -387,8 +388,6 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
             assign_values_to_unsolvable_problem(statistic_dict, record_fields)
 
 
-
-
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
     satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
@@ -528,7 +527,10 @@ def get_fixed_filed_from_json_file(file_list, field):
 
 
 def get_category_summary(data_dict):
-    basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number"]
+    basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number",
+                          "improved_solving_time_prioritize_clauses_number",
+                          "improved_cegar_iteration_prioritize_clauses_number",
+                          "improved_solving_time_threshold_number", "improved_cegar_iteartion_threshold_number"]
     # could add any number fields corresponding to category column
     target_column_list = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification", "min_solving_time (s)"]
     category_summary_columns = []
@@ -548,6 +550,25 @@ def get_category_summary(data_dict):
         category_dict["unsafe_number"].append(satisfiability_in_one_category.count("unsafe"))
         category_dict["unknown_number"].append(satisfiability_in_one_category.count("unknown"))
         category_dict["total_number"].append(len(satisfiability_in_one_category))
+        # improved by prioritize
+        improved_solving_time_prioritize_clauses = get_target_row_by_condition(data_dict, "category", c,
+                                                                               "improved_solving_time_prioritize_clauses (s)")
+        improved_cegar_iteration_prioritize_clauses = get_target_row_by_condition(data_dict, "category", c,
+                                                                                  "improved_cegar_iteration_prioritize_clauses")
+        improved_solving_time_list = [x for x in improved_solving_time_prioritize_clauses if x > 0]
+        improved_cegar_iteration_list = [x for x in improved_cegar_iteration_prioritize_clauses if x > 0]
+        category_dict["improved_solving_time_prioritize_clauses_number"].append(len(improved_solving_time_list))
+        category_dict["improved_cegar_iteration_prioritize_clauses_number"].append(len(improved_cegar_iteration_list))
+        # improved by threshold
+        improved_solving_time_threshold = get_target_row_by_condition(data_dict, "category", c,
+                                                                      "improved_solving_time_threshold (s)")
+        improved_cegar_iteration_threshold = get_target_row_by_condition(data_dict, "category", c,
+                                                                         "improved_cegar_iteartion_threshold")
+        improved_solving_time_list = [x for x in improved_solving_time_threshold if x > 0]
+        improved_cegar_iteration_list = [x for x in improved_cegar_iteration_threshold if x > 0]
+        category_dict["improved_solving_time_threshold_number"].append(len(improved_solving_time_list))
+        category_dict["improved_cegar_iteartion_threshold_number"].append(len(improved_cegar_iteration_list))
+
 
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberBeforeSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")

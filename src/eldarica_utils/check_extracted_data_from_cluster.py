@@ -27,8 +27,6 @@ def separate_files_by_solvability_fields(folder):
         if len(object) > 1: #has solvability file
             min_solving_option, min_solving_time = select_key_with_value_condition(get_solving_time_dict(object), min)
             satisfiability=get_satisfiability(object,min_solving_option)
-            print("satisfiability",satisfiability)
-            print(min_solving_option,min_solving_time)
 
             if satisfiability=="safe":
                 if int(object["clauseNumberAfterSimplification"][0])==0:
