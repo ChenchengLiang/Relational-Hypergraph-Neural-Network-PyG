@@ -8,7 +8,7 @@ from src.plots import plot_cactus
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/non-linear-dataset/train_data"
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test/train_data"
     # get abstract_option_list
     abstract_option_list = get_abstract_option_list()
 
@@ -82,7 +82,15 @@ def get_solvability_summary_by_abstract_option(abstract_option_list, folder):
     for solvability_object in solvability_object_list:
         if len(solvability_object) > 1:
             for op in solvability_summary_by_abstract_option:
-                measurement_dict = {m: int(solvability_object[m + "_" + op][0]) for m in measurement_list}
+                measurement_dict={}
+                for m in measurement_list:
+                    if m != "satisfiability":
+                        measurement_dict[m]= int(solvability_object[m + "_" + op][0])
+                    else:
+                        measurement_dict[m]= solvability_object["satisfiability"][0]
+
+
+                #measurement_dict = {m: int(solvability_object[m + "_" + op][0]) if m!="satisfiability" for m in measurement_list else m:solvability_object["satisfiability"][0]}
                 if measurement_dict["solvingTime"] != 10800000:
                     solvability_summary_by_abstract_option[op]["solvable_number"] += 1
                     solvability_summary_by_abstract_option[op]["solvable_list"].append(

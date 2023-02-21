@@ -117,7 +117,8 @@ def draw_confusion_matrix(predicted_y, true_y, num_classes, folder, name="", acc
     mlflow.log_artifact(save_file_name)
 
 
-def plot_cactus(summary_folder, solvability_summary):
+def plot_cactus(summary_folder, solvability_summary,plot_name=""):
+    #solvability_summary={solving_option_1:{solving_time_list:[],"cegar_iteration_number_list:[],...},solving_option_2:{solving_time_list:[],"cegar_iteration_number_list:[],...}}
     max_time = np.max(np.max(np.array([item["solvingTime_list"] for item in solvability_summary.values()]))) / 1000
     print("max_time s", max_time)
     cactus = {}
@@ -139,11 +140,11 @@ def plot_cactus(summary_folder, solvability_summary):
     #     draw_one_cactus_plotly(summary_folder,cactus,k)
 
     # draw_one_cactus(summary_folder, cactus, "")
-    draw_one_cactus_plotly(summary_folder, cactus, key_word="", scale="linear")
-    draw_one_cactus_plotly(summary_folder, cactus, key_word="", scale="log")
+    draw_one_cactus_plotly(summary_folder, cactus, key_word="", scale="linear",plot_name=plot_name)
+    draw_one_cactus_plotly(summary_folder, cactus, key_word="", scale="log",plot_name=plot_name)
 
 
-def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale=""):
+def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="",plot_name=""):
     # sort lines by solved problems for the highest time limit
     lines = []
     for k in cactus:
@@ -165,4 +166,4 @@ def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale=""):
         xaxis_title='solved benchmarks',
         yaxis_title='time limit (s)')
     fig.update_yaxes(type=scale)
-    fig.write_html(summary_folder + "/" + key_word + "-" + scale + "-cactus.html")
+    fig.write_html(summary_folder + "/" +plot_name+ key_word + "-" + scale + "-cactus.html")

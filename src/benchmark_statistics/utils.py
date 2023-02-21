@@ -3,7 +3,7 @@ from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean, stdev
 from src.utils import camel_to_snake, make_dirct, read_a_json_field, get_file_list
-from src.plots import scatter_plot
+from src.plots import scatter_plot,plot_cactus
 import itertools
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
@@ -48,6 +48,7 @@ def get_statistiics_in_one_folder(folder):
     read_graph_info_from_json_file(file_list, data_dict)
 
     get_scatters(summary_folder=summary_folder, data_dict=data_dict)
+    get_cactus(summary_folder,folder)
 
     # get summaries
 
@@ -102,6 +103,39 @@ def get_statistiics_in_one_folder(folder):
         pd.DataFrame(pd.DataFrame(clause_prioritize_summary)).to_excel(writer, sheet_name="clause_prioritize_summary")
         pd.DataFrame(pd.DataFrame(clause_pruning_summary)).to_excel(writer, sheet_name="clause_pruning_summary")
 
+def get_cactus(summary_folder,folder):
+    # create cactus dict
+    cactus_dict_threshold = {}  # {CDHG-0.01:{solvingTime_list:[],cegar_iteration_list:[]},CG-0.01:{solvingTime_list:[],cegar_iteration_list:[]}}
+    cactus_dict_prioritize = {}
+    threshold_list = [0.0, 0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5]
+    for graph_type in ["CDHG", "CG"]:
+        # threshold
+        for t in threshold_list:
+            current_option = graph_type + "-" + str(t)
+
+            # read file
+            solving_time_list = []
+            solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
+                                                 read_function=read_json_file)
+            for object in solvability_object_list:
+                solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
+
+            cactus_dict_threshold[current_option] = {"solvingTime_list": solving_time_list}
+
+        # prioritize
+        for current_option in ["CDHG-0.0", "prioritizeClausesByUnsatCoreRank-CDHG",
+                               "prioritizeClausesByUnsatCoreRank-CG"]:
+            # read file
+            solving_time_list = []
+            solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
+                                                 read_function=read_json_file)
+            for object in solvability_object_list:
+                solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
+
+            cactus_dict_prioritize[current_option] = {"solvingTime_list": solving_time_list}
+
+    plot_cactus(summary_folder, cactus_dict_threshold, plot_name="unsatcore_threhold")
+    plot_cactus(summary_folder, cactus_dict_prioritize, plot_name="unsatcore_prioritize")
 
 def get_scatters(summary_folder, data_dict):
     scatter_folder = make_dirct(summary_folder + "/scatters")
@@ -278,6 +312,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "max_solving_time_average_predicate_size", "max_solving_time_predicate_generator_time",
         "solvable_option_list"]
     assign_dict_key_empty_list(statistic_dict, record_fields)
+    threshold_list = get_unsatcore_threshold_list()
     for json_obj in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
         if len(json_obj) > 1:  # has solvability file
             solving_time_dict = {}
@@ -300,7 +335,6 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                     str([x.replace("solvingTime_", "") for x in solvable_option_dict.keys()]))
 
                 # record unsatcore threhold reulsts
-                threshold_list = get_unsatcore_threshold_list(json_obj)
                 satisfiability_threshold_CDHG, clause_number_after_pruning_list_CDHG, threshold_list_CDHG, solving_time_list_CDHG, cegar_number_list_CDHG, \
                     non_pruning_satisfiability_CDHG, non_pruning_solving_time_CDHG, non_pruning_cegar_iteration_CDHG = get_fields_by_unsatcore_threshold(
                     json_obj, "CDHG", threshold_list=threshold_list)
@@ -464,16 +498,8 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
             "unknown_cegar_iteration_list"], non_pruning_satisfiability, non_pruning_solving_time, non_pruning_cegar_iteration
 
 
-def get_unsatcore_threshold_list(json_obj):
-    total_threshold_list = [round(0.01 * i, 2) for i in range(0, 100)]
-    threshold_list = []
-    for t in total_threshold_list:
-        try:
-            x = json_obj["clauseNumberAfterPruning-CG-" + str(t)]
-            threshold_list.append(t)
-        except:
-            pass
-    return threshold_list
+def get_unsatcore_threshold_list():
+    return [round(0.01 * i, 2) for i in range(0, 100)]
 
 
 def get_min_number_from_list(l, except_number):
