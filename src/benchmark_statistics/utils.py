@@ -10,7 +10,7 @@ from src.collect_results.utils import read_files, read_smt2_category, get_sumary
 import os
 
 
-def get_statistiics_in_one_folder(folder):
+def get_statistiics_in_one_folder(folder,second_folder=""):
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
@@ -48,7 +48,7 @@ def get_statistiics_in_one_folder(folder):
     read_graph_info_from_json_file(file_list, data_dict)
 
     get_scatters(summary_folder=summary_folder, data_dict=data_dict)
-    get_cactus(summary_folder,folder)
+    get_cactus(summary_folder,folder,second_folder)
 
     # get summaries
 
@@ -103,13 +103,14 @@ def get_statistiics_in_one_folder(folder):
         pd.DataFrame(pd.DataFrame(clause_prioritize_summary)).to_excel(writer, sheet_name="clause_prioritize_summary")
         pd.DataFrame(pd.DataFrame(clause_pruning_summary)).to_excel(writer, sheet_name="clause_pruning_summary")
 
-def get_cactus(summary_folder,folder):
+def get_cactus(summary_folder,folder,second_folder=""):
     # create cactus dict
     cactus_dict_threshold = {}  # {CDHG-0.01:{solvingTime_list:[],cegar_iteration_list:[]},CG-0.01:{solvingTime_list:[],cegar_iteration_list:[]}}
     cactus_dict_prioritize = {}
     threshold_list = [0.0, 0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5]
     for graph_type in ["CDHG", "CG"]:
         # threshold
+        # todo get min solving time curve
         for t in threshold_list:
             current_option = graph_type + "-" + str(t)
 
@@ -123,16 +124,30 @@ def get_cactus(summary_folder,folder):
             cactus_dict_threshold[current_option] = {"solvingTime_list": solving_time_list}
 
         # prioritize
-        for current_option in ["CDHG-0.0", "prioritizeClausesByUnsatCoreRank-CDHG",
-                               "prioritizeClausesByUnsatCoreRank-CG"]:
-            # read file
-            solving_time_list = []
-            solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
-                                                 read_function=read_json_file)
-            for object in solvability_object_list:
-                solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
+        # todo get min solving time curve
+        folder1=folder
+        folder2=folder if second_folder=="" else second_folder
+        for fo,strategy in zip([folder1,folder2],["only score","score with existed heuristics"]):
+            for current_option in ["prioritizeClausesByUnsatCoreRank-CDHG",
+                                   "prioritizeClausesByUnsatCoreRank-CG"]:
+                # read file
+                solving_time_list = []
+                solvability_object_list = read_files(get_file_list(fo, "smt2"), file_type="solvability.JSON",
+                                                     read_function=read_json_file)
+                for object in solvability_object_list:
+                    solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
 
-            cactus_dict_prioritize[current_option] = {"solvingTime_list": solving_time_list}
+                cactus_dict_prioritize[current_option+"-"+strategy] = {"solvingTime_list": solving_time_list}
+
+        # original prioritize
+        current_option="CDHG-0.0"
+        solving_time_list = []
+        solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
+                                             read_function=read_json_file)
+        for object in solvability_object_list:
+            solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
+
+        cactus_dict_prioritize["existed heuristics"] = {"solvingTime_list": solving_time_list}
 
     plot_cactus(summary_folder, cactus_dict_threshold, plot_name="unsatcore_threhold")
     plot_cactus(summary_folder, cactus_dict_prioritize, plot_name="unsatcore_prioritize")

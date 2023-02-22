@@ -12,7 +12,8 @@ from utils import get_statistiics_in_one_folder
 
 def main():
     folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test/train_data"
-    get_statistiics_in_one_folder(folder)
+    another_prioritizing_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test/only-rank"
+    get_statistiics_in_one_folder(folder,another_prioritizing_folder)
 
 
 if __name__ == '__main__':

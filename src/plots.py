@@ -158,12 +158,12 @@ def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="",plot_name=
             fig.add_trace(go.Scatter(
                 x=list(range(len(line[2]))),
                 y=line[2],
-                name=line[1]
+                name=line[1],mode='lines+markers'
             ))
 
     fig.update_layout(  # legend_title_text='Trend',
         title='',
-        xaxis_title='solved benchmarks',
-        yaxis_title='time limit (s)')
+        xaxis_title='Solved benchmarks',
+        yaxis_title='Time limit (s)')
     fig.update_yaxes(type=scale)
     fig.write_html(summary_folder + "/" +plot_name+ key_word + "-" + scale + "-cactus.html")
