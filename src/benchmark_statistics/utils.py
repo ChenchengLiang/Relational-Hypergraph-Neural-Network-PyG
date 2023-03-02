@@ -8,6 +8,7 @@ import itertools
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
 import os
+from src.CONSTANTS import max_cegar_iteration
 
 
 def get_statistiics_in_one_folder(folder,second_folder=""):
@@ -60,7 +61,7 @@ def get_statistiics_in_one_folder(folder,second_folder=""):
                                                                   "clauseNumberAfterSimplification", "satisfiability",
                                                                   "no-pruning-satisfiability",
                                                                   "no-pruning-solving-time (s)",
-                                                                  "no-pruning-cegar_itartion",
+                                                                  "no-pruning-cegar_iteration",
                                                                   "improved_solving_time_prioritize_clauses (s)",
                                                                   "improved_cegar_iteration_prioritize_clauses",
                                                                   "satisfiability-prioritize-clauses-CDHG",
@@ -76,7 +77,7 @@ def get_statistiics_in_one_folder(folder,second_folder=""):
                                                                "clauseNumberAfterSimplification", "satisfiability",
                                                                "no-pruning-satisfiability",
                                                                "no-pruning-solving-time (s)",
-                                                               "no-pruning-cegar_itartion",
+                                                               "no-pruning-cegar_iteration",
                                                                "improved_solving_time_threshold (s)",
                                                                "improved_cegar_iteartion_threshold",
                                                                "satisfiability-threshold-CDHG",
@@ -156,29 +157,34 @@ def get_scatters(summary_folder, data_dict):
     scatter_folder = make_dirct(summary_folder + "/scatters")
     # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
     # combinations_pairs=itertools.combinations(combinations_list,2)
-    combinations_pairs = [["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification"],
+    combinations_pairs = [["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification","number of clauses"],
                           # ["clauseNumberAfterSimplification", "clauseNumberAfterPruning"],#todo draw scatter with best threshold
-                          ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification"],
+                          ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification","number of relation symbols"],
                           # ["clauseNumberBeforeSimplification", "relationSymbolNumberBeforeSimplification"],
                           # ["clauseNumberAfterSimplification", "relationSymbolNumberAfterSimplification"],
-                          ["clauseNumberAfterSimplification", "min_solving_time_cegar_interation_number"],
-                          ["clauseNumberAfterSimplification", "min_solving_time (s)"],
-                          ["CDHG_node_number", "min_solving_time (s)"],
-                          ["CG_node_number", "min_solving_time (s)"],
-                          ["clauseNumberAfterSimplification", "CDHG_node_number"],
-                          ["clauseNumberAfterSimplification", "CDHG_label_number"],
-                          ["clauseNumberAfterSimplification", "CG_node_number"],
-                          ["clauseNumberAfterSimplification", "CG_label_number"],
-                          ["CDHG_node_number", "CG_node_number"],
-                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CDHG"],
-                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CG"],
-                          ["no-pruning-solving-time (s)", "prioritize_clauses_min_solving_time (s)"],
-                          ["no-pruning-solving-time (s)", "pruned_unsatcore_min_solving_time (s)"],
-                          ["no-pruning-cegar_itartion", "prioritize_clauses_min_cegar_iteration"],
-                          ["no-pruning-cegar_itartion", "cegar_iteration-prioritize-clauses-CDHG"],
-                          ["no-pruning-cegar_itartion", "cegar_iteration-prioritize-clauses-CG"],
-                          ["no-pruning-cegar_itartion", "pruned_unsatcore_min_cegar_iteration"],
+                          ["clauseNumberAfterSimplification", "min_solving_time_cegar_interation_number","number pf iterations"],
+                          ["clauseNumberAfterSimplification", "min_solving_time (s)","solving time (s)"],
+                          ["CDHG_node_number", "min_solving_time (s)","solving time (s)"],
+                          ["CG_node_number", "min_solving_time (s)","solving time (s)"],
+                          ["clauseNumberAfterSimplification", "CDHG_node_number","node number"],
+                          ["clauseNumberAfterSimplification", "CDHG_label_number","label number"],
+                          ["clauseNumberAfterSimplification", "CG_node_number","node number"],
+                          ["clauseNumberAfterSimplification", "CG_label_number","label number"],
+                          ["CDHG_node_number", "CG_node_number","node number"],
+                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CDHG","solving time (s)"],
+                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CG","solving time (s)"],
+                          ["no-pruning-solving-time (s)", "pruned_unsatcore_min_solving_time (s)","solving time (s)"],
+                          ["no-pruning-solving-time (s)", "prioritize_clauses_min_solving_time (s)","solving time (s)"],
+                          ["no-pruning-cegar_iteration", "cegar_iteration-prioritize-clauses-CDHG","number of iterations"],
+                          ["no-pruning-cegar_iteration", "cegar_iteration-prioritize-clauses-CG","number of iterations"],
+                          ["no-pruning-cegar_iteration", "pruned_unsatcore_min_cegar_iteration","number of iterations"],
+                          ["no-pruning-cegar_iteration", "prioritize_clauses_min_cegar_iteration","number of iterations"],
                           ]
+    axis_maps={"no-pruning-solving-time (s)":"original version","no-pruning-cegar_iteration":"original version",
+               "solving-time-prioritize-clauses-CDHG":"prioritizing-CDHG","solving-time-prioritize-clauses-CG":"prioritizing-CG",
+               "pruned_unsatcore_min_solving_time (s)":"pruning using best setting","prioritize_clauses_min_solving_time (s)":"prioritizing using best setting ",
+               "cegar_iteration-prioritize-clauses-CDHG":"pruning-CDHG","cegar_iteration-prioritize-clauses-CG":"pruning-CG",
+               "pruned_unsatcore_min_cegar_iteration":"pruning using best setting","prioritize_clauses_min_cegar_iteration":"prioritizing using best setting"}
     # z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
     z_data = []
     for p_cdhg, p_cg, t_cdhg, t_cg, s in zip(data_dict["satisfiability-prioritize-clauses-CDHG"],
@@ -209,12 +215,18 @@ def get_scatters(summary_folder, data_dict):
         data_text.append(f + "\n" + "threshold_list_CDHG:" + str(t1) + "\n" + "threshold_list_CG:" + str(t2) + "\n")
 
     for pairs in combinations_pairs:
-        x_key = pairs[0]
-        y_key = pairs[1]
+        if pairs[0] in axis_maps.keys():
+            x_key=axis_maps[pairs[0]]
+        else:
+            x_key = pairs[0]
+        if pairs[1] in axis_maps.keys():
+            y_key=axis_maps[pairs[1]]
+        else:
+            y_key = pairs[1]
         try:
-            scatter_plot(x_data=data_dict[x_key], y_data=data_dict[y_key], z_data=z_data,
+            scatter_plot(x_data=data_dict[pairs[0]], y_data=data_dict[pairs[1]], z_data=z_data,
                          x_axis=x_key, y_axis=y_key, folder=scatter_folder, data_text=data_text,
-                         name=x_key + " vs. " + y_key)
+                         name=pairs[2])
         except:
             print("no field", pairs)
 
@@ -290,7 +302,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
         "satisfiability",
         "no-pruning-satisfiability",
         "no-pruning-solving-time (s)",
-        "no-pruning-cegar_itartion",
+        "no-pruning-cegar_iteration",
         # prioritized
         "improved_solving_time_prioritize_clauses (s)",
         "improved_cegar_iteration_prioritize_clauses",
@@ -364,7 +376,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 
                 statistic_dict["no-pruning-solving-time (s)"].append(non_pruning_solving_time)
                 statistic_dict["no-pruning-satisfiability"].append(non_pruning_satisfiability_CDHG)
-                statistic_dict["no-pruning-cegar_itartion"].append(non_pruning_cegar_iteration)
+                statistic_dict["no-pruning-cegar_iteration"].append(non_pruning_cegar_iteration)
                 statistic_dict["satisfiability-threshold-CDHG"].append(satisfiability_threshold_CDHG)
                 statistic_dict["satisfiability-threshold-CG"].append(satisfiability_threshold_CG)
                 statistic_dict["clause_number_after_pruning_list_CDHG"].append(clause_number_after_pruning_list_CDHG)
@@ -438,7 +450,6 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 
 
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
-    max_cegar_iteration=4000
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
     satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
     cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
@@ -451,7 +462,6 @@ def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
 def get_fields_by_unsatcore_threshold(json_obj, graph_type,
                                       threshold_list=[0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
                                                       0.6]):
-    max_cegar_iteration = 4000
     measurement_list = ["satisfiability_list", "clause_number_after_pruning_list", "threshold_list",
                         "solving_time_list", "cegar_iteration_list"]
     satisfiability_dict_key_list = []
