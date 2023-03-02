@@ -8,6 +8,7 @@ import mlflow
 import plotly.graph_objects as go
 from sklearn.metrics import confusion_matrix
 import plotly.express as px
+import plotly.io as pio
 import numpy as np
 from src.utils import count_generator, make_dirct
 
@@ -146,14 +147,21 @@ def plot_cactus(summary_folder, solvability_summary,plot_name=""):
 
 def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="",plot_name=""):
     # sort lines by solved problems for the highest time limit
+    key_word_map_to_legend={"prioritizeClausesByUnsatCoreRank-CG-score with existed heuristics":"CG-SEH","prioritizeClausesByUnsatCoreRank-CG-only score":"CG-score",
+                  "prioritizeClausesByUnsatCoreRank-CDHG-score with existed heuristics":"CDHG-SEH","prioritizeClausesByUnsatCoreRank-CDHG-only score":"CDHG-score"}
     lines = []
     for k in cactus:
+        cactus_without_zero=[0]+[x for x in cactus[k] if x!=0 ]
         if key_word in k:
-            lines.append((len(cactus[k]), k, cactus[k]))
+            if k in key_word_map_to_legend.keys():
+                lines.append((len(cactus[k]), key_word_map_to_legend[k], cactus_without_zero))
+            else:
+                lines.append((len(cactus[k]), k, cactus_without_zero))
     lines.sort(reverse=True)
 
     fig = go.Figure()
     for line in lines:
+        #print(line[0],line[1],line[2])
         if key_word in line[1]:
             fig.add_trace(go.Scatter(
                 x=list(range(len(line[2]))),
@@ -167,3 +175,5 @@ def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="",plot_name=
         yaxis_title='Time limit (s)')
     fig.update_yaxes(type=scale)
     fig.write_html(summary_folder + "/" +plot_name+ key_word + "-" + scale + "-cactus.html")
+    #fig.write_image(summary_folder + "/" +plot_name+ key_word + "-" + scale + "-cactus.png")
+    pio.write_image(fig, summary_folder + "/" +plot_name+ key_word + "-" + scale + "-cactus.png", format='png', dpi=300)

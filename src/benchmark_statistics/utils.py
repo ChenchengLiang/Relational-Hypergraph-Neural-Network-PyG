@@ -438,10 +438,11 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 
 
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
+    max_cegar_iteration=4000
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
     satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
     cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
-    cegar_iteration = 10800 if cegar_iteration == -1 else cegar_iteration
+    cegar_iteration = max_cegar_iteration if cegar_iteration == -1 else cegar_iteration
     solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
     solving_time = 10800 if solving_time == -1 else solving_time / 1000
     return satisfiability, solving_time, cegar_iteration
@@ -450,6 +451,7 @@ def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
 def get_fields_by_unsatcore_threshold(json_obj, graph_type,
                                       threshold_list=[0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
                                                       0.6]):
+    max_cegar_iteration = 4000
     measurement_list = ["satisfiability_list", "clause_number_after_pruning_list", "threshold_list",
                         "solving_time_list", "cegar_iteration_list"]
     satisfiability_dict_key_list = []
@@ -461,13 +463,13 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
     assign_dict_key_empty_list(satisfiability_dict, satisfiability_dict_key_list)
     non_pruning_satisfiability = 10800
     non_pruning_solving_time = 10800
-    non_pruning_cegar_iteration = 10800
+    non_pruning_cegar_iteration = max_cegar_iteration
     for t in threshold_list:
         suffix = "-" + graph_type + "-" + str(t)
         satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
         clause_number_after_pruning = int(read_a_json_field(json_obj, "clauseNumberAfterPruning" + suffix))
         cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
-        cegar_iteration = 10800 if cegar_iteration == -1 else cegar_iteration
+        cegar_iteration = max_cegar_iteration if cegar_iteration == -1 else cegar_iteration
         solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
         solving_time = 10800 if solving_time == -1 else solving_time / 1000
         if t == 0:

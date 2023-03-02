@@ -17,9 +17,11 @@ def main():
         copy(f,cdhg_folder)
         copy(file_name+".simplified.zip",cdhg_folder)
         copy(file_name+".hyperEdgeGraph.JSON.zip", cdhg_folder)
+        copy(file_name + ".solvability.JSON.zip", cdhg_folder)
         copy(f, cg_folder)
         copy(file_name + ".simplified.zip", cg_folder)
         copy(file_name + ".monoDirectionLayerGraph.JSON.zip", cg_folder)
+        copy(file_name + ".solvability.JSON.zip", cg_folder)
 
 
 if __name__ == '__main__':
