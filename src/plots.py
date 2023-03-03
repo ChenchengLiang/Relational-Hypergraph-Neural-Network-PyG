@@ -51,7 +51,6 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
     fig.update_layout(
         title=name,
         title_x=0.5,
-        title_y=0.5,
         xaxis_title=x_axis,
         yaxis_title=y_axis)
     plot_file_name = name + "-" + x_axis + "-vs-" + y_axis
