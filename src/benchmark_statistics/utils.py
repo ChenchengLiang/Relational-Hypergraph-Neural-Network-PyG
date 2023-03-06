@@ -8,7 +8,7 @@ import itertools
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
 import os
-from src.CONSTANTS import max_cegar_iteration
+from src.CONSTANTS import max_cegar_iteration, filter_out_min_solving_time
 
 
 def get_statistiics_in_one_folder(folder, second_folder=""):
@@ -16,17 +16,25 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
     folder_basename = os.path.basename(folder)
 
     file_list = get_file_list(folder, "smt2")
+    #filter file list when the original solving time is shorter than 5 seconds
+    solvability_object_list = read_files(file_list, file_type="solvability.JSON",
+                                         read_function=read_json_file)
+    filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
+    filtered_file_list = [x["file_name"]+".zip" for x in filtered_solvability_object_list]
+    print("file number: ", len(file_list))
+    print("file number after filtering: ", len(filtered_file_list))
+
     data_dict = {}
 
     # get file names
     data_dict["file_name"] = [os.path.basename(x["file_name"]) for x in
-                              read_files(file_list, file_type="",
+                              read_files(filtered_file_list, file_type="",
                                          read_function=read_smt2_category)]
     # get fix smt attributes
     smt_measurements = ["file_size", "file_size_h", "category"]
     for sm in smt_measurements:
         data_dict[sm] = [x[sm] for x in
-                         read_files(file_list, file_type="", read_function=read_smt2_category)]
+                         read_files(filtered_file_list, file_type="", read_function=read_smt2_category)]
 
         # get fix clause attributes
     fixed_clause_measurements = ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
@@ -40,13 +48,13 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
                                  # "unlabeledTemplateNumber", "unlabeledTemplateRelationSymbolNumber"
                                  ]
     for cm in fixed_clause_measurements:
-        data_dict[cm] = list(get_fixed_filed_from_json_file(file_list, cm))
+        data_dict[cm] = list(get_fixed_filed_from_json_file(filtered_file_list, cm))
 
     # get non-fix fields
-    read_solving_time_from_json_file(file_list, data_dict)
+    read_solving_time_from_json_file(filtered_file_list, data_dict)
 
     # get graph info
-    read_graph_info_from_json_file(file_list, data_dict)
+    read_graph_info_from_json_file(filtered_file_list, data_dict)
 
     get_scatters(summary_folder=summary_folder, data_dict=data_dict)
     get_cactus(summary_folder, folder, second_folder)
@@ -108,6 +116,15 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
         pd.DataFrame(pd.DataFrame(clause_pruning_summary)).to_excel(writer, sheet_name="clause_pruning_summary")
 
 
+def filter_object_list_by_original_solving_time(solvability_object_list):
+    filtered_solvability_object_list = []
+    for o in solvability_object_list:
+        original_solving_time = int(float(read_a_json_field(o, "solvingTime-CDHG-0.0"))) / 1000
+        if original_solving_time == -0.001 or original_solving_time > filter_out_min_solving_time:
+            filtered_solvability_object_list.append(o)
+    return filtered_solvability_object_list
+
+
 def get_cactus(summary_folder, folder, second_folder=""):
     # create cactus dict
     cactus_dict_threshold = {}  # {CDHG-0.01:{solvingTime_list:[],cegar_iteration_list:[]},CG-0.01:{solvingTime_list:[],cegar_iteration_list:[]}}
@@ -126,7 +143,8 @@ def get_cactus(summary_folder, folder, second_folder=""):
                 solving_time_list = []
                 solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
                                                      read_function=read_json_file)
-                for object in solvability_object_list:
+                filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
+                for object in filtered_solvability_object_list:
                     solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
                 if current_option == "CDHG-0.0":
                     cactus_dict_threshold["original version"] = {"solvingTime_list": solving_time_list}
@@ -144,7 +162,8 @@ def get_cactus(summary_folder, folder, second_folder=""):
                 solving_time_list = []
                 solvability_object_list = read_files(get_file_list(fo, "smt2"), file_type="solvability.JSON",
                                                      read_function=read_json_file)
-                for object in solvability_object_list:
+                filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
+                for object in filtered_solvability_object_list:
                     solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
 
                 cactus_dict_prioritize[current_option + "-" + strategy] = {"solvingTime_list": solving_time_list}
@@ -154,11 +173,13 @@ def get_cactus(summary_folder, folder, second_folder=""):
         solving_time_list = []
         solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
                                              read_function=read_json_file)
-        for object in solvability_object_list:
+        filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
+        for object in filtered_solvability_object_list:
             solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
 
-        cactus_dict_prioritize["existed heuristics"] = {"solvingTime_list": solving_time_list}
+        cactus_dict_prioritize["original version"] = {"solvingTime_list": solving_time_list}
 
+    # plot cactus
     plot_cactus(summary_folder, cactus_dict_threshold, plot_name="unsatcore_threhold")
     plot_cactus(summary_folder, cactus_dict_prioritize, plot_name="unsatcore_prioritize")
 
@@ -616,19 +637,20 @@ def merge_category_summary(category_dict):
     for merged_name in merged_category_names:
         for c in columns:
             category_summary[c][merged_name] = []
-        for c_name, total_number, safe_number, unsafe_number, unknown_number,istpcn,icipcn,isttn,icitn in zip(category_dict["category_name"],
-                                                                                    category_dict["total_number"],
-                                                                                    category_dict["safe_number"],
-                                                                                    category_dict["unsafe_number"],
-                                                                                    category_dict["unknown_number"],
-                                                                                    category_dict[
-                                                                                        "improved_solving_time_prioritize_clauses_number"],
-                                                                                    category_dict[
-                                                                                        "improved_cegar_iteration_prioritize_clauses_number"],
-                                                                                    category_dict[
-                                                                                        "improved_solving_time_threshold_number"],
-                                                                                    category_dict[
-                                                                                        "improved_cegar_iteartion_threshold_number"]):
+        for c_name, total_number, safe_number, unsafe_number, unknown_number, istpcn, icipcn, isttn, icitn in zip(
+                category_dict["category_name"],
+                category_dict["total_number"],
+                category_dict["safe_number"],
+                category_dict["unsafe_number"],
+                category_dict["unknown_number"],
+                category_dict[
+                    "improved_solving_time_prioritize_clauses_number"],
+                category_dict[
+                    "improved_cegar_iteration_prioritize_clauses_number"],
+                category_dict[
+                    "improved_solving_time_threshold_number"],
+                category_dict[
+                    "improved_cegar_iteartion_threshold_number"]):
             if merged_name in c_name:
                 category_summary["category_name"][merged_name].append(c_name)
                 category_summary["total_number"][merged_name].append(total_number)
@@ -650,10 +672,11 @@ def merge_category_summary(category_dict):
             for l in category_summary[k].values():
                 merged_sumary[k].append(sum(l))
 
-    #add total row
-    merged_sumary=add_total_row_to_category_dict(merged_sumary)
+    # add total row
+    merged_sumary = add_total_row_to_category_dict(merged_sumary)
 
     return merged_sumary
+
 
 def add_total_row_to_category_dict(category_dict):
     for k in category_dict:
@@ -710,7 +733,6 @@ def get_category_summary(data_dict):
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberBeforeSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "min_solving_time (s)")
-
 
     return category_dict
 
