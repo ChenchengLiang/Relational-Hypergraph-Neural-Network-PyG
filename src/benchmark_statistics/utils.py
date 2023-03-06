@@ -52,9 +52,10 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
     get_cactus(summary_folder, folder, second_folder)
 
     # get summaries
-
     category_summary = get_category_summary(data_dict)
     merged_category_summary = merge_category_summary(category_summary)
+    # add verification sum at last row for category_summary
+    category_summary = add_total_row_to_category_dict(category_summary)
 
     statistic_summary = get_statistic_summary(data_dict)
 
@@ -649,10 +650,18 @@ def merge_category_summary(category_dict):
             for l in category_summary[k].values():
                 merged_sumary[k].append(sum(l))
 
-    #todo: add total column
-
+    #add total row
+    merged_sumary=add_total_row_to_category_dict(merged_sumary)
 
     return merged_sumary
+
+def add_total_row_to_category_dict(category_dict):
+    for k in category_dict:
+        if k != "category_name":
+            category_dict[k].append(sum(category_dict[k]))
+        else:
+            category_dict[k].append("total")
+    return category_dict
 
 
 def get_category_summary(data_dict):
@@ -702,14 +711,6 @@ def get_category_summary(data_dict):
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "min_solving_time (s)")
 
-    # add verification sum at last row
-    # category_dict["category_name"].append("verification_sum")
-    # category_dict["safe_number"].append(sum(category_dict["safe_number"]))
-    # category_dict["unsafe_number"].append(sum(category_dict["unsafe_number"]))
-    # category_dict["unknown_number"].append(sum(category_dict["unknown_number"]))
-    # category_dict["total_number"].append(sum(category_dict["total_number"]))
-    # for x in category_summary_columns:
-    #     category_dict[x].append(-1)
 
     return category_dict
 
