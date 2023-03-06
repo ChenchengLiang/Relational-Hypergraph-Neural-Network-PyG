@@ -3,7 +3,7 @@ from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean, stdev
 from src.utils import camel_to_snake, make_dirct, read_a_json_field, get_file_list
-from src.plots import scatter_plot,plot_cactus
+from src.plots import scatter_plot, plot_cactus
 import itertools
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
@@ -11,7 +11,7 @@ import os
 from src.CONSTANTS import max_cegar_iteration
 
 
-def get_statistiics_in_one_folder(folder,second_folder=""):
+def get_statistiics_in_one_folder(folder, second_folder=""):
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
@@ -49,11 +49,12 @@ def get_statistiics_in_one_folder(folder,second_folder=""):
     read_graph_info_from_json_file(file_list, data_dict)
 
     get_scatters(summary_folder=summary_folder, data_dict=data_dict)
-    get_cactus(summary_folder,folder,second_folder)
+    get_cactus(summary_folder, folder, second_folder)
 
     # get summaries
 
     category_summary = get_category_summary(data_dict)
+    merged_category_summary = merge_category_summary(category_summary)
 
     statistic_summary = get_statistic_summary(data_dict)
 
@@ -100,11 +101,13 @@ def get_statistiics_in_one_folder(folder,second_folder=""):
     with pd.ExcelWriter(summary_folder + "/" + folder_basename + "_statistics_split_clauses_1.xlsx") as writer:
         pd.DataFrame(pd.DataFrame(data_dict)).to_excel(writer, sheet_name=folder_basename)
         pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
+        pd.DataFrame(pd.DataFrame(merged_category_summary)).to_excel(writer, sheet_name="merged_category_summary")
         pd.DataFrame(pd.DataFrame(statistic_summary)).to_excel(writer, sheet_name="statistic_summary")
         pd.DataFrame(pd.DataFrame(clause_prioritize_summary)).to_excel(writer, sheet_name="clause_prioritize_summary")
         pd.DataFrame(pd.DataFrame(clause_pruning_summary)).to_excel(writer, sheet_name="clause_pruning_summary")
 
-def get_cactus(summary_folder,folder,second_folder=""):
+
+def get_cactus(summary_folder, folder, second_folder=""):
     # create cactus dict
     cactus_dict_threshold = {}  # {CDHG-0.01:{solvingTime_list:[],cegar_iteration_list:[]},CG-0.01:{solvingTime_list:[],cegar_iteration_list:[]}}
     cactus_dict_prioritize = {}
@@ -114,21 +117,26 @@ def get_cactus(summary_folder,folder,second_folder=""):
         # todo get min solving time curve
         for t in threshold_list:
             current_option = graph_type + "-" + str(t)
-
-            # read file
-            solving_time_list = []
-            solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
-                                                 read_function=read_json_file)
-            for object in solvability_object_list:
-                solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
-
-            cactus_dict_threshold[current_option] = {"solvingTime_list": solving_time_list}
+            # threat CG-0.0 as CDHG-0.0 to be original version
+            if current_option == "CG-0.0":
+                pass
+            else:
+                # read file
+                solving_time_list = []
+                solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
+                                                     read_function=read_json_file)
+                for object in solvability_object_list:
+                    solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
+                if current_option == "CDHG-0.0":
+                    cactus_dict_threshold["original version"] = {"solvingTime_list": solving_time_list}
+                else:
+                    cactus_dict_threshold[current_option] = {"solvingTime_list": solving_time_list}
 
         # prioritize
         # todo get min solving time curve
-        folder1=folder
-        folder2=folder if second_folder=="" else second_folder
-        for fo,strategy in zip([folder1,folder2],["only score","score with existed heuristics"]):
+        folder1 = folder
+        folder2 = folder if second_folder == "" else second_folder
+        for fo, strategy in zip([folder1, folder2], ["only score", "score with existed heuristics"]):
             for current_option in ["prioritizeClausesByUnsatCoreRank-CDHG",
                                    "prioritizeClausesByUnsatCoreRank-CG"]:
                 # read file
@@ -138,10 +146,10 @@ def get_cactus(summary_folder,folder,second_folder=""):
                 for object in solvability_object_list:
                     solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
 
-                cactus_dict_prioritize[current_option+"-"+strategy] = {"solvingTime_list": solving_time_list}
+                cactus_dict_prioritize[current_option + "-" + strategy] = {"solvingTime_list": solving_time_list}
 
         # original prioritize
-        current_option="CDHG-0.0"
+        current_option = "CDHG-0.0"
         solving_time_list = []
         solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
                                              read_function=read_json_file)
@@ -153,38 +161,50 @@ def get_cactus(summary_folder,folder,second_folder=""):
     plot_cactus(summary_folder, cactus_dict_threshold, plot_name="unsatcore_threhold")
     plot_cactus(summary_folder, cactus_dict_prioritize, plot_name="unsatcore_prioritize")
 
+
 def get_scatters(summary_folder, data_dict):
     scatter_folder = make_dirct(summary_folder + "/scatters")
     # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
     # combinations_pairs=itertools.combinations(combinations_list,2)
-    combinations_pairs = [["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification","number of clauses"],
+    combinations_pairs = [["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification", "number of clauses"],
                           # ["clauseNumberAfterSimplification", "clauseNumberAfterPruning"],#todo draw scatter with best threshold
-                          ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification","number of relation symbols"],
+                          ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
+                           "number of relation symbols"],
                           # ["clauseNumberBeforeSimplification", "relationSymbolNumberBeforeSimplification"],
                           # ["clauseNumberAfterSimplification", "relationSymbolNumberAfterSimplification"],
-                          ["clauseNumberAfterSimplification", "min_solving_time_cegar_interation_number","vlause number vs. number of iterations"],
-                          ["clauseNumberAfterSimplification", "min_solving_time (s)","clause number vs. solving time"],
-                          ["CDHG_node_number", "min_solving_time (s)","node number vs. solving time"],
-                          ["CG_node_number", "min_solving_time (s)","node number vs. solving time"],
-                          ["clauseNumberAfterSimplification", "CDHG_node_number","node number"],
-                          ["clauseNumberAfterSimplification", "CDHG_label_number","label number"],
-                          ["clauseNumberAfterSimplification", "CG_node_number","node number"],
-                          ["clauseNumberAfterSimplification", "CG_label_number","label number"],
-                          ["CDHG_node_number", "CG_node_number","node number"],
-                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CDHG","solving time (s)"],
-                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CG","solving time (s)"],
-                          ["no-pruning-solving-time (s)", "pruned_unsatcore_min_solving_time (s)","solving time (s)"],
-                          ["no-pruning-solving-time (s)", "prioritize_clauses_min_solving_time (s)","solving time (s)"],
-                          ["no-pruning-cegar_iteration", "cegar_iteration-prioritize-clauses-CDHG","number of iterations"],
-                          ["no-pruning-cegar_iteration", "cegar_iteration-prioritize-clauses-CG","number of iterations"],
-                          ["no-pruning-cegar_iteration", "pruned_unsatcore_min_cegar_iteration","number of iterations"],
-                          ["no-pruning-cegar_iteration", "prioritize_clauses_min_cegar_iteration","number of iterations"],
+                          ["clauseNumberAfterSimplification", "min_solving_time_cegar_interation_number",
+                           "vlause number vs. number of iterations"],
+                          ["clauseNumberAfterSimplification", "min_solving_time (s)", "clause number vs. solving time"],
+                          ["CDHG_node_number", "min_solving_time (s)", "node number vs. solving time"],
+                          ["CG_node_number", "min_solving_time (s)", "node number vs. solving time"],
+                          ["clauseNumberAfterSimplification", "CDHG_node_number", "node number"],
+                          ["clauseNumberAfterSimplification", "CDHG_label_number", "label number"],
+                          ["clauseNumberAfterSimplification", "CG_node_number", "node number"],
+                          ["clauseNumberAfterSimplification", "CG_label_number", "label number"],
+                          ["CDHG_node_number", "CG_node_number", "node number"],
+                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CDHG", "solving time (s)"],
+                          ["no-pruning-solving-time (s)", "solving-time-prioritize-clauses-CG", "solving time (s)"],
+                          ["no-pruning-solving-time (s)", "pruned_unsatcore_min_solving_time (s)", "solving time (s)"],
+                          ["no-pruning-solving-time (s)", "prioritize_clauses_min_solving_time (s)",
+                           "solving time (s)"],
+                          ["no-pruning-cegar_iteration", "cegar_iteration-prioritize-clauses-CDHG",
+                           "number of iterations"],
+                          ["no-pruning-cegar_iteration", "cegar_iteration-prioritize-clauses-CG",
+                           "number of iterations"],
+                          ["no-pruning-cegar_iteration", "pruned_unsatcore_min_cegar_iteration",
+                           "number of iterations"],
+                          ["no-pruning-cegar_iteration", "prioritize_clauses_min_cegar_iteration",
+                           "number of iterations"],
                           ]
-    axis_maps={"no-pruning-solving-time (s)":"original version","no-pruning-cegar_iteration":"original version",
-               "solving-time-prioritize-clauses-CDHG":"prioritizing-CDHG","solving-time-prioritize-clauses-CG":"prioritizing-CG",
-               "pruned_unsatcore_min_solving_time (s)":"pruning using best setting","prioritize_clauses_min_solving_time (s)":"prioritizing using best setting ",
-               "cegar_iteration-prioritize-clauses-CDHG":"pruning-CDHG","cegar_iteration-prioritize-clauses-CG":"pruning-CG",
-               "pruned_unsatcore_min_cegar_iteration":"pruning using best setting","prioritize_clauses_min_cegar_iteration":"prioritizing using best setting"}
+    axis_maps = {"no-pruning-solving-time (s)": "original version", "no-pruning-cegar_iteration": "original version",
+                 "solving-time-prioritize-clauses-CDHG": "prioritizing-CDHG",
+                 "solving-time-prioritize-clauses-CG": "prioritizing-CG",
+                 "pruned_unsatcore_min_solving_time (s)": "pruning using best setting",
+                 "prioritize_clauses_min_solving_time (s)": "prioritizing using best setting ",
+                 "cegar_iteration-prioritize-clauses-CDHG": "pruning-CDHG",
+                 "cegar_iteration-prioritize-clauses-CG": "pruning-CG",
+                 "pruned_unsatcore_min_cegar_iteration": "pruning using best setting",
+                 "prioritize_clauses_min_cegar_iteration": "prioritizing using best setting"}
     # z_data = data_dict["min_solving_time (s)"] if min(data_dict["min_solving_time (s)"]) != 10800 else []
     z_data = []
     for p_cdhg, p_cg, t_cdhg, t_cg, s in zip(data_dict["satisfiability-prioritize-clauses-CDHG"],
@@ -216,11 +236,11 @@ def get_scatters(summary_folder, data_dict):
 
     for pairs in combinations_pairs:
         if pairs[0] in axis_maps.keys():
-            x_key=axis_maps[pairs[0]]
+            x_key = axis_maps[pairs[0]]
         else:
             x_key = pairs[0]
         if pairs[1] in axis_maps.keys():
-            y_key=axis_maps[pairs[1]]
+            y_key = axis_maps[pairs[1]]
         else:
             y_key = pairs[1]
         try:
@@ -391,6 +411,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 # compute improved solving time using threshold 0 and other threshold
                 pruned_unsatcore_min_solving_time = get_min_number_from_list(
                     solving_time_list_CDHG + solving_time_list_CG, -0.001)
+
                 pruned_unsatcore_min_cegar_iteartion = get_min_number_from_list(
                     cegar_number_list_CDHG + cegar_number_list_CG, -1)
 
@@ -405,22 +426,22 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
                 statistic_dict["pruned_unsatcore_min_cegar_iteration"].append(pruned_unsatcore_min_cegar_iteartion)
 
                 # record unsatcore clause prioritize reulsts
-                satisfiability_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CDHG, cega_iteration_CDHG = get_fields_by_unsatcore_prioritize_clauses(
+                satisfiability_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CDHG, cegar_iteration_CDHG = get_fields_by_unsatcore_prioritize_clauses(
                     json_obj, "CDHG")
-                satisfiability_prioritize_clauses_CG, solving_time_prioritize_clauses_CG, cega_iteration_CG = get_fields_by_unsatcore_prioritize_clauses(
+                satisfiability_prioritize_clauses_CG, solving_time_prioritize_clauses_CG, cegar_iteration_CG = get_fields_by_unsatcore_prioritize_clauses(
                     json_obj, "CG")
 
                 statistic_dict["satisfiability-prioritize-clauses-CDHG"].append(satisfiability_prioritize_clauses_CDHG)
                 statistic_dict["satisfiability-prioritize-clauses-CG"].append(satisfiability_prioritize_clauses_CG)
                 statistic_dict["solving-time-prioritize-clauses-CDHG"].append(solving_time_prioritize_clauses_CDHG)
                 statistic_dict["solving-time-prioritize-clauses-CG"].append(solving_time_prioritize_clauses_CG)
-                statistic_dict["cegar_iteration-prioritize-clauses-CDHG"].append(cega_iteration_CDHG)
-                statistic_dict["cegar_iteration-prioritize-clauses-CG"].append(cega_iteration_CG)
+                statistic_dict["cegar_iteration-prioritize-clauses-CDHG"].append(cegar_iteration_CDHG)
+                statistic_dict["cegar_iteration-prioritize-clauses-CG"].append(cegar_iteration_CG)
                 # compute improved solving time using threshold 0 and prioritize-clauses
                 prioritize_clauses_min_solving_time = get_min_number_from_list(
                     [solving_time_prioritize_clauses_CDHG, solving_time_prioritize_clauses_CG], -0.001)
                 prioritize_clauses_min_cegar_iteration = get_min_number_from_list(
-                    [cega_iteration_CDHG, cega_iteration_CG], -1)
+                    [cegar_iteration_CDHG, cegar_iteration_CG], -1)
 
                 prioritize_clauses_improved_solving_time = get_improved_field(non_pruning_solving_time,
                                                                               prioritize_clauses_min_solving_time,
@@ -460,8 +481,8 @@ def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
 
 
 def get_fields_by_unsatcore_threshold(json_obj, graph_type,
-                                      threshold_list=[0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5,
-                                                      0.6]):
+                                      threshold_list=[0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
+                                                      0.5]):
     measurement_list = ["satisfiability_list", "clause_number_after_pruning_list", "threshold_list",
                         "solving_time_list", "cegar_iteration_list"]
     satisfiability_dict_key_list = []
@@ -579,6 +600,61 @@ def get_fixed_filed_from_json_file(file_list, field):
             yield 10800000
 
 
+def merge_category_summary(category_dict):
+    '''
+    merge value rows in category_dict according to category_name
+    '''
+    merged_category_names = list(set([x[:x.find("/")] for x in category_dict["category_name"]]))
+
+    columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number",
+               "improved_solving_time_prioritize_clauses_number",
+               "improved_cegar_iteration_prioritize_clauses_number",
+               "improved_solving_time_threshold_number", "improved_cegar_iteartion_threshold_number"]
+    category_summary = {c: {} for c in columns}
+
+    for merged_name in merged_category_names:
+        for c in columns:
+            category_summary[c][merged_name] = []
+        for c_name, total_number, safe_number, unsafe_number, unknown_number,istpcn,icipcn,isttn,icitn in zip(category_dict["category_name"],
+                                                                                    category_dict["total_number"],
+                                                                                    category_dict["safe_number"],
+                                                                                    category_dict["unsafe_number"],
+                                                                                    category_dict["unknown_number"],
+                                                                                    category_dict[
+                                                                                        "improved_solving_time_prioritize_clauses_number"],
+                                                                                    category_dict[
+                                                                                        "improved_cegar_iteration_prioritize_clauses_number"],
+                                                                                    category_dict[
+                                                                                        "improved_solving_time_threshold_number"],
+                                                                                    category_dict[
+                                                                                        "improved_cegar_iteartion_threshold_number"]):
+            if merged_name in c_name:
+                category_summary["category_name"][merged_name].append(c_name)
+                category_summary["total_number"][merged_name].append(total_number)
+                category_summary["safe_number"][merged_name].append(safe_number)
+                category_summary["unsafe_number"][merged_name].append(unsafe_number)
+                category_summary["unknown_number"][merged_name].append(unknown_number)
+                category_summary["improved_solving_time_prioritize_clauses_number"][merged_name].append(istpcn)
+                category_summary["improved_cegar_iteration_prioritize_clauses_number"][merged_name].append(icipcn)
+                category_summary["improved_solving_time_threshold_number"][merged_name].append(isttn)
+                category_summary["improved_cegar_iteartion_threshold_number"][merged_name].append(icitn)
+
+    # add rows by category name
+    merged_sumary = {}
+    for k in category_summary:
+        merged_sumary[k] = []
+        if k == "category_name":
+            merged_sumary[k] = list(category_summary[k].keys())
+        else:
+            for l in category_summary[k].values():
+                merged_sumary[k].append(sum(l))
+
+    #todo: add total column
+
+
+    return merged_sumary
+
+
 def get_category_summary(data_dict):
     basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number",
                           "improved_solving_time_prioritize_clauses_number",
@@ -621,7 +697,6 @@ def get_category_summary(data_dict):
         improved_cegar_iteration_list = [x for x in improved_cegar_iteration_threshold if x > 0]
         category_dict["improved_solving_time_threshold_number"].append(len(improved_solving_time_list))
         category_dict["improved_cegar_iteartion_threshold_number"].append(len(improved_cegar_iteration_list))
-
 
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberBeforeSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
