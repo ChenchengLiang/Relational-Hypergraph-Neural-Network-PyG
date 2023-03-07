@@ -68,7 +68,7 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
     statistic_summary = get_statistic_summary(data_dict)
 
     clause_prioritize_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
-                                                                  "clauseNumberAfterSimplification", "satisfiability",
+                                                                  "clauseNumberAfterSimplification", "satisfiability","best_satisfiability",
                                                                   "no-pruning-satisfiability",
                                                                   "no-pruning-solving-time (s)",
                                                                   "no-pruning-cegar_iteration",
@@ -84,7 +84,7 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
                                                                   "prioritize_clauses_min_cegar_iteration",
                                                                   "CDHG_node_number", "CG_node_number"])
     clause_pruning_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
-                                                               "clauseNumberAfterSimplification", "satisfiability",
+                                                               "clauseNumberAfterSimplification", "satisfiability","best_satisfiability",
                                                                "no-pruning-satisfiability",
                                                                "no-pruning-solving-time (s)",
                                                                "no-pruning-cegar_iteration",
@@ -184,6 +184,16 @@ def get_cactus(summary_folder, folder, second_folder=""):
     plot_cactus(summary_folder, cactus_dict_prioritize, plot_name="unsatcore_prioritize")
 
 
+def get_satisfiability_from_list(s):
+    if "safe" in s and "unsafe" in s:
+        return "unsound error"
+    elif "safe" in s:
+        return "safe"
+    elif "unsafe" in s:
+        return "unsafe"
+    else:
+        return "unknown"
+
 def get_scatters(summary_folder, data_dict):
     scatter_folder = make_dirct(summary_folder + "/scatters")
     # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
@@ -233,20 +243,19 @@ def get_scatters(summary_folder, data_dict):
                                              data_dict["satisfiability-prioritize-clauses-CG"],
                                              data_dict["satisfiability-threshold-CDHG"],
                                              data_dict["satisfiability-threshold-CG"], data_dict["satisfiability"]):
-        if p_cdhg != "unknown":
-            z_data.append(p_cdhg)
-        elif p_cg != "unknown":
-            z_data.append(p_cg)
-        elif t_cdhg != "unknown":
-            z_data.append(t_cdhg)
-        elif t_cg != "unknown":
-            z_data.append(t_cdhg)
-        elif s != "unknown":
-            z_data.append(s)
-        else:
-            z_data.append("unknown")
 
-    data_dict["satisfiability"] = z_data
+        if t_cdhg != "safe" and t_cg!="safe":
+            z_data.append(get_satisfiability_from_list([p_cdhg,p_cg,t_cdhg,t_cg,s]))
+        elif t_cdhg != "safe":
+            z_data.append(get_satisfiability_from_list([p_cdhg,p_cg,t_cdhg,s]))
+        elif t_cg != "safe":
+            z_data.append(get_satisfiability_from_list([p_cdhg,p_cg,t_cg,s]))
+        else:
+            z_data.append(get_satisfiability_from_list([p_cdhg,p_cg,s]))
+
+
+
+    data_dict["best_satisfiability"] = z_data
     data_text = []
     for f, t1, t2 in zip(data_dict["file_name"], data_dict["threshold_list_CDHG"],
                          data_dict["threshold_list_CG"]):
@@ -342,6 +351,7 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
 def read_solving_time_from_json_file(file_list, statistic_dict):
     record_fields = [
         "satisfiability",
+        "best_satisfiability",
         "no-pruning-satisfiability",
         "no-pruning-solving-time (s)",
         "no-pruning-cegar_iteration",
@@ -629,10 +639,12 @@ def merge_category_summary(category_dict):
     merged_category_names = list(set([x[:x.find("/")] for x in category_dict["category_name"]]))
 
     columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number",
+               "prioritize_safe_number", "prioritize_unsafe_number", "prioritize_unknown_number",
                "improved_solving_time_prioritize_clauses_number",
                "istpcn_safe", "istpcn_unsafe", "istpcn_unknown",
                "improved_cegar_iteration_prioritize_clauses_number",
                "icipcn_safe", "icipcn_unsafe", "icipcn_unknown",
+               "threshold_safe_number", "threshold_unsafe_number", "threshold_unknown_number",
                "improved_solving_time_threshold_number",
                "isttn_safe", "isttn_unsafe", "isttn_unknown",
                "improved_cegar_iteartion_threshold_number",
@@ -721,7 +733,9 @@ def get_category_summary(data_dict):
                           "improved_solving_time_threshold_number",
                           "isttn_safe", "isttn_unsafe", "isttn_unknown",
                           "improved_cegar_iteartion_threshold_number",
-                          "icitn_safe", "icitn_unsafe", "icitn_unknown"]
+                          "icitn_safe", "icitn_unsafe", "icitn_unknown",
+                          "prioritize_safe_number", "prioritize_unsafe_number", "prioritize_unknown_number",
+                          "threshold_safe_number", "threshold_unsafe_number", "threshold_unknown_number"]
     # could add any number fields corresponding to category column
     target_column_list = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification", "min_solving_time (s)"]
     category_summary_columns = []
@@ -735,14 +749,14 @@ def get_category_summary(data_dict):
 
     category_list = sorted(list(set(data_dict["category"])))
     for c in category_list:
-        satisfiability_in_one_category = get_target_row_by_condition(data_dict, "category", c, "satisfiability")
-        category_dict["category_name"].append(c)
-        category_dict["safe_number"].append(satisfiability_in_one_category.count("safe"))
-        category_dict["unsafe_number"].append(satisfiability_in_one_category.count("unsafe"))
-        category_dict["unknown_number"].append(satisfiability_in_one_category.count("unknown"))
-        category_dict["total_number"].append(len(satisfiability_in_one_category))
         original_satisfiabilities_by_category = get_target_row_by_condition(data_dict, "category", c,
                                                                             "no-pruning-satisfiability")
+        category_dict["category_name"].append(c)
+        category_dict["safe_number"].append(original_satisfiabilities_by_category.count("safe"))
+        category_dict["unsafe_number"].append(original_satisfiabilities_by_category.count("unsafe"))
+        category_dict["unknown_number"].append(original_satisfiabilities_by_category.count("unknown"))
+        category_dict["total_number"].append(len(original_satisfiabilities_by_category))
+
         # improved by prioritize
         # improved solving time
         improved_solving_time_prioritize_clauses = get_target_row_by_condition(data_dict, "category", c,
@@ -752,12 +766,6 @@ def get_category_summary(data_dict):
         # get improved solving time by safe unsafe, and unknown given by no-pruning-satisfiability
         get_improved_fields_by_satisfiability(category_dict, "istpcn", improved_solving_time_prioritize_clauses,
                                               original_satisfiabilities_by_category)
-        # for category in ["safe", "unsafe", "unknown"]:
-        #     improved_solving_time_list_by_satisfiability = [x for x, y in zip(improved_solving_time_prioritize_clauses,
-        #                                                     original_satisfiabilities_by_category) if
-        #                                   x > 0 and y == category]
-        #     category_dict[f"istpcn_{category}"].append(len(improved_solving_time_list_by_satisfiability))
-
         # improved iteration
         improved_cegar_iteration_prioritize_clauses = get_target_row_by_condition(data_dict, "category", c,
                                                                                   "improved_cegar_iteration_prioritize_clauses")
@@ -784,6 +792,40 @@ def get_category_summary(data_dict):
         # get improved cegar iteration by safe unsafe, and unknown given by no-pruning-satisfiability
         get_improved_fields_by_satisfiability(category_dict, "icitn", improved_cegar_iteration_threshold,
                                               original_satisfiabilities_by_category)
+
+        # satisfiability of prioritizing
+        prioritize_satisfiability_CDHG = get_target_row_by_condition(data_dict, "category", c, "satisfiability-prioritize-clauses-CDHG")
+        prioritize_satisfiability_CG = get_target_row_by_condition(data_dict, "category", c, "satisfiability-prioritize-clauses-CG")
+        prioritize_satisfiability=[]
+        for cdhg_s,cg_s in zip(prioritize_satisfiability_CDHG,prioritize_satisfiability_CG):
+           prioritize_satisfiability.append(get_satisfiability_from_list([cdhg_s, cg_s]))
+        category_dict["prioritize_safe_number"].append(prioritize_satisfiability.count("safe"))
+        category_dict["prioritize_unsafe_number"].append(prioritize_satisfiability.count("unsafe"))
+        category_dict["prioritize_unknown_number"].append(prioritize_satisfiability.count("unknown"))
+
+
+        # satisfiability of threshold
+        threshold_satisfiability_CDHG = get_target_row_by_condition(data_dict, "category", c, "satisfiability-threshold-CDHG")
+        threshold_satisfiability_CG = get_target_row_by_condition(data_dict, "category", c, "satisfiability-threshold-CG")
+        threshold_satisfiability=[]
+        for cdhg_s,cg_s in zip(threshold_satisfiability_CDHG,threshold_satisfiability_CG):
+            if cdhg_s!="safe" and cg_s!="safe":
+                threshold_satisfiability.append(get_satisfiability_from_list([cdhg_s, cg_s]))
+            elif cdhg_s!="safe":
+                threshold_satisfiability.append(cdhg_s)
+            elif cg_s!="safe":
+                threshold_satisfiability.append(cg_s)
+            else:
+                threshold_satisfiability.append("unknown")
+        category_dict["threshold_safe_number"].append(threshold_satisfiability.count("safe"))
+        category_dict["threshold_unsafe_number"].append(threshold_satisfiability.count("unsafe"))
+        category_dict["threshold_unknown_number"].append(threshold_satisfiability.count("unknown"))
+
+
+
+
+
+
 
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberBeforeSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
