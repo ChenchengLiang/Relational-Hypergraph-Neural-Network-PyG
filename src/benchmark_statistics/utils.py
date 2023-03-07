@@ -68,7 +68,8 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
     statistic_summary = get_statistic_summary(data_dict)
 
     clause_prioritize_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
-                                                                  "clauseNumberAfterSimplification", "satisfiability","best_satisfiability",
+                                                                  "clauseNumberAfterSimplification", "satisfiability",
+                                                                  "best_satisfiability",
                                                                   "no-pruning-satisfiability",
                                                                   "no-pruning-solving-time (s)",
                                                                   "no-pruning-cegar_iteration",
@@ -84,7 +85,8 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
                                                                   "prioritize_clauses_min_cegar_iteration",
                                                                   "CDHG_node_number", "CG_node_number"])
     clause_pruning_summary = get_summary_by_fields(data_dict, ["file_name", "file_size_h", "category",
-                                                               "clauseNumberAfterSimplification", "satisfiability","best_satisfiability",
+                                                               "clauseNumberAfterSimplification", "satisfiability",
+                                                               "best_satisfiability",
                                                                "no-pruning-satisfiability",
                                                                "no-pruning-solving-time (s)",
                                                                "no-pruning-cegar_iteration",
@@ -194,6 +196,7 @@ def get_satisfiability_from_list(s):
     else:
         return "unknown"
 
+
 def get_scatters(summary_folder, data_dict):
     scatter_folder = make_dirct(summary_folder + "/scatters")
     # combinations_list=["clauseNumberBeforeSimplification","clauseNumberAfterSimplification"]
@@ -244,16 +247,14 @@ def get_scatters(summary_folder, data_dict):
                                              data_dict["satisfiability-threshold-CDHG"],
                                              data_dict["satisfiability-threshold-CG"], data_dict["satisfiability"]):
 
-        if t_cdhg != "safe" and t_cg!="safe":
-            z_data.append(get_satisfiability_from_list([p_cdhg,p_cg,t_cdhg,t_cg,s]))
+        if t_cdhg != "safe" and t_cg != "safe":
+            z_data.append(get_satisfiability_from_list([p_cdhg, p_cg, t_cdhg, t_cg, s]))
         elif t_cdhg != "safe":
-            z_data.append(get_satisfiability_from_list([p_cdhg,p_cg,t_cdhg,s]))
+            z_data.append(get_satisfiability_from_list([p_cdhg, p_cg, t_cdhg, s]))
         elif t_cg != "safe":
-            z_data.append(get_satisfiability_from_list([p_cdhg,p_cg,t_cg,s]))
+            z_data.append(get_satisfiability_from_list([p_cdhg, p_cg, t_cg, s]))
         else:
-            z_data.append(get_satisfiability_from_list([p_cdhg,p_cg,s]))
-
-
+            z_data.append(get_satisfiability_from_list([p_cdhg, p_cg, s]))
 
     data_dict["best_satisfiability"] = z_data
     data_text = []
@@ -726,16 +727,18 @@ def add_total_row_to_category_dict(category_dict):
 
 def get_category_summary(data_dict):
     basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number",
+                          "icitn_safe", "icitn_unsafe", "icitn_unknown",
+                          "prioritize_safe_number", "prioritize_unsafe_number", "prioritize_unknown_number",
                           "improved_solving_time_prioritize_clauses_number",
                           "istpcn_safe", "istpcn_unsafe", "istpcn_unknown",
                           "improved_cegar_iteration_prioritize_clauses_number",
                           "icipcn_safe", "icipcn_unsafe", "icipcn_unknown",
+                          "threshold_safe_number", "threshold_unsafe_number", "threshold_unknown_number",
                           "improved_solving_time_threshold_number",
                           "isttn_safe", "isttn_unsafe", "isttn_unknown",
                           "improved_cegar_iteartion_threshold_number",
                           "icitn_safe", "icitn_unsafe", "icitn_unknown",
-                          "prioritize_safe_number", "prioritize_unsafe_number", "prioritize_unknown_number",
-                          "threshold_safe_number", "threshold_unsafe_number", "threshold_unknown_number"]
+                          ]
     # could add any number fields corresponding to category column
     target_column_list = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification", "min_solving_time (s)"]
     category_summary_columns = []
@@ -794,38 +797,35 @@ def get_category_summary(data_dict):
                                               original_satisfiabilities_by_category)
 
         # satisfiability of prioritizing
-        prioritize_satisfiability_CDHG = get_target_row_by_condition(data_dict, "category", c, "satisfiability-prioritize-clauses-CDHG")
-        prioritize_satisfiability_CG = get_target_row_by_condition(data_dict, "category", c, "satisfiability-prioritize-clauses-CG")
-        prioritize_satisfiability=[]
-        for cdhg_s,cg_s in zip(prioritize_satisfiability_CDHG,prioritize_satisfiability_CG):
-           prioritize_satisfiability.append(get_satisfiability_from_list([cdhg_s, cg_s]))
+        prioritize_satisfiability_CDHG = get_target_row_by_condition(data_dict, "category", c,
+                                                                     "satisfiability-prioritize-clauses-CDHG")
+        prioritize_satisfiability_CG = get_target_row_by_condition(data_dict, "category", c,
+                                                                   "satisfiability-prioritize-clauses-CG")
+        prioritize_satisfiability = []
+        for cdhg_s, cg_s in zip(prioritize_satisfiability_CDHG, prioritize_satisfiability_CG):
+            prioritize_satisfiability.append(get_satisfiability_from_list([cdhg_s, cg_s]))
         category_dict["prioritize_safe_number"].append(prioritize_satisfiability.count("safe"))
         category_dict["prioritize_unsafe_number"].append(prioritize_satisfiability.count("unsafe"))
         category_dict["prioritize_unknown_number"].append(prioritize_satisfiability.count("unknown"))
 
-
         # satisfiability of threshold
-        threshold_satisfiability_CDHG = get_target_row_by_condition(data_dict, "category", c, "satisfiability-threshold-CDHG")
-        threshold_satisfiability_CG = get_target_row_by_condition(data_dict, "category", c, "satisfiability-threshold-CG")
-        threshold_satisfiability=[]
-        for cdhg_s,cg_s in zip(threshold_satisfiability_CDHG,threshold_satisfiability_CG):
-            if cdhg_s!="safe" and cg_s!="safe":
+        threshold_satisfiability_CDHG = get_target_row_by_condition(data_dict, "category", c,
+                                                                    "satisfiability-threshold-CDHG")
+        threshold_satisfiability_CG = get_target_row_by_condition(data_dict, "category", c,
+                                                                  "satisfiability-threshold-CG")
+        threshold_satisfiability = []
+        for cdhg_s, cg_s in zip(threshold_satisfiability_CDHG, threshold_satisfiability_CG):
+            if cdhg_s != "safe" and cg_s != "safe":
                 threshold_satisfiability.append(get_satisfiability_from_list([cdhg_s, cg_s]))
-            elif cdhg_s!="safe":
+            elif cdhg_s != "safe":
                 threshold_satisfiability.append(cdhg_s)
-            elif cg_s!="safe":
+            elif cg_s != "safe":
                 threshold_satisfiability.append(cg_s)
             else:
                 threshold_satisfiability.append("unknown")
         category_dict["threshold_safe_number"].append(threshold_satisfiability.count("safe"))
         category_dict["threshold_unsafe_number"].append(threshold_satisfiability.count("unsafe"))
         category_dict["threshold_unknown_number"].append(threshold_satisfiability.count("unknown"))
-
-
-
-
-
-
 
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberBeforeSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
