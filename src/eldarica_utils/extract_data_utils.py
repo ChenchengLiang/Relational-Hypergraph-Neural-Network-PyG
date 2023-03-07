@@ -12,7 +12,7 @@ import numpy as np
 
 
 
-def run_eldarica_with_shell(file, shell_timeout, eldarica_parameter_list, shell_folder):
+def run_eldarica_with_shell(file, shell_timeout, solver_parameter_list, shell_folder,solver_location = "../../eldarica-graph-generation/eld "):
     file = file[:-len(".zip")]
 
     # unzip file
@@ -20,21 +20,20 @@ def run_eldarica_with_shell(file, shell_timeout, eldarica_parameter_list, shell_
         unzip_file(f)
         os.remove(f)
 
-    eldarica = "../../eldarica-graph-generation/eld "
     file_name = os.path.basename(file)
     shell_file_name = shell_folder + "/" + "run-ulimit" + "-" + file_name + ".sh"
-    eldarica_parameter_list = change_eldarica_parameters(file, eldarica_parameter_list)
+    solver_parameter_list= change_eldarica_parameters(file, solver_parameter_list) if "eldarica" in solver_location else solver_parameter_list
     timeout_command = "timeout " + str(shell_timeout)
     f = open(shell_file_name, "w")
     f.write("#!/bin/sh\n")
     # f.write("ulimit -m 4000000; \n")
     # f.write("ulimit -v 6000000; \n")
     # f.write("ulimit -a; \n")
-    f.write(timeout_command + " " + eldarica + " " + file + " " + eldarica_parameter_list + "\n")
+    f.write(timeout_command + " " + solver_location + " " + file + " " + solver_parameter_list + "\n")
     f.close()
 
     run_shell_command = ["sh", shell_file_name]
-    used_time = call_Eldarica_one_time(run_shell_command, file_name, eldarica_parameter_list)
+    used_time = call_solver_one_time(run_shell_command, file_name, solver_parameter_list)
     # os.remove(shell_file_name)
 
     # compress files
@@ -46,9 +45,9 @@ def run_eldarica_with_shell(file, shell_timeout, eldarica_parameter_list, shell_
                 os.remove(f)
 
 
-def call_Eldarica_one_time(run_shell_command, file_name, eldarica_parameter_list):
+def call_solver_one_time(run_shell_command, file_name, solver_parameter_list):
     print("-" * 20)
-    print("extracting " + file_name, eldarica_parameter_list)
+    print("extracting " + file_name, solver_parameter_list)
     start = time.time()
     eld = subprocess.Popen(run_shell_command, stdout=subprocess.DEVNULL, shell=False)
     eld.wait()

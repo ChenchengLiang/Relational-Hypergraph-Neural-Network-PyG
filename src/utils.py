@@ -110,7 +110,12 @@ def make_dirct(d):
     except:
         print(str(d), "folder existed")
         return d
-
+def distinct_list(original_list):
+    distinct_list = []
+    for item in original_list:
+        if item not in distinct_list:
+            distinct_list.append(item)
+    return distinct_list
 
 def count_generator(iter):
     return sum(1 for _ in iter)

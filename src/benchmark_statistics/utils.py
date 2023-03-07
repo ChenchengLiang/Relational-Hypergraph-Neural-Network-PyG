@@ -2,7 +2,7 @@ from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean, stdev
-from src.utils import camel_to_snake, make_dirct, read_a_json_field, get_file_list
+from src.utils import camel_to_snake, make_dirct, read_a_json_field, get_file_list,distinct_list
 from src.plots import scatter_plot, plot_cactus
 import itertools
 import pandas as pd
@@ -637,7 +637,10 @@ def merge_category_summary(category_dict):
     '''
     merge value rows in category_dict according to category_name
     '''
-    merged_category_names = list(set([x[:x.find("/")] for x in category_dict["category_name"]]))
+    merged_category_names = distinct_list([x[:x.find("/")] for x in category_dict["category_name"]])
+    merged_category_names = [item.split("-benchmarks")[0] if "-benchmarks" in item else item for item in merged_category_names]
+    merged_category_names = [item.split("-bench")[0] if "-bench" in item else item for item in
+                             merged_category_names]
 
     columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number",
                "prioritize_safe_number", "prioritize_unsafe_number", "prioritize_unknown_number",
@@ -659,7 +662,8 @@ def merge_category_summary(category_dict):
                 istpcn, istpcn_safe, istpcn_unsafe, istpcn_unknown, \
                 icipcn, icipcn_safe, icipcn_unsafe, icipcn_unknown, \
                 isttn, isttn_safe, isttn_unsafe, isttn_unknown, \
-                icitn, icitn_safe, icitn_unsafe, icitn_unknown in zip(
+                icitn, icitn_safe, icitn_unsafe, icitn_unknown,\
+                p_safe,p_unsafe,p_unknown,t_safe,t_unsafe,t_unknown in zip(
             category_dict["category_name"],
             category_dict["total_number"],
             category_dict["safe_number"],
@@ -676,7 +680,9 @@ def merge_category_summary(category_dict):
             category_dict["isttn_safe"], category_dict["isttn_unsafe"], category_dict["isttn_unknown"],
             category_dict[
                 "improved_cegar_iteartion_threshold_number"],
-            category_dict["icitn_safe"], category_dict["icitn_unsafe"], category_dict["icitn_unknown"]):
+            category_dict["icitn_safe"], category_dict["icitn_unsafe"], category_dict["icitn_unknown"],
+        category_dict["prioritize_safe_number"], category_dict["prioritize_unsafe_number"], category_dict["prioritize_unknown_number"],
+        category_dict["threshold_safe_number"], category_dict["threshold_unsafe_number"], category_dict["threshold_unknown_number"]):
             if merged_name in c_name:
                 category_summary["category_name"][merged_name].append(c_name)
                 category_summary["total_number"][merged_name].append(total_number)
@@ -699,6 +705,12 @@ def merge_category_summary(category_dict):
                 category_summary["icitn_safe"][merged_name].append(icitn_safe)
                 category_summary["icitn_unsafe"][merged_name].append(icitn_unsafe)
                 category_summary["icitn_unknown"][merged_name].append(icitn_unknown)
+                category_summary["prioritize_safe_number"][merged_name].append(p_safe)
+                category_summary["prioritize_unsafe_number"][merged_name].append(p_unsafe)
+                category_summary["prioritize_unknown_number"][merged_name].append(p_unknown)
+                category_summary["threshold_safe_number"][merged_name].append(t_safe)
+                category_summary["threshold_unsafe_number"][merged_name].append(t_unsafe)
+                category_summary["threshold_unknown_number"][merged_name].append(t_unknown)
 
     # add rows by category name
     merged_sumary = {}
@@ -727,7 +739,6 @@ def add_total_row_to_category_dict(category_dict):
 
 def get_category_summary(data_dict):
     basic_info_columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number",
-                          "icitn_safe", "icitn_unsafe", "icitn_unknown",
                           "prioritize_safe_number", "prioritize_unsafe_number", "prioritize_unknown_number",
                           "improved_solving_time_prioritize_clauses_number",
                           "istpcn_safe", "istpcn_unsafe", "istpcn_unknown",

@@ -8,9 +8,9 @@ from tqdm import tqdm
 from utils import run_one_shell
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/z3-solutions/non-linear/train_data-solved-eldarica-unsolvable-39"#sys.argv[1]
-    #collect_predicate_from_other_solvers(folder, solver_location=sys.argv[2], shell_timeout=60 * 5)
-    separate_solvable_cases(folder)
+    folder = "/home/cheli243/Desktop/debug/unsat-corner-cases/0003"#sys.argv[1]
+    collect_predicate_from_other_solvers(folder, solver_location=sys.argv[2], shell_timeout=60 * 5)
+    #separate_solvable_cases(folder)
 
 
 def separate_solvable_cases(folder):
@@ -32,6 +32,7 @@ def separate_solvable_cases(folder):
                 copy_relative_files(file_name, unsolvable_folder)
 
 
+
 def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3", shell_timeout=20):
     solver_parameter_list = " -smt2 -v:1 "
     shell_folder = make_dirct(os.path.join(os.path.dirname(unsolvable_folder), "shell_folder"))
@@ -46,7 +47,6 @@ def collect_predicate_from_other_solvers(unsolvable_folder, solver_location="z3"
         # for f in file_list:
         # unzip file
         unzip_file(f)
-        os.remove(f)
         f = f[:-len(".zip")]
 
         # print info
