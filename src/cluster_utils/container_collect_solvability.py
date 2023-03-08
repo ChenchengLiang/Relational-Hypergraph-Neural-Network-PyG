@@ -1,6 +1,7 @@
 import sys
 
-sys.path.append("/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG")
+#sys.path.append("/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG") #local machine path
+sys.path.append("/home/cheli243/Systematic-Predicate-Abstraction-using-Machine-Learning/extractable_dataset") #uppmax path
 from src.utils import get_file_list, unzip_file, compress_file, make_dirct
 import os
 from tqdm import tqdm

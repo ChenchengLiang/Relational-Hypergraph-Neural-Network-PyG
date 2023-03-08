@@ -1,7 +1,8 @@
 # build image command: apptainer build image.sif my_recipe.def
 # use image command: apptainer exec  image.sif z3
 BootStrap: docker
-From: ubuntu:20.04
+From: continuumio/miniconda3
+#ubuntu:20.04
 
 
 %post
