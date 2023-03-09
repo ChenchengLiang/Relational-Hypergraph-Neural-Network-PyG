@@ -8,17 +8,16 @@ import itertools
 import pandas as pd
 from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
 import os
-from src.CONSTANTS import max_cegar_iteration, filter_out_min_solving_time
+from src.CONSTANTS import max_cegar_iteration, filter_out_min_solving_time, benchmark_timeout
 
 
-def get_statistiics_in_one_folder(folder, second_folder="", z3_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-z3-2955/train_data"):
+def get_statistiics_in_one_folder(folder, second_folder="",
+                                  z3_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-z3-2955/train_data"):
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
-    second_folder=folder if second_folder == "" else second_folder
+    second_folder = folder if second_folder == "" else second_folder
     file_list = get_file_list(folder, "smt2")
-
-
 
     # filter file list when the original solving time is shorter than 5 seconds
     solvability_object_list = read_files(file_list, file_type="solvability.JSON",
@@ -138,30 +137,21 @@ def get_cactus(summary_folder, folder, second_folder=""):
     # create cactus dict
     cactus_dict_threshold = {}  # {CDHG-0.01:{solvingTime_list:[],cegar_iteration_list:[]},CG-0.01:{solvingTime_list:[],cegar_iteration_list:[]}}
     cactus_dict_prioritize = {}
-    threshold_list = [0.0, 0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5]
+    threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5] #0.0 work as original version and will be added later
     for graph_type in ["CDHG", "CG"]:
         # threshold
-        # todo get min solving time curve
         for t in threshold_list:
             current_option = graph_type + "-" + str(t)
-            # threat CG-0.0 as CDHG-0.0 to be original version
-            if current_option == "CG-0.0":
-                pass
-            else:
-                # read file
-                solving_time_list = []
-                solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
-                                                     read_function=read_json_file)
-                filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
-                for object in filtered_solvability_object_list:
-                    solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
-                if current_option == "CDHG-0.0":
-                    cactus_dict_threshold["original version"] = {"solvingTime_list": solving_time_list}
-                else:
-                    cactus_dict_threshold[current_option] = {"solvingTime_list": solving_time_list}
+            # read file
+            solving_time_list = []
+            solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
+                                                 read_function=read_json_file)
+            filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
+            for object in filtered_solvability_object_list:
+                solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
+                cactus_dict_threshold[current_option] = {"solvingTime_list": solving_time_list}
 
         # prioritize
-        # todo get min solving time curve
         folder1 = folder
         folder2 = second_folder
         for fo, strategy in zip([folder1, folder2], ["only score", "score with existed heuristics"]):
@@ -177,16 +167,23 @@ def get_cactus(summary_folder, folder, second_folder=""):
 
                 cactus_dict_prioritize[current_option + "-" + strategy] = {"solvingTime_list": solving_time_list}
 
-        # original prioritize
+        # original version line
         current_option = "CDHG-0.0"
-        solving_time_list = []
+        solving_time_original_list = []
         solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
                                              read_function=read_json_file)
         filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
         for object in filtered_solvability_object_list:
-            solving_time_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
+            solving_time_original_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
 
-        cactus_dict_prioritize["original version"] = {"solvingTime_list": solving_time_list}
+        # original version line for prioritize cactus plot
+        cactus_dict_prioritize["original version"] = {"solvingTime_list": solving_time_original_list}
+        #original version line for threshold cactus plot
+        cactus_dict_threshold["original version"] = {"solvingTime_list": solving_time_original_list}
+
+        # virtual best graph threshold
+
+        # virtual best graph prioritize
 
     # plot cactus
     plot_cactus(summary_folder, cactus_dict_threshold, plot_name="unsatcore_threhold")
@@ -355,24 +352,34 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
             statistic_dict["CG_ternary_edge_number"].append(-1)
             statistic_dict["CG_label_number"].append(-1)
 
-def read_z3_fields(file_list, statistic_dict,z3_folder):
-    z3_file_list=[os.path.join(z3_folder,os.path.basename(f))for f in file_list]
-    record_fields = ["solving_time_z3","satisfiability_z3"]
+
+def read_z3_fields(file_list, statistic_dict, z3_folder):
+    z3_file_list = [os.path.join(z3_folder, os.path.basename(f)) for f in file_list]
+    record_fields = ["solving_time_z3", "satisfiability_z3", "improved_solving_time_z3"]
     assign_dict_key_empty_list(statistic_dict, record_fields)
-    for json_obj in read_files(z3_file_list, file_type="z3-solvability.JSON", read_function=read_json_file):
+    for json_obj, eldarica_solving_time in zip(
+            read_files(z3_file_list, file_type="z3-solvability.JSON", read_function=read_json_file),
+            statistic_dict["no-pruning-solving-time (s)"]):
         if len(json_obj) > 1:
-            statistic_dict["solving_time_z3"].append(float(json_obj["solving_time"][0]))
-            if json_obj["satisfiability"][0]=="sat":
+            # read solving time
+            solving_time_z3 = float(json_obj["solving_time"][0])
+            solving_time_z3 = benchmark_timeout if solving_time_z3 > benchmark_timeout else solving_time_z3
+            statistic_dict["solving_time_z3"].append(solving_time_z3)
+            # read satisfiability
+            if json_obj["satisfiability"][0] == "sat":
                 statistic_dict["satisfiability_z3"].append("safe")
-            elif json_obj["satisfiability"][0]=="unsat":
+            elif json_obj["satisfiability"][0] == "unsat":
                 statistic_dict["satisfiability_z3"].append("unsafe")
             else:
                 statistic_dict["satisfiability_z3"].append("unknown")
+            # get improved solving time
+            statistic_dict["improved_solving_time_z3"].append(eldarica_solving_time - solving_time_z3)
+
         else:
             assign_values_to_unsolvable_problem(statistic_dict, record_fields)
 
+
 def read_solving_time_from_json_file(file_list, statistic_dict):
-    # todo read solving time and satisfiability from z3
     record_fields = [
         "satisfiability",
         "best_satisfiability",
@@ -676,7 +683,10 @@ def merge_category_summary(category_dict):
                "improved_solving_time_threshold_number",
                "isttn_safe", "isttn_unsafe", "isttn_unknown",
                "improved_cegar_iteartion_threshold_number",
-               "icitn_safe", "icitn_unsafe", "icitn_unknown"]
+               "icitn_safe", "icitn_unsafe", "icitn_unknown",
+               "z3_safe_number", "z3_unsafe_number", "z3_unknown_number",
+               "improved_solving_time_z3_number",
+               "istz3n_safe", "istz3n_unsafe", "istz3n_unknown"]
     category_summary = {c: {} for c in columns}
 
     for merged_name in merged_category_names:
@@ -687,7 +697,10 @@ def merge_category_summary(category_dict):
                 icipcn, icipcn_safe, icipcn_unsafe, icipcn_unknown, \
                 isttn, isttn_safe, isttn_unsafe, isttn_unknown, \
                 icitn, icitn_safe, icitn_unsafe, icitn_unknown, \
-                p_safe, p_unsafe, p_unknown, t_safe, t_unsafe, t_unknown in zip(
+                istz3n, istz3n_safe, istz3n_unsafe, istz3n_unknown, \
+                p_safe, p_unsafe, p_unknown, \
+                t_safe, t_unsafe, t_unknown, \
+                z3_safe, z3_unsafe, z3_unknown in zip(
             category_dict["category_name"],
             category_dict["total_number"],
             category_dict["safe_number"],
@@ -705,10 +718,13 @@ def merge_category_summary(category_dict):
             category_dict[
                 "improved_cegar_iteartion_threshold_number"],
             category_dict["icitn_safe"], category_dict["icitn_unsafe"], category_dict["icitn_unknown"],
+            category_dict["improved_solving_time_z3_number"],
+            category_dict["istz3n_safe"], category_dict["istz3n_unsafe"], category_dict["istz3n_unknown"],
             category_dict["prioritize_safe_number"], category_dict["prioritize_unsafe_number"],
             category_dict["prioritize_unknown_number"],
             category_dict["threshold_safe_number"], category_dict["threshold_unsafe_number"],
-            category_dict["threshold_unknown_number"]):
+            category_dict["threshold_unknown_number"],
+            category_dict["z3_safe_number"], category_dict["z3_unsafe_number"], category_dict["z3_unknown_number"]):
             if merged_name in c_name:
                 category_summary["category_name"][merged_name].append(c_name)
                 category_summary["total_number"][merged_name].append(total_number)
@@ -731,12 +747,19 @@ def merge_category_summary(category_dict):
                 category_summary["icitn_safe"][merged_name].append(icitn_safe)
                 category_summary["icitn_unsafe"][merged_name].append(icitn_unsafe)
                 category_summary["icitn_unknown"][merged_name].append(icitn_unknown)
+                category_summary["improved_solving_time_z3_number"][merged_name].append(istz3n)
+                category_summary["istz3n_safe"][merged_name].append(istz3n_safe)
+                category_summary["istz3n_unsafe"][merged_name].append(istz3n_unsafe)
+                category_summary["istz3n_unknown"][merged_name].append(istz3n_unknown)
                 category_summary["prioritize_safe_number"][merged_name].append(p_safe)
                 category_summary["prioritize_unsafe_number"][merged_name].append(p_unsafe)
                 category_summary["prioritize_unknown_number"][merged_name].append(p_unknown)
                 category_summary["threshold_safe_number"][merged_name].append(t_safe)
                 category_summary["threshold_unsafe_number"][merged_name].append(t_unsafe)
                 category_summary["threshold_unknown_number"][merged_name].append(t_unknown)
+                category_summary["z3_safe_number"][merged_name].append(z3_safe)
+                category_summary["z3_unsafe_number"][merged_name].append(z3_unsafe)
+                category_summary["z3_unknown_number"][merged_name].append(z3_unknown)
 
     # add rows by category name
     merged_sumary = {}
@@ -775,6 +798,9 @@ def get_category_summary(data_dict):
                           "isttn_safe", "isttn_unsafe", "isttn_unknown",
                           "improved_cegar_iteartion_threshold_number",
                           "icitn_safe", "icitn_unsafe", "icitn_unknown",
+                          "z3_safe_number", "z3_unsafe_number", "z3_unknown_number",
+                          "improved_solving_time_z3_number",
+                          "istz3n_safe", "istz3n_unsafe", "istz3n_unknown"
                           ]
     # could add any number fields corresponding to category column
     target_column_list = ["clauseNumberBeforeSimplification", "clauseNumberAfterSimplification", "min_solving_time (s)"]
@@ -797,42 +823,6 @@ def get_category_summary(data_dict):
         category_dict["unknown_number"].append(original_satisfiabilities_by_category.count("unknown"))
         category_dict["total_number"].append(len(original_satisfiabilities_by_category))
 
-        # improved by prioritize
-        # improved solving time
-        improved_solving_time_prioritize_clauses = get_target_row_by_condition(data_dict, "category", c,
-                                                                               "improved_solving_time_prioritize_clauses (s)")
-        improved_solving_time_list = [x for x in improved_solving_time_prioritize_clauses if x > 0]
-        category_dict["improved_solving_time_prioritize_clauses_number"].append(len(improved_solving_time_list))
-        # get improved solving time by safe unsafe, and unknown given by no-pruning-satisfiability
-        get_improved_fields_by_satisfiability(category_dict, "istpcn", improved_solving_time_prioritize_clauses,
-                                              original_satisfiabilities_by_category)
-        # improved iteration
-        improved_cegar_iteration_prioritize_clauses = get_target_row_by_condition(data_dict, "category", c,
-                                                                                  "improved_cegar_iteration_prioritize_clauses")
-        improved_cegar_iteration_list = [x for x in improved_cegar_iteration_prioritize_clauses if x > 0]
-        category_dict["improved_cegar_iteration_prioritize_clauses_number"].append(len(improved_cegar_iteration_list))
-        # get improved cegar iteration by safe unsafe, and unknown given by no-pruning-satisfiability
-        get_improved_fields_by_satisfiability(category_dict, "icipcn", improved_cegar_iteration_prioritize_clauses,
-                                              original_satisfiabilities_by_category)
-
-        # improved by threshold
-        # improved solving time
-        improved_solving_time_threshold = get_target_row_by_condition(data_dict, "category", c,
-                                                                      "improved_solving_time_threshold (s)")
-        improved_solving_time_list = [x for x in improved_solving_time_threshold if x > 0]
-        category_dict["improved_solving_time_threshold_number"].append(len(improved_solving_time_list))
-        # get improved solving time by safe unsafe, and unknown given by no-pruning-satisfiability
-        get_improved_fields_by_satisfiability(category_dict, "isttn", improved_solving_time_threshold,
-                                              original_satisfiabilities_by_category)
-        # improved cegar itearation
-        improved_cegar_iteration_threshold = get_target_row_by_condition(data_dict, "category", c,
-                                                                         "improved_cegar_iteartion_threshold")
-        improved_cegar_iteration_list = [x for x in improved_cegar_iteration_threshold if x > 0]
-        category_dict["improved_cegar_iteartion_threshold_number"].append(len(improved_cegar_iteration_list))
-        # get improved cegar iteration by safe unsafe, and unknown given by no-pruning-satisfiability
-        get_improved_fields_by_satisfiability(category_dict, "icitn", improved_cegar_iteration_threshold,
-                                              original_satisfiabilities_by_category)
-
         # satisfiability of prioritizing
         prioritize_satisfiability_CDHG = get_target_row_by_condition(data_dict, "category", c,
                                                                      "satisfiability-prioritize-clauses-CDHG")
@@ -844,6 +834,23 @@ def get_category_summary(data_dict):
         category_dict["prioritize_safe_number"].append(prioritize_satisfiability.count("safe"))
         category_dict["prioritize_unsafe_number"].append(prioritize_satisfiability.count("unsafe"))
         category_dict["prioritize_unknown_number"].append(prioritize_satisfiability.count("unknown"))
+
+        # improved solving time by prioritizing
+        improved_solving_time_prioritize_clauses = get_target_row_by_condition(data_dict, "category", c,
+                                                                               "improved_solving_time_prioritize_clauses (s)")
+        improved_solving_time_list = [x for x in improved_solving_time_prioritize_clauses if x > 0]
+        category_dict["improved_solving_time_prioritize_clauses_number"].append(len(improved_solving_time_list))
+        # get improved solving time by safe unsafe, and unknown given by no-pruning-satisfiability
+        get_improved_fields_by_satisfiability(category_dict, "istpcn", improved_solving_time_prioritize_clauses,
+                                              original_satisfiabilities_by_category)
+        # improved iteration by prioritizing
+        improved_cegar_iteration_prioritize_clauses = get_target_row_by_condition(data_dict, "category", c,
+                                                                                  "improved_cegar_iteration_prioritize_clauses")
+        improved_cegar_iteration_list = [x for x in improved_cegar_iteration_prioritize_clauses if x > 0]
+        category_dict["improved_cegar_iteration_prioritize_clauses_number"].append(len(improved_cegar_iteration_list))
+        # get improved cegar iteration by safe unsafe, and unknown given by no-pruning-satisfiability
+        get_improved_fields_by_satisfiability(category_dict, "icipcn", improved_cegar_iteration_prioritize_clauses,
+                                              original_satisfiabilities_by_category)
 
         # satisfiability of threshold
         threshold_satisfiability_CDHG = get_target_row_by_condition(data_dict, "category", c,
@@ -863,6 +870,38 @@ def get_category_summary(data_dict):
         category_dict["threshold_safe_number"].append(threshold_satisfiability.count("safe"))
         category_dict["threshold_unsafe_number"].append(threshold_satisfiability.count("unsafe"))
         category_dict["threshold_unknown_number"].append(threshold_satisfiability.count("unknown"))
+
+        # improved solving time by threshold
+        improved_solving_time_threshold = get_target_row_by_condition(data_dict, "category", c,
+                                                                      "improved_solving_time_threshold (s)")
+        improved_solving_time_threshold_list = [x for x in improved_solving_time_threshold if x > 0]
+        category_dict["improved_solving_time_threshold_number"].append(len(improved_solving_time_threshold_list))
+        # get improved solving time by safe unsafe, and unknown given by no-pruning-satisfiability
+        get_improved_fields_by_satisfiability(category_dict, "isttn", improved_solving_time_threshold,
+                                              original_satisfiabilities_by_category)
+        # improved cegar itearation by threshold
+        improved_cegar_iteration_threshold = get_target_row_by_condition(data_dict, "category", c,
+                                                                         "improved_cegar_iteartion_threshold")
+        improved_cegar_iteration_list = [x for x in improved_cegar_iteration_threshold if x > 0]
+        category_dict["improved_cegar_iteartion_threshold_number"].append(len(improved_cegar_iteration_list))
+        # get improved cegar iteration by safe unsafe, and unknown given by no-pruning-satisfiability
+        get_improved_fields_by_satisfiability(category_dict, "icitn", improved_cegar_iteration_threshold,
+                                              original_satisfiabilities_by_category)
+
+        # improved solving time by z3
+        z3_satisfiabilities_by_category = get_target_row_by_condition(data_dict, "category", c,
+                                                                      "satisfiability_z3")
+        improved_solving_time_z3 = get_target_row_by_condition(data_dict, "category", c, "improved_solving_time_z3")
+        improved_solving_time_z3_list = [x for x in improved_solving_time_z3 if x > 0]
+        category_dict["improved_solving_time_z3_number"].append(len(improved_solving_time_z3_list))
+        get_improved_fields_by_satisfiability(category_dict, "istz3n", improved_solving_time_z3,
+                                              z3_satisfiabilities_by_category)
+
+        # satisfiability of z3
+        z3_satisfiability = get_target_row_by_condition(data_dict, "category", c, "satisfiability_z3")
+        category_dict["z3_safe_number"].append(z3_satisfiability.count("safe"))
+        category_dict["z3_unsafe_number"].append(z3_satisfiability.count("unsafe"))
+        category_dict["z3_unknown_number"].append(z3_satisfiability.count("unknown"))
 
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberBeforeSimplification")
         min_max_mean_one_column_by_row(data_dict, category_dict, "category", c, "clauseNumberAfterSimplification")
