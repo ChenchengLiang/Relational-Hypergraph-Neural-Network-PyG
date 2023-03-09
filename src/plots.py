@@ -154,7 +154,8 @@ def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="", plot_name
     key_word_map_to_legend = {"prioritizeClausesByUnsatCoreRank-CG-score with existed heuristics": "CG-SEH",
                               "prioritizeClausesByUnsatCoreRank-CG-only score": "CG-score",
                               "prioritizeClausesByUnsatCoreRank-CDHG-score with existed heuristics": "CDHG-SEH",
-                              "prioritizeClausesByUnsatCoreRank-CDHG-only score": "CDHG-score"}
+                              "prioritizeClausesByUnsatCoreRank-CDHG-only score": "CDHG-score",
+                              "only score": "score","score with existed heuristics": "SEH"}
     lines = []
     for k in cactus:
         cactus_without_zero = [0] + [x for x in cactus[k] if x != 0]

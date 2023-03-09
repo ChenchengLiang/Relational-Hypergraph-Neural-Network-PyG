@@ -136,8 +136,9 @@ def filter_object_list_by_original_solving_time(solvability_object_list):
 def get_cactus(summary_folder, folder, second_folder=""):
     # create cactus dict
     cactus_dict_threshold = {}  # {CDHG-0.01:{solvingTime_list:[],cegar_iteration_list:[]},CG-0.01:{solvingTime_list:[],cegar_iteration_list:[]}}
-    cactus_dict_prioritize = {}
-    threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5] #0.0 work as original version and will be added later
+    cactus_dict_prioritize = {}  # {prioritizeClausesByUnsatCoreRank-CDHG-only score:{solvingTime_list:[],cegar_iteration_list:[]},}
+    threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
+                      0.5]  # 0.0 work as original version and will be added later
     for graph_type in ["CDHG", "CG"]:
         # threshold
         for t in threshold_list:
@@ -167,27 +168,48 @@ def get_cactus(summary_folder, folder, second_folder=""):
 
                 cactus_dict_prioritize[current_option + "-" + strategy] = {"solvingTime_list": solving_time_list}
 
-        # original version line
-        current_option = "CDHG-0.0"
-        solving_time_original_list = []
-        solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
-                                             read_function=read_json_file)
-        filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
-        for object in filtered_solvability_object_list:
-            solving_time_original_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
+    # original version line
+    current_option = "CDHG-0.0"
+    solving_time_original_list = []
+    solvability_object_list = read_files(get_file_list(folder, "smt2"), file_type="solvability.JSON",
+                                         read_function=read_json_file)
+    filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
+    for object in filtered_solvability_object_list:
+        solving_time_original_list.append(int(float(read_a_json_field(object, "solvingTime-" + current_option))))
 
-        # original version line for prioritize cactus plot
-        cactus_dict_prioritize["original version"] = {"solvingTime_list": solving_time_original_list}
-        #original version line for threshold cactus plot
-        cactus_dict_threshold["original version"] = {"solvingTime_list": solving_time_original_list}
+    # original version line for prioritize cactus plot
+    cactus_dict_prioritize["original version"] = {"solvingTime_list": solving_time_original_list}
+    # original version line for threshold cactus plot
+    cactus_dict_threshold["original version"] = {"solvingTime_list": solving_time_original_list}
 
-        # virtual best graph threshold
+    # virtual best graph threshold
+    cactus_dict_threshold_virtual_best_graph = {}
+    cactus_dict_threshold_virtual_best_graph["original version"] = {"solvingTime_list": solving_time_original_list}
+    for t in threshold_list:
+        virtual_best_solving_time_list = []
+        for st_cdhg, st_cg in zip(cactus_dict_threshold["CDHG-" + str(t)]["solvingTime_list"],
+                                  cactus_dict_threshold["CG-" + str(t)]["solvingTime_list"]):
+            virtual_best_solving_time_list.append(get_min_number_from_list([st_cdhg, st_cg], -0.001))
+        cactus_dict_threshold_virtual_best_graph[str(t)] = {"solvingTime_list": virtual_best_solving_time_list}
 
-        # virtual best graph prioritize
+    # virtual best graph prioritize
+    cactus_dict_prioritize_virtual_best_graph = {}
+    cactus_dict_prioritize_virtual_best_graph["original version"] = {"solvingTime_list": solving_time_original_list}
+    virtual_best_solving_time_list = []
+    for strategy in ["only score", "score with existed heuristics"]:
+        for st_cdhg, st_cg in zip(
+                cactus_dict_prioritize["prioritizeClausesByUnsatCoreRank-CDHG-" + strategy]["solvingTime_list"],
+                cactus_dict_prioritize["prioritizeClausesByUnsatCoreRank-CG-" + strategy]["solvingTime_list"]):
+            virtual_best_solving_time_list.append(get_min_number_from_list([st_cdhg, st_cg], -0.001))
+        cactus_dict_prioritize_virtual_best_graph[strategy] = {"solvingTime_list": virtual_best_solving_time_list}
 
     # plot cactus
     plot_cactus(summary_folder, cactus_dict_threshold, plot_name="unsatcore_threhold")
     plot_cactus(summary_folder, cactus_dict_prioritize, plot_name="unsatcore_prioritize")
+    plot_cactus(summary_folder, cactus_dict_threshold_virtual_best_graph,
+                plot_name="unsatcore_threhold_virtual_best_graph")
+    plot_cactus(summary_folder, cactus_dict_prioritize_virtual_best_graph,
+                plot_name="unsatcore_prioritize_virtual_best_graph")
 
 
 def get_satisfiability_from_list(s):
