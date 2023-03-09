@@ -2,7 +2,7 @@ from src.utils import assign_dict_key_empty_list
 from src.collect_results.utils import read_files, read_json_file
 from src.collect_results.utils import get_min_max_solving_time
 from statistics import mean, stdev
-from src.utils import camel_to_snake, make_dirct, read_a_json_field, get_file_list,distinct_list
+from src.utils import camel_to_snake, make_dirct, read_a_json_field, get_file_list, distinct_list
 from src.plots import scatter_plot, plot_cactus
 import itertools
 import pandas as pd
@@ -11,11 +11,15 @@ import os
 from src.CONSTANTS import max_cegar_iteration, filter_out_min_solving_time
 
 
-def get_statistiics_in_one_folder(folder, second_folder=""):
+def get_statistiics_in_one_folder(folder, second_folder="", z3_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-z3-2955/train_data"):
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
+    second_folder=folder if second_folder == "" else second_folder
     file_list = get_file_list(folder, "smt2")
+
+
+
     # filter file list when the original solving time is shorter than 5 seconds
     solvability_object_list = read_files(file_list, file_type="solvability.JSON",
                                          read_function=read_json_file)
@@ -36,7 +40,7 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
         data_dict[sm] = [x[sm] for x in
                          read_files(filtered_file_list, file_type="", read_function=read_smt2_category)]
 
-        # get fix clause attributes
+    # get fix clause attributes
     fixed_clause_measurements = ["relationSymbolNumberBeforeSimplification", "relationSymbolNumberAfterSimplification",
                                  "clauseNumberBeforeSimplification", "clauseNumberAfterSimplification",
                                  # "clauseNumberAfterPruning",
@@ -52,6 +56,9 @@ def get_statistiics_in_one_folder(folder, second_folder=""):
 
     # get non-fix fields
     read_solving_time_from_json_file(filtered_file_list, data_dict)
+
+    # get z3 fields
+    read_z3_fields(filtered_file_list, data_dict, z3_folder)
 
     # get graph info
     read_graph_info_from_json_file(filtered_file_list, data_dict)
@@ -156,7 +163,7 @@ def get_cactus(summary_folder, folder, second_folder=""):
         # prioritize
         # todo get min solving time curve
         folder1 = folder
-        folder2 = folder if second_folder == "" else second_folder
+        folder2 = second_folder
         for fo, strategy in zip([folder1, folder2], ["only score", "score with existed heuristics"]):
             for current_option in ["prioritizeClausesByUnsatCoreRank-CDHG",
                                    "prioritizeClausesByUnsatCoreRank-CG"]:
@@ -348,8 +355,24 @@ def read_graph_info_from_json_file(file_list, statistic_dict):
             statistic_dict["CG_ternary_edge_number"].append(-1)
             statistic_dict["CG_label_number"].append(-1)
 
+def read_z3_fields(file_list, statistic_dict,z3_folder):
+    z3_file_list=[os.path.join(z3_folder,os.path.basename(f))for f in file_list]
+    record_fields = ["solving_time_z3","satisfiability_z3"]
+    assign_dict_key_empty_list(statistic_dict, record_fields)
+    for json_obj in read_files(z3_file_list, file_type="z3-solvability.JSON", read_function=read_json_file):
+        if len(json_obj) > 1:
+            statistic_dict["solving_time_z3"].append(float(json_obj["solving_time"][0]))
+            if json_obj["satisfiability"][0]=="sat":
+                statistic_dict["satisfiability_z3"].append("safe")
+            elif json_obj["satisfiability"][0]=="unsat":
+                statistic_dict["satisfiability_z3"].append("unsafe")
+            else:
+                statistic_dict["satisfiability_z3"].append("unknown")
+        else:
+            assign_values_to_unsolvable_problem(statistic_dict, record_fields)
 
 def read_solving_time_from_json_file(file_list, statistic_dict):
+    # todo read solving time and satisfiability from z3
     record_fields = [
         "satisfiability",
         "best_satisfiability",
@@ -638,7 +661,8 @@ def merge_category_summary(category_dict):
     merge value rows in category_dict according to category_name
     '''
     merged_category_names = distinct_list([x[:x.find("/")] for x in category_dict["category_name"]])
-    merged_category_names = [item.split("-benchmarks")[0] if "-benchmarks" in item else item for item in merged_category_names]
+    merged_category_names = [item.split("-benchmarks")[0] if "-benchmarks" in item else item for item in
+                             merged_category_names]
     merged_category_names = [item.split("-bench")[0] if "-bench" in item else item for item in
                              merged_category_names]
 
@@ -662,8 +686,8 @@ def merge_category_summary(category_dict):
                 istpcn, istpcn_safe, istpcn_unsafe, istpcn_unknown, \
                 icipcn, icipcn_safe, icipcn_unsafe, icipcn_unknown, \
                 isttn, isttn_safe, isttn_unsafe, isttn_unknown, \
-                icitn, icitn_safe, icitn_unsafe, icitn_unknown,\
-                p_safe,p_unsafe,p_unknown,t_safe,t_unsafe,t_unknown in zip(
+                icitn, icitn_safe, icitn_unsafe, icitn_unknown, \
+                p_safe, p_unsafe, p_unknown, t_safe, t_unsafe, t_unknown in zip(
             category_dict["category_name"],
             category_dict["total_number"],
             category_dict["safe_number"],
@@ -681,8 +705,10 @@ def merge_category_summary(category_dict):
             category_dict[
                 "improved_cegar_iteartion_threshold_number"],
             category_dict["icitn_safe"], category_dict["icitn_unsafe"], category_dict["icitn_unknown"],
-        category_dict["prioritize_safe_number"], category_dict["prioritize_unsafe_number"], category_dict["prioritize_unknown_number"],
-        category_dict["threshold_safe_number"], category_dict["threshold_unsafe_number"], category_dict["threshold_unknown_number"]):
+            category_dict["prioritize_safe_number"], category_dict["prioritize_unsafe_number"],
+            category_dict["prioritize_unknown_number"],
+            category_dict["threshold_safe_number"], category_dict["threshold_unsafe_number"],
+            category_dict["threshold_unknown_number"]):
             if merged_name in c_name:
                 category_summary["category_name"][merged_name].append(c_name)
                 category_summary["total_number"][merged_name].append(total_number)
