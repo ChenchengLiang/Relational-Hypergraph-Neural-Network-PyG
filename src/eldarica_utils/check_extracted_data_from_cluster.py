@@ -68,17 +68,17 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "4-clause_number_match",
                                                                        "4-clause_number_mismatch",
                                                                        separate_mismatch_label_number_and_clauses_number)
-    try:
-        separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "5-predicted_label_match_clauses",
-                                                                           "5-predicted_label_not_match_clauses",
-                                                                           separate_mismatch_predicted_number_and_clauses_number)
-    except:
-        print("no 5-predicted-labels")
-    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "6-has-positive-labels",
-                                                                       "6-no-positive-labels",
+    # try:
+    #     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "5-predicted_label_match_clauses",
+    #                                                                        "5-predicted_label_not_match_clauses",
+    #                                                                        separate_mismatch_predicted_number_and_clauses_number)
+    # except:
+    #     print("no 5-predicted-labels")
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "5-has-positive-labels",
+                                                                       "5-no-positive-labels",
                                                                        separate_no_labeled_template_cases)
 
-    ready_for_train_folder=make_dirct(os.path.join(folder,"7-ready-for-training"))
+    ready_for_train_folder=make_dirct(os.path.join(folder,"6-ready-for-training"))
 
     for file in glob.glob(separated_folder+"/*") + glob.glob(exception_folder+"/*"):
         copy(file,ready_for_train_folder)
