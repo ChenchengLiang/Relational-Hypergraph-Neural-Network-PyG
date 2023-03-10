@@ -178,11 +178,9 @@ def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="", plot_name
 
     fig.update_layout(  # legend_title_text='Trend',
         title='',
-        height=700,
-        width=800,
-        autosize=True,
         xaxis_title='Solved benchmarks',
         yaxis_title='Time limit (s)')
     fig.update_yaxes(type=scale)
     fig.write_html(summary_folder + "/" + plot_name + key_word + "-" + scale + "-cactus.html")
+    fig.update_layout(height=700, width=800,autosize=True)
     fig.write_image(summary_folder + "/" + plot_name + key_word + "-" + scale + "-cactus.png")

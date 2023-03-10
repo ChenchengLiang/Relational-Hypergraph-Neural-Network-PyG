@@ -11,8 +11,7 @@ import os
 from src.CONSTANTS import max_cegar_iteration, filter_out_min_solving_time, benchmark_timeout, z3_solvability_folder
 
 
-def get_statistiics_in_one_folder(folder, second_folder="",
-                                  z3_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-z3-2955/train_data"):
+def get_statistiics_in_one_folder(folder, second_folder="",z3_folder=z3_solvability_folder):
     summary_folder = get_sumary_folder(folder)
     folder_basename = os.path.basename(folder)
 
