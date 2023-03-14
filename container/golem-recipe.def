@@ -11,12 +11,22 @@ From: continuumio/miniconda3
     conda install pip
     pip install tqdm
     apt-get update && apt-get install -y build-essential python python-dev python-setuptools git
-    git clone https://github.com/Z3Prover/z3.git
-    cd z3
-    python scripts/mk_make.py
-    cd build
-    make
+    apt-get install libgmp-dev -y
+
+    apt-get install bison -y
+    apt-get install flex -y
+    apt-get install check -y
+    apt-get install libevent-dev -y
+    apt-get install build-essential git autoconf libtool libgmp-dev libboost-all-dev libz-dev libpthread-stubs0-dev libedit-dev -y
+    apt-get install cmake -y
+
+    git clone https://github.com/usi-verification-and-security/golem
+    cd golem
+    cmake .
+    cd src/bin
     make install
+    cd ../../
+    cp golem /usr/local/bin/
 
 
 
