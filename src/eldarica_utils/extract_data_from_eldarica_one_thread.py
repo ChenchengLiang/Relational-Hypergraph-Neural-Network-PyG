@@ -37,19 +37,19 @@ def main():
     # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -abstract:off")
 
     # unsatcore: check solvability differernt threshold # 12*2*3 hours
-    # need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
-    # threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
-    #                   0.5]  # rank above this value remains
-    # for g in ["CDHG", "CG"]:
-    #     for threshold in threshold_list:  # reverse this list
-    #         parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
-    #             threshold) + " -hornGraphType:" + g +" -abstract:off ")
+    #need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
+    threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
+                      0.5]  # rank above this value remains
+    for g in ["CDHG", "CG"]:
+        for threshold in threshold_list:  # reverse this list
+            parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
+                threshold) + " -hornGraphType:" + g +" -abstract:off ")
 
     # unsatcore: check solvability for prioritized clauses 6 + 3 hours
-    parameters_pipeline.append(
-        " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:off ")
-    for g in ["CDHG", "CG"]:
-        parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:off " )
+    # parameters_pipeline.append(
+    #     " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:off ")
+    # for g in ["CDHG", "CG"]:
+    #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:off " )
 
 
     # template_selection: get labeled templates # 3 hours

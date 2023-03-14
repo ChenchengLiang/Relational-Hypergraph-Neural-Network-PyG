@@ -8,14 +8,14 @@ from utils import run_one_shell
 
 def main():
     folder = sys.argv[1]
-    collect_solving_info_from_other_solvers(folder, solver_location=sys.argv[2], shell_timeout=60*60*3) #z3
-
+    solver_location = sys.argv[2]
+    collect_solving_info_from_other_solvers(folder, solver_location=solver_location, shell_timeout=20,solver_name=os.path.basename(solver_location)) #z3
 
 
 
 
 def collect_solving_info_from_other_solvers(folder,solver_location="z3", shell_timeout=20,solver_name="z3"):
-    solver_parameter_list = " -smt2 "
+    solver_parameter_list =  "-smt2 " if  solver_name=="z3" else " "
     shell_folder = make_dirct(os.path.join(os.path.dirname(folder), "shell_folder"))
     file_list = get_file_list(folder, "smt2")
     timeout_command = "timeout " + str(shell_timeout)

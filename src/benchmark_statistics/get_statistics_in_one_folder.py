@@ -11,8 +11,8 @@ from utils import get_statistiics_in_one_folder
 
 
 def main():
-    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/test/train_data"
-    another_prioritizing_folder=folder
+    folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/prioritize-normalized-rank/train_data"
+    another_prioritizing_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/prioritize-only-rank/train_data"
     z3_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-z3-2955/train_data"
     get_statistiics_in_one_folder(folder,another_prioritizing_folder,z3_folder)
 

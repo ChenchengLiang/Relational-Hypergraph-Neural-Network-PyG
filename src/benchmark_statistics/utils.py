@@ -154,7 +154,7 @@ def get_cactus(summary_folder, folder, second_folder=""):
         # prioritize
         folder1 = folder
         folder2 = second_folder
-        for fo, strategy in zip([folder1, folder2], ["only score", "score with existed heuristics"]):
+        for fo, strategy in zip([folder1, folder2], ["score with existed heuristics", "only score"]):
             for current_option in ["prioritizeClausesByUnsatCoreRank-CDHG",
                                    "prioritizeClausesByUnsatCoreRank-CG"]:
                 # read file
@@ -170,7 +170,7 @@ def get_cactus(summary_folder, folder, second_folder=""):
     # virtual best graph prioritize
     cactus_dict_prioritize_virtual_best_graph = {}
     virtual_best_solving_time_list = []
-    for strategy in ["only score", "score with existed heuristics"]:
+    for strategy in ["score with existed heuristics","only score"]:
         for st_cdhg, st_cg in zip(
                 cactus_dict_prioritize["prioritizeClausesByUnsatCoreRank-CDHG-" + strategy]["solvingTime_list"],
                 cactus_dict_prioritize["prioritizeClausesByUnsatCoreRank-CG-" + strategy]["solvingTime_list"]):
