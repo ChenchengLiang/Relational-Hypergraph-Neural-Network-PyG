@@ -120,11 +120,22 @@ def distinct_list(original_list):
 def count_generator(iter):
     return sum(1 for _ in iter)
 
-def read_a_json_field(json_obj,filed_name):
+def read_a_json_field(json_obj,field_name):
     try:
-        return json_obj[filed_name][0]
+        field=json_obj[field_name][0]
+        if "satisfiability" in field_name:
+            if field=="sat":
+                return "safe"
+            elif field=="unsat":
+                return "unsafe"
+            elif field=="unknown":
+                return "unknown"
+            else:
+                return field
+        else:
+            return field
     except:
-        print("no field in json file:",filed_name)
+        print("no field in json file:",field_name)
         return -1
 
 # calculate file size in KB, MB, GB

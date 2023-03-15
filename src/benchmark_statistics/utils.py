@@ -223,12 +223,18 @@ def get_cactus(summary_folder, folder, second_folder=""):
                 plot_name="unsatcore_prioritize_virtual_best_graph")
 
 
-def get_satisfiability_from_list(s):
+def virtual_best_satisfiability_from_list(s):
     if "safe" in s and "unsafe" in s:
         return "unsound error"
     elif "safe" in s:
         return "safe"
     elif "unsafe" in s:
+        return "unsafe"
+    else:
+        return "unknown"
+
+def virtual_best_satisfiability_from_list_for_pruning(s):
+    if "unsafe" in s:
         return "unsafe"
     else:
         return "unknown"
@@ -285,13 +291,13 @@ def get_scatters(summary_folder, data_dict):
                                              data_dict["satisfiability-threshold-CG"], data_dict["satisfiability"]):
 
         if t_cdhg != "safe" and t_cg != "safe":
-            z_data.append(get_satisfiability_from_list([p_cdhg, p_cg, t_cdhg, t_cg, s]))
+            z_data.append(virtual_best_satisfiability_from_list([p_cdhg, p_cg, t_cdhg, t_cg, s]))
         elif t_cdhg != "safe":
-            z_data.append(get_satisfiability_from_list([p_cdhg, p_cg, t_cdhg, s]))
+            z_data.append(virtual_best_satisfiability_from_list([p_cdhg, p_cg, t_cdhg, s]))
         elif t_cg != "safe":
-            z_data.append(get_satisfiability_from_list([p_cdhg, p_cg, t_cg, s]))
+            z_data.append(virtual_best_satisfiability_from_list([p_cdhg, p_cg, t_cg, s]))
         else:
-            z_data.append(get_satisfiability_from_list([p_cdhg, p_cg, s]))
+            z_data.append(virtual_best_satisfiability_from_list([p_cdhg, p_cg, s]))
 
     data_dict["best_satisfiability"] = z_data
     data_text = []
@@ -399,12 +405,9 @@ def read_z3_fields(file_list, statistic_dict, z3_folder):
             solving_time_z3 = benchmark_timeout if solving_time_z3 > benchmark_timeout else solving_time_z3
             statistic_dict["solving_time_z3"].append(solving_time_z3)
             # read satisfiability
-            if json_obj["satisfiability"][0] == "sat":
-                statistic_dict["satisfiability_z3"].append("safe")
-            elif json_obj["satisfiability"][0] == "unsat":
-                statistic_dict["satisfiability_z3"].append("unsafe")
-            else:
-                statistic_dict["satisfiability_z3"].append("unknown")
+            field=read_a_json_field(json_obj, "satisfiability")
+            statistic_dict["satisfiability_z3"].append(field)
+
             # get improved solving time
             statistic_dict["improved_solving_time_z3"].append(eldarica_solving_time - solving_time_z3)
 
@@ -568,7 +571,7 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
-    satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
+    satisfiability = decode_satisfiability(read_a_json_field(json_obj, "satisfiability" + suffix))
     cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
     cegar_iteration = max_cegar_iteration if cegar_iteration == -1 else cegar_iteration
     solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
@@ -588,17 +591,17 @@ def get_fields_by_unsatcore_threshold(json_obj, graph_type,
 
     satisfiability_dict = {}
     assign_dict_key_empty_list(satisfiability_dict, satisfiability_dict_key_list)
-    non_pruning_satisfiability = 10800
-    non_pruning_solving_time = 10800
+    non_pruning_satisfiability = benchmark_timeout
+    non_pruning_solving_time = benchmark_timeout
     non_pruning_cegar_iteration = max_cegar_iteration
     for t in threshold_list:
         suffix = "-" + graph_type + "-" + str(t)
-        satisfiability = decode_satisfiability(float(read_a_json_field(json_obj, "satisfiability" + suffix)))
+        satisfiability = decode_satisfiability(read_a_json_field(json_obj, "satisfiability" + suffix))
         clause_number_after_pruning = int(read_a_json_field(json_obj, "clauseNumberAfterPruning" + suffix))
         cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
         cegar_iteration = max_cegar_iteration if cegar_iteration == -1 else cegar_iteration
         solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
-        solving_time = 10800 if solving_time == -1 else solving_time / 1000
+        solving_time = benchmark_timeout if solving_time == -1 else solving_time / 1000
         if t == 0:
             non_pruning_satisfiability = satisfiability
             non_pruning_solving_time = solving_time
@@ -656,6 +659,32 @@ def get_min_number_from_list(l, except_number):
         min_number = 10800
     return min_number
 
+def virtual_best_solving_time_for_pruning(satisfiability_CDHG,satisfiability_CG,
+                                          CDHG_solving_time,CG_solving_time, CDHG_threshold_list,
+                                          CG_threshold_list,CDHG_clause_number_list,CG_clause_number_list, except_number):
+    # todo: get corresdponding clause number after pruning in that threshold
+    if satisfiability_CDHG =="unsafe" and satisfiability_CG == "unsafe":
+        solving_time_list=CDHG_solving_time+CG_solving_time
+        threshold_list = CDHG_threshold_list + CG_threshold_list
+        clause_number_list=CDHG_clause_number_list+CG_clause_number_list
+    elif satisfiability_CDHG =="unsafe" and satisfiability_CG == "safe":
+        solving_time_list=CDHG_solving_time
+        threshold_list = CDHG_threshold_list
+        clause_number_list=CDHG_clause_number_list
+    elif satisfiability_CDHG =="safe" and satisfiability_CG == "unsafe":
+        solving_time_list=CG_solving_time
+        threshold_list = CG_threshold_list
+        clause_number_list=CG_clause_number_list
+    else:
+        solving_time_list=[0]
+        threshold_list = [0]
+        clause_number_list=[0]
+
+    min_solving_time = get_min_number_from_list(solving_time_list, except_number)
+    min_solving_time_index = solving_time_list.index(min_solving_time)
+    min_solving_time_threshold = threshold_list[min_solving_time_index]
+    min_solving_time_clause_number = clause_number_list[min_solving_time_index]
+    return min_solving_time, min_solving_time_threshold,min_solving_time_clause_number
 
 def get_improved_field(non_pruning_filed, field, except_number):
     if field != except_number:
@@ -680,13 +709,15 @@ def get_satisfiability(json_obj, min_solving_option):
 
 
 def decode_satisfiability(satisfiability):
-    if int(satisfiability) == 1:
-        return "safe"
-    elif int(satisfiability) == 0:
-        return "unsafe"
-    else:
-        return "unknown"
-
+    try:
+        if int(float(satisfiability)) == 1:
+            return "safe"
+        elif int(float(satisfiability)) == 0:
+            return "unsafe"
+        else:
+            return "unknown"
+    except:
+        return satisfiability
 
 def get_fixed_filed_from_json_file(file_list, field):
     for x in read_files(file_list, file_type="solvability.JSON", read_function=read_json_file):
@@ -863,7 +894,7 @@ def get_category_summary(data_dict):
                                                                    "satisfiability-prioritize-clauses-CG")
         prioritize_satisfiability = []
         for cdhg_s, cg_s in zip(prioritize_satisfiability_CDHG, prioritize_satisfiability_CG):
-            prioritize_satisfiability.append(get_satisfiability_from_list([cdhg_s, cg_s]))
+            prioritize_satisfiability.append(virtual_best_satisfiability_from_list([cdhg_s, cg_s]))
         category_dict["prioritize_safe_number"].append(prioritize_satisfiability.count("safe"))
         category_dict["prioritize_unsafe_number"].append(prioritize_satisfiability.count("unsafe"))
         category_dict["prioritize_unknown_number"].append(prioritize_satisfiability.count("unknown"))
@@ -893,7 +924,7 @@ def get_category_summary(data_dict):
         threshold_satisfiability = []
         for cdhg_s, cg_s in zip(threshold_satisfiability_CDHG, threshold_satisfiability_CG):
             if cdhg_s != "safe" and cg_s != "safe":
-                threshold_satisfiability.append(get_satisfiability_from_list([cdhg_s, cg_s]))
+                threshold_satisfiability.append(virtual_best_satisfiability_from_list([cdhg_s, cg_s]))
             elif cdhg_s != "safe":
                 threshold_satisfiability.append(cdhg_s)
             elif cg_s != "safe":
