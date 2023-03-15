@@ -82,8 +82,7 @@ def read_solvability_to_dict(full_file_folder, solver_variation_folders_dict):
                 read_function=read_json_file, disable_tqdm=True)
             for object in solvability_object_list:
                 if len(object) > 1:  # has solvability file
-                    if "prioritizing" in solver_variation:
-                        # todo read prioritizing fields
+                    if "prioritizing" in solver_variation: #read from prioritizing eldarica variations
                         satisfiability_CDHG, solving_time_CDHG, cegar_iteration_CDHG = get_fields_by_unsatcore_prioritize_clauses(
                             object, "CDHG")
                         satisfiability_CG, solving_time_CG, cegar_iteration_CG = get_fields_by_unsatcore_prioritize_clauses(
@@ -95,8 +94,7 @@ def read_solvability_to_dict(full_file_folder, solver_variation_folders_dict):
                         for m, field in zip(measurements,
                                             [virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs]):
                             solvability_dict[solver_variation + "_" + m].append(field)
-                    elif "pruning" in solver_variation:
-                        # todo read pruning fields
+                    elif "pruning" in solver_variation: #read from pruning eldarica variations
                         threshold_list = get_unsatcore_threshold_list()
                         satisfiability_CDHG, clause_number_after_pruning_list_CDHG, threshold_list_CDHG, solving_time_list_CDHG, cegar_number_list_CDHG, \
                             non_pruning_satisfiability_CDHG, non_pruning_solving_time_CDHG, non_pruning_cegar_iteration_CDHG = get_fields_by_unsatcore_threshold(
@@ -110,7 +108,7 @@ def read_solvability_to_dict(full_file_folder, solver_variation_folders_dict):
                             satisfiability_CDHG, satisfiability_CG,
                             solving_time_list_CDHG, solving_time_list_CG, threshold_list_CDHG, threshold_list_CG,
                             clause_number_after_pruning_list_CDHG,clause_number_after_pruning_list_CG,-0.001)
-
+                        #compound field = field[virtual_best_threshold_graphs][virtual_best_clause_number_graphs]
                         for m, field in zip(measurements,
                                             [virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs]):
                             solvability_dict[solver_variation + "_" + m].append(
