@@ -18,10 +18,11 @@ def get_statistiics_in_one_folder(folder, second_folder="",z3_folder=z3_solvabil
     second_folder = folder if second_folder == "" else second_folder
     file_list = get_file_list(folder, "smt2")
 
-    # filter file list when the original solving time is shorter than 5 seconds
     solvability_object_list = read_files(file_list, file_type="solvability.JSON",
                                          read_function=read_json_file)
-    filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
+    # todo filter file list when every variation solving time is shorter than 5 seconds
+    #filtered_solvability_object_list = filter_object_list_by_original_solving_time(solvability_object_list)
+    filtered_solvability_object_list=solvability_object_list
     filtered_file_list = [x["file_name"] + ".zip" for x in filtered_solvability_object_list]
     print("file number: ", len(file_list))
     print("file number after filtering: ", len(filtered_file_list))

@@ -1,6 +1,7 @@
 import sys
 
-sys.path.append("../..")
+#sys.path.append("../..")
+sys.path.append("/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG") #local machine path
 from src.utils import get_file_list, unzip_file, compress_file, make_dirct
 import os
 from tqdm import tqdm

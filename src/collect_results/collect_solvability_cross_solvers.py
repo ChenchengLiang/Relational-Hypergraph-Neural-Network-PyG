@@ -35,6 +35,8 @@ def main():
 
     solvability_dict = read_solvability_to_dict(full_file_folder, solver_variation_folders_dict)
 
+    #todo: category summary
+
     # write to excel
     with pd.ExcelWriter(summary_folder + "/" + "statistics_split_clauses_1.xlsx") as writer:
         pd.DataFrame(pd.DataFrame(solvability_dict)).to_excel(writer, sheet_name="data")

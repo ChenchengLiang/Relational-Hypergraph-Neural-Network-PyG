@@ -10,6 +10,13 @@ from tqdm import tqdm
 
 def collect_solving_info_from_other_solvers(folder,solver_location="z3", shell_timeout=20,solver_name="z3"):
     solver_parameter_list =  "-smt2 " if  solver_name=="z3" else " "
+    if solver_name == "z3":
+        solver_parameter_list = "-smt2 "
+    elif solver_name == "golem":
+        solver_parameter_list = " "
+    elif solver_name == "eld":
+        solver_parameter_list = " -abstract:term "
+
     shell_folder = make_dirct(os.path.join(os.path.dirname(folder), "shell_folder"))
     file_list = get_file_list(folder, "smt2")
     timeout_command = "timeout " + str(shell_timeout)
