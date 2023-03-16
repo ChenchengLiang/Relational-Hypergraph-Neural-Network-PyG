@@ -727,16 +727,20 @@ def get_fixed_filed_from_json_file(file_list, field):
         except:
             yield 10800000
 
+def get_distinct_category_list(category_list):
+    merged_category_names = distinct_list([x[:x.find("/")] for x in category_list])
+    merged_category_names = [item.split("-benchmarks")[0] if "-benchmarks" in item else item for item in
+                             merged_category_names]
+    merged_category_names = [item.split("-bench")[0] if "-bench" in item else item for item in
+                             merged_category_names]
+    return merged_category_names
 
 def merge_category_summary(category_dict):
     '''
     merge value rows in category_dict according to category_name
     '''
-    merged_category_names = distinct_list([x[:x.find("/")] for x in category_dict["category_name"]])
-    merged_category_names = [item.split("-benchmarks")[0] if "-benchmarks" in item else item for item in
-                             merged_category_names]
-    merged_category_names = [item.split("-bench")[0] if "-bench" in item else item for item in
-                             merged_category_names]
+    merged_category_names=get_distinct_category_list(category_dict["category_name"])
+
 
     columns = ["category_name", "total_number", "safe_number", "unsafe_number", "unknown_number",
                "prioritize_safe_number", "prioritize_unsafe_number", "prioritize_unknown_number",

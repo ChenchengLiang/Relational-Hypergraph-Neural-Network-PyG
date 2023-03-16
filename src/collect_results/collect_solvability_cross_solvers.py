@@ -8,7 +8,7 @@ from src.CONSTANTS import graph_types
 from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_clauses, \
     virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
-    virtual_best_solving_time_for_pruning
+    virtual_best_solving_time_for_pruning,get_distinct_category_list
 
 
 def main():
@@ -33,7 +33,7 @@ def main():
                                      "eldarica_abstract_off_pruning_rank": eldarica_abstract_off_folder_pruning_rank_folder,
                                      "eldarica_abstract_off_pruning_score": eldarica_abstract_off_folder_pruning_score_folder}
 
-    solvability_dict = read_solvability_to_dict(full_file_folder, solver_variation_folders_dict)
+    solvability_dict = read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict)
 
     #todo: category summary
 
@@ -43,7 +43,19 @@ def main():
         # pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
 
 
-def read_solvability_to_dict(full_file_folder, solver_variation_folders_dict):
+def category_summary_for_solvability_dict(solvability_dict,solver_variation_folders_dict):
+    categories=get_distinct_category_list(solvability_dict)
+
+    columns = ["category"]
+    for k in solver_variation_folders_dict:
+        for s in ["safe","unsafe","unknown"]:
+            columns.append(k+"_"+s)
+
+    for solver in solver_variation_folders_dict:
+        pass
+
+
+def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict):
     # decide record fields
     record_fields = []
     other_fields = ["file_name"]
