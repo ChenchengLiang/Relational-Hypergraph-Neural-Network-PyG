@@ -130,6 +130,8 @@ def read_a_json_field(json_obj,field_name):
                 return "unsafe"
             elif field=="unknown":
                 return "unknown"
+            elif field=="":
+                return "unknown"
             else:
                 return field
         else:
