@@ -4,7 +4,7 @@ import os
 from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category
 import pandas as pd
 from tqdm import tqdm
-from src.CONSTANTS import graph_types,benchmark_timeout
+from src.CONSTANTS import graph_types, benchmark_timeout
 from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_clauses, \
     virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
@@ -16,12 +16,12 @@ def main():
         "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data")
 
     golem_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-golem/train_data"
-    z3_folder = ""  # "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-z3/train_data"
+    z3_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-z3/train_data"
 
     eldarica_abstract_off_folder = golem_folder
     eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/prioritize-normalized-rank/train_data"
-    eldarica_abstract_off_folder_prioritizing_rank_folder = ""  # "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/prioritize-only-rank/train_data"
-    eldarica_abstract_off_folder_pruning_rank_folder = ""  # "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/threshold-rank/train_data"
+    eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/prioritize-only-rank/train_data"
+    eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/threshold-rank/train_data"
     eldarica_abstract_off_folder_pruning_score_folder = ""
 
     full_file_folder = golem_folder
@@ -45,39 +45,57 @@ def main():
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
     categories = get_distinct_category_list(solvability_dict["category"])
+    measurements = ["safe", "unsafe", "unknown","solving_time"]
 
+    # get column names
     columns = ["category"]
     for solver in solver_variation_folders_dict:
-        for s in ["safe", "unsafe", "unknown"]:
+        for s in measurements:
             if "prioritizing" in solver or "pruning" in solver:
                 columns.append("vb_" + solver + "_" + s)
             else:
                 columns.append(solver + "_" + s)
 
+    # initialize dict
     category_dict = {}
     assign_dict_key_empty_list(category_dict, columns)
 
     # compute each column
     for c in categories:
         category_dict["category"].append(c)
-        for s in ["safe", "unsafe", "unknown"]:
+        for m in measurements:
             for solver in solver_variation_folders_dict:
-                count = 0
-                for ca, sa in zip(solvability_dict["category"], solvability_dict[solver + "_satisfiability"]):
-                    if c in ca and s == sa:
-                        count += 1
-                category_dict[solver + "_" + s].append(count)
+                if "prioritizing" in solver or "pruning" in solver:
+                    count_satisfiability(c, m, solvability_dict, category_dict, "vb_" + solver)
+                    sum_solving_time(c, solvability_dict, category_dict, "vb_" + solver)
+                else:
+                    count_satisfiability(c, m, solvability_dict, category_dict, solver)
+                    sum_solving_time(c, solvability_dict, category_dict, solver)
     # add total row
     category_dict["category"].append("total")
-    for s in ["safe", "unsafe", "unknown"]:
+    for m in measurements:
         for solver in solver_variation_folders_dict:
             if "prioritizing" in solver or "pruning" in solver:
-                category_dict["vb_"+solver + "_" + s].append(sum(category_dict[solver + "_" + s]))
+                category_dict["vb_" + solver + "_" + m].append(sum(category_dict["vb_" + solver + "_" + m]))
             else:
-                category_dict[solver + "_" + s].append(sum(category_dict[solver + "_" + s]))
+                category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
 
     return category_dict
 
+
+def count_satisfiability(c, s, solvability_dict, category_dict, solver):
+    count = 0
+    for ca, sa in zip(solvability_dict["category"], solvability_dict[solver + "_satisfiability"]):
+        if c in ca and s == sa:
+            count += 1
+        category_dict[solver + "_" + s].append(count)
+
+def sum_solving_time(c,solvability_dict, category_dict, solver):
+    solving_time=0
+    for ca, st in zip(solvability_dict["category"], solvability_dict[solver + "_solving_time"]):
+        if c in ca:
+            solving_time+=st
+    category_dict[solver + "_solving_time"].append(solving_time)
 
 def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict):
     # decide record fields
@@ -107,14 +125,14 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
     for file in tqdm(file_list, desc="read files"):
         file_basename = os.path.basename(file)
         solvability_dict["file_name"].append(file_basename[:-len(".zip")])
-        for solver_variation in solver_variation_folders_dict:
+        for solver_variation in solver_variations:
             # if solver_variation_folders_dict[solver_variation] != "":
             if "golem" in solver_variation:
                 json_file_suffix = "golem-solvability.JSON"
             elif "z3" in solver_variation:
                 json_file_suffix = "z3-solvability.JSON"
-            elif "eldarica_abstract_off"==solver_variation:
-                json_file_suffix = "golem-solvability.JSON" #todo check this
+            elif "eldarica_abstract_off" == solver_variation:
+                json_file_suffix = "golem-solvability.JSON"  # todo check this
             else:
                 json_file_suffix = "solvability.JSON"
 
@@ -123,7 +141,6 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 file_type=json_file_suffix,
                 read_function=read_json_file, disable_tqdm=True)
             for object in solvability_object_list:
-                #if len(object) > 1:  # has solvability file
                 if "prioritizing" in solver_variation:  # read from prioritizing eldarica variations
                     if len(object) > 1:  # has solvability file
                         satisfiability_CDHG, solving_time_CDHG, cegar_iteration_CDHG = get_fields_by_unsatcore_prioritize_clauses(
@@ -135,14 +152,16 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                             [satisfiability_CDHG, satisfiability_CG])
                         virtual_best_solving_time_graphs = get_min_number_from_list(
                             [solving_time_CDHG, solving_time_CG], -0.001)
-                        for m, field in zip(measurements,
-                                            [virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs]):
-                            solvability_dict[solver_variation + "_" + m].append(field)
+
+                        satisfiability, solving_time = mask_results_by_benchmark_timeout(virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
+                        solvability_dict[solver_variation + "_" + "satisfiability"].append(satisfiability)
+                        solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
+
                     else:  # no solvability file
                         for m in measurements:
                             solvability_dict[solver_variation + "_" + m].append("miss info")
-                        virtual_best_satisfiability_graphs="unknown"
-                        virtual_best_solving_time_graphs=benchmark_timeout
+                        virtual_best_satisfiability_graphs = "unknown"
+                        virtual_best_solving_time_graphs = benchmark_timeout
 
                     # virtual best of eldarica
                     virtual_best_cross_eldarica_variation(solver_variation, solvability_dict,
@@ -166,29 +185,31 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                             solving_time_list_CDHG, solving_time_list_CG, threshold_list_CDHG, threshold_list_CG,
                             clause_number_after_pruning_list_CDHG, clause_number_after_pruning_list_CG, -0.001)
                         # compound field = field[virtual_best_threshold_graphs][virtual_best_clause_number_graphs]
-                        for m, field in zip(measurements,
-                                            [virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs]):
-                            solvability_dict[solver_variation + "_" + m].append(
-                                str(field) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
+
+                        satisfiability, solving_time = mask_results_by_benchmark_timeout(
+                            virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
+                        solvability_dict[solver_variation + "_" + "satisfiability"].append(str(satisfiability) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
                                     virtual_best_clause_number_graphs) + "]")
+                        solvability_dict[solver_variation + "_" + "solving_time"].append(str(solving_time) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
+                                    virtual_best_clause_number_graphs) + "]")
+
                     else:  # no solvability file
                         for m in measurements:
                             solvability_dict[solver_variation + "_" + m].append("miss info")
-                        virtual_best_satisfiability_graphs="unknown"
-                        virtual_best_solving_time_graphs=benchmark_timeout
+                        virtual_best_satisfiability_graphs = "unknown"
+                        virtual_best_solving_time_graphs = benchmark_timeout
                     # virtual best of eldarica
                     virtual_best_cross_eldarica_variation(solver_variation, solvability_dict,
                                                           virtual_best_satisfiability_graphs,
                                                           virtual_best_solving_time_graphs, measurements,
                                                           "pruning")
                 else:  # read from standard solvers
-                    for m in measurements:
-                        field = read_a_json_field(object, m)
-                        solvability_dict[solver_variation + "_" + m].append(field)
+                    satisfiability = read_a_json_field(object, "satisfiability")
+                    solving_time = float(read_a_json_field(object, "solving_time"))
+                    satisfiability, solving_time = mask_results_by_benchmark_timeout(satisfiability, solving_time)
+                    solvability_dict[solver_variation + "_" + "satisfiability"].append(satisfiability)
+                    solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
 
-                # else:  # no solvability file
-                #     for m in measurements:
-                #         solvability_dict[solver_variation + "_" + m].append("miss info")
 
     for k in solvability_dict:
         print(k, len(solvability_dict[k]))
@@ -204,9 +225,18 @@ def virtual_best_cross_eldarica_variation(solver_variation, solvability_dict, vi
         [virtual_best_satisfiability_graphs, satisfiability_abstract])
     virtual_best_solving_time = get_min_number_from_list(
         [virtual_best_solving_time_graphs, float(solving_time_abstract)], -0.001)
-    for m, field in zip(measurements,
-                        [virtual_best_satisfiability, virtual_best_solving_time]):
-        solvability_dict["vb_" + solver_variation + "_" + m].append(field)
+
+    satisfiability, solving_time = mask_results_by_benchmark_timeout(virtual_best_satisfiability,
+                                                                     virtual_best_solving_time)
+    solvability_dict["vb_" +solver_variation + "_" + "satisfiability"].append(satisfiability)
+    solvability_dict["vb_" +solver_variation + "_" + "solving_time"].append(solving_time)
+
+
+def mask_results_by_benchmark_timeout(satisfiability, solving_time):
+    if solving_time > benchmark_timeout:
+        solving_time = benchmark_timeout
+        satisfiability = "unknown"
+    return satisfiability, solving_time
 
 
 if __name__ == '__main__':
