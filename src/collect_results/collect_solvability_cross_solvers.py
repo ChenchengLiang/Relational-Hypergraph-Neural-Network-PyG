@@ -72,16 +72,18 @@ def category_dict_to_table(category_dict,solver_variation_folders_dict):
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
     categories = get_distinct_category_list(solvability_dict["category"])
     measurements = ["safe", "unsafe", "unknown","solving_time"]
+    comparison_solver_list=["vb"]
+    for solver in solver_variation_folders_dict:
+        if "prioritizing" in solver or "pruning" in solver:
+            comparison_solver_list.append("vb_" + solver)
+        else:
+            comparison_solver_list.append(solver)
 
     # get column names
-    solver_variation_list=list(solver_variation_folders_dict.keys())+["vb"]
     columns = ["category"]
-    for solver in solver_variation_list:
+    for solver in comparison_solver_list:
         for s in measurements:
-            if "prioritizing" in solver or "pruning" in solver:
-                columns.append("vb_" + solver + "_" + s)
-            else:
-                columns.append(solver + "_" + s)
+            columns.append(solver + "_" + s)
 
 
     # initialize dict
@@ -92,23 +94,42 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     for c in categories:
         category_dict["category"].append(c)
         for m in measurements:
-            for solver in solver_variation_list:
-                if "prioritizing" in solver or "pruning" in solver:
-                    count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, "vb_" + solver)
-                else:
-                    count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
+            for solver in comparison_solver_list:
+                count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
+
+
+    # todo add largest contribution rank column for each solver
+    #todo not involve vb
+    lcr_solvers=comparison_solver_list.copy()
+    lcr_solvers.remove("vb")
+    for solver in lcr_solvers:
+        category_dict[solver + "_lcr"]=[]
+
+
+    for solver in lcr_solvers: #lcr column
+        lcr_list=[]
+        for i, c in enumerate(category_dict["category"]):  # for each row
+            vb_solver=category_dict["vb_safe"][i]+category_dict["vb_unsafe"][i]
+
+            other_solvers=lcr_solvers.copy()
+            other_solvers.remove(solver)
+            other_solvers_solving_list = []
+            for other_solver in other_solvers:
+                other_solvers_solving_list.append(category_dict[other_solver+"_safe"][i]+category_dict[other_solver+"_unsafe"][i])
+            vb_other_solvers=max(other_solvers_solving_list)
+
+            lcr=1-(vb_other_solvers/vb_solver)
+            lcr_list.append(lcr)
+
+        category_dict[solver+"_lcr"]=lcr_list
 
 
     # add total row
     category_dict["category"].append("total")
-    for m in measurements:
-        for solver in solver_variation_list:
-            if "prioritizing" in solver or "pruning" in solver:
-                category_dict["vb_" + solver + "_" + m].append(sum(category_dict["vb_" + solver + "_" + m]))
-            else:
-                category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
-
-
+    for solver in comparison_solver_list:
+        for m in measurements:
+            category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
+        category_dict[solver + "_lcr"].append(sum(category_dict[solver + "_lcr"]))
 
 
     for k in category_dict:
@@ -246,24 +267,26 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                     solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
 
     # add virtual best columns
+    comparison_solver_list=[]
+    for k in solver_variation_folders_dict:
+        if "pruning" in k or "prioritizing" in k:
+            comparison_solver_list.append("vb_"+k)
+        else:
+            comparison_solver_list.append(k)
+    print("comparison_solver_list",comparison_solver_list)
     vb_satisfiability = []
     vb_solving_time = []
     for i, f in enumerate(solvability_dict["file_name"]):
         one_file_vb_satisfiability = []
         one_file_vb_solving_time = []
-        for k in solver_variation_folders_dict:
-            if "pruning" in k or "prioritizing" in k:
-                one_file_vb_satisfiability.append(solvability_dict["vb_"+k+"_satisfiability"][i])
-                one_file_vb_solving_time.append(solvability_dict["vb_"+k+"_solving_time"][i])
-            else:
-                one_file_vb_satisfiability.append(solvability_dict[k + "_satisfiability"][i])
-                one_file_vb_solving_time.append(solvability_dict[k + "_solving_time"][i])
+        for k in comparison_solver_list:
+            one_file_vb_satisfiability.append(solvability_dict[k + "_satisfiability"][i])
+            one_file_vb_solving_time.append(solvability_dict[k + "_solving_time"][i])
+
         vb_satisfiability.append(virtual_best_satisfiability_from_list(one_file_vb_satisfiability))
         vb_solving_time.append(get_min_number_from_list(one_file_vb_solving_time,-0.001))
     solvability_dict["vb_satisfiability"] = vb_satisfiability
     solvability_dict["vb_solving_time"] = vb_solving_time
-
-    #todo add largest contribution rank
 
 
 
