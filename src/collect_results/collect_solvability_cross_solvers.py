@@ -8,7 +8,7 @@ from src.CONSTANTS import graph_types, benchmark_timeout
 from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_clauses, \
     virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
-    virtual_best_solving_time_for_pruning, get_distinct_category_list
+    virtual_best_solving_time_for_pruning, get_distinct_category_list,get_target_row_by_condition
 
 
 def main():
@@ -36,11 +36,37 @@ def main():
     solvability_dict = read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict)
 
     category_dict = category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict)
+    safe_unsafe_unknown_sheet,unsafe_unknown_sheet=category_dict_to_table(category_dict,solver_variation_folders_dict)
 
     # write to excel
     with pd.ExcelWriter(summary_folder + "/" + "statistics_split_clauses_1.xlsx") as writer:
         pd.DataFrame(pd.DataFrame(solvability_dict)).to_excel(writer, sheet_name="data")
         pd.DataFrame(pd.DataFrame(category_dict)).to_excel(writer, sheet_name="category_summary")
+        pd.DataFrame(pd.DataFrame(safe_unsafe_unknown_sheet)).to_excel(writer, sheet_name="safe_unsafe_unknown")
+        pd.DataFrame(pd.DataFrame(unsafe_unknown_sheet)).to_excel(writer, sheet_name="unsafe_unknown")
+
+
+def category_dict_to_table(category_dict,solver_variation_folders_dict):
+
+    safe_unsafe_unknown_colounms = ["category"]
+    for solver in solver_variation_folders_dict:
+        if "pruning" not in solver:
+            for s in ["safe", "unsafe", "unknown","solving_time"]:
+                if "prioritizing" in solver or "pruning" in solver:
+                    safe_unsafe_unknown_colounms.append("vb_" + solver + "_" + s)
+                else:
+                    safe_unsafe_unknown_colounms.append(solver + "_" + s)
+    safe_unsafe_unknown_sheet = {k:category_dict[k] for k in safe_unsafe_unknown_colounms}
+
+    unsafe_unknown_colounms = ["category"]
+    for solver in solver_variation_folders_dict:
+        for s in ["unsafe", "unknown", "solving_time"]:
+            if "prioritizing" in solver or "pruning" in solver:
+                unsafe_unknown_colounms.append("vb_" + solver + "_" + s)
+            else:
+                unsafe_unknown_colounms.append(solver + "_" + s)
+    unsafe_unknown_sheet={k:category_dict[k] for k in unsafe_unknown_colounms}
+    return safe_unsafe_unknown_sheet,unsafe_unknown_sheet
 
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
@@ -48,13 +74,15 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     measurements = ["safe", "unsafe", "unknown","solving_time"]
 
     # get column names
+    solver_variation_list=list(solver_variation_folders_dict.keys())+["vb"]
     columns = ["category"]
-    for solver in solver_variation_folders_dict:
+    for solver in solver_variation_list:
         for s in measurements:
             if "prioritizing" in solver or "pruning" in solver:
                 columns.append("vb_" + solver + "_" + s)
             else:
                 columns.append(solver + "_" + s)
+
 
     # initialize dict
     category_dict = {}
@@ -64,20 +92,24 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     for c in categories:
         category_dict["category"].append(c)
         for m in measurements:
-            for solver in solver_variation_folders_dict:
+            for solver in solver_variation_list:
                 if "prioritizing" in solver or "pruning" in solver:
                     count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, "vb_" + solver)
                 else:
                     count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
 
+
     # add total row
     category_dict["category"].append("total")
     for m in measurements:
-        for solver in solver_variation_folders_dict:
+        for solver in solver_variation_list:
             if "prioritizing" in solver or "pruning" in solver:
                 category_dict["vb_" + solver + "_" + m].append(sum(category_dict["vb_" + solver + "_" + m]))
             else:
                 category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
+
+
+
 
     for k in category_dict:
         print(k,len(category_dict[k]))
@@ -212,6 +244,27 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                     satisfiability, solving_time = mask_results_by_benchmark_timeout(satisfiability, solving_time)
                     solvability_dict[solver_variation + "_" + "satisfiability"].append(satisfiability)
                     solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
+
+    # add virtual best columns
+    vb_satisfiability = []
+    vb_solving_time = []
+    for i, f in enumerate(solvability_dict["file_name"]):
+        one_file_vb_satisfiability = []
+        one_file_vb_solving_time = []
+        for k in solver_variation_folders_dict:
+            if "pruning" in k or "prioritizing" in k:
+                one_file_vb_satisfiability.append(solvability_dict["vb_"+k+"_satisfiability"][i])
+                one_file_vb_solving_time.append(solvability_dict["vb_"+k+"_solving_time"][i])
+            else:
+                one_file_vb_satisfiability.append(solvability_dict[k + "_satisfiability"][i])
+                one_file_vb_solving_time.append(solvability_dict[k + "_solving_time"][i])
+        vb_satisfiability.append(virtual_best_satisfiability_from_list(one_file_vb_satisfiability))
+        vb_solving_time.append(get_min_number_from_list(one_file_vb_solving_time,-0.001))
+    solvability_dict["vb_satisfiability"] = vb_satisfiability
+    solvability_dict["vb_solving_time"] = vb_solving_time
+
+    #todo add largest contribution rank
+
 
 
     for k in solvability_dict:

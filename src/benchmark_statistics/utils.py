@@ -663,7 +663,6 @@ def get_min_number_from_list(l, except_number):
 def virtual_best_solving_time_for_pruning(satisfiability_CDHG,satisfiability_CG,
                                           CDHG_solving_time,CG_solving_time, CDHG_threshold_list,
                                           CG_threshold_list,CDHG_clause_number_list,CG_clause_number_list, except_number):
-    # todo: get corresdponding clause number after pruning in that threshold
     if satisfiability_CDHG =="unsafe" and satisfiability_CG == "unsafe":
         solving_time_list=CDHG_solving_time+CG_solving_time
         threshold_list = CDHG_threshold_list + CG_threshold_list
@@ -677,7 +676,7 @@ def virtual_best_solving_time_for_pruning(satisfiability_CDHG,satisfiability_CG,
         threshold_list = CG_threshold_list
         clause_number_list=CG_clause_number_list
     else:
-        solving_time_list=[0]
+        solving_time_list=[benchmark_timeout]
         threshold_list = [0]
         clause_number_list=[0]
 
@@ -691,14 +690,14 @@ def get_improved_field(non_pruning_filed, field, except_number):
     if field != except_number:
         improved_field = non_pruning_filed - field
     else:
-        improved_field = 10800
+        improved_field = benchmark_timeout
     return improved_field
 
 
 def assign_values_to_unsolvable_problem(statistic_dict, record_fields):
     for rf in record_fields:
         if rf != "satisfiability":
-            statistic_dict[rf].append(10800000)
+            statistic_dict[rf].append(benchmark_timeout)
         else:
             statistic_dict[rf].append("unknown")
 
