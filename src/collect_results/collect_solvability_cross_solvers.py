@@ -66,11 +66,10 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
         for m in measurements:
             for solver in solver_variation_folders_dict:
                 if "prioritizing" in solver or "pruning" in solver:
-                    count_satisfiability(c, m, solvability_dict, category_dict, "vb_" + solver)
-                    sum_solving_time(c, solvability_dict, category_dict, "vb_" + solver)
+                    count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, "vb_" + solver)
                 else:
-                    count_satisfiability(c, m, solvability_dict, category_dict, solver)
-                    sum_solving_time(c, solvability_dict, category_dict, solver)
+                    count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
+
     # add total row
     category_dict["category"].append("total")
     for m in measurements:
@@ -80,22 +79,26 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
             else:
                 category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
 
+    for k in category_dict:
+        print(k,len(category_dict[k]))
+
     return category_dict
 
 
-def count_satisfiability(c, s, solvability_dict, category_dict, solver):
+def count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver):
     count = 0
-    for ca, sa in zip(solvability_dict["category"], solvability_dict[solver + "_satisfiability"]):
-        if c in ca and s == sa:
+    solving_time = 0
+    for ca, sa,st in zip(solvability_dict["category"], solvability_dict[solver + "_satisfiability"],solvability_dict[solver + "_solving_time"]):
+        if c in ca and m == sa:
             count += 1
-        category_dict[solver + "_" + s].append(count)
-
-def sum_solving_time(c,solvability_dict, category_dict, solver):
-    solving_time=0
-    for ca, st in zip(solvability_dict["category"], solvability_dict[solver + "_solving_time"]):
         if c in ca:
             solving_time+=st
-    category_dict[solver + "_solving_time"].append(solving_time)
+    if "solving_time" == m:
+        category_dict[solver + "_" + m].append(solving_time)
+    else:
+        category_dict[solver + "_" + m].append(count)
+
+
 
 def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict):
     # decide record fields
