@@ -48,37 +48,14 @@ def main():
     solvability_dict = read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict)
 
     category_dict = category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict)
-    safe_unsafe_unknown_sheet, unsafe_unknown_sheet = category_dict_to_table(category_dict,
-                                                                             solver_variation_folders_dict)
 
     # write to excel
     with pd.ExcelWriter(summary_folder + "/" + "statistics_split_clauses_1.xlsx") as writer:
         pd.DataFrame(pd.DataFrame(solvability_dict)).to_excel(writer, sheet_name="data")
         pd.DataFrame(pd.DataFrame(category_dict)).to_excel(writer, sheet_name="category_summary")
-        pd.DataFrame(pd.DataFrame(safe_unsafe_unknown_sheet)).to_excel(writer, sheet_name="safe_unsafe_unknown")
-        pd.DataFrame(pd.DataFrame(unsafe_unknown_sheet)).to_excel(writer, sheet_name="unsafe_unknown")
+        pd.DataFrame(pd.DataFrame(category_dict)).transpose().to_excel(writer, sheet_name="category_summary_transpose")
 
 
-def category_dict_to_table(category_dict, solver_variation_folders_dict):
-    safe_unsafe_unknown_colounms = ["category"]
-    for solver in solver_variation_folders_dict:
-        if "pruning" not in solver:
-            for s in ["safe", "unsafe", "unknown", "solving_time"]:
-                if "prioritizing" in solver or "pruning" in solver:
-                    safe_unsafe_unknown_colounms.append("vb_" + solver + "_" + s)
-                else:
-                    safe_unsafe_unknown_colounms.append(solver + "_" + s)
-    safe_unsafe_unknown_sheet = {k: category_dict[k] for k in safe_unsafe_unknown_colounms}
-
-    unsafe_unknown_colounms = ["category"]
-    for solver in solver_variation_folders_dict:
-        for s in ["unsafe", "unknown", "solving_time"]:
-            if "prioritizing" in solver or "pruning" in solver:
-                unsafe_unknown_colounms.append("vb_" + solver + "_" + s)
-            else:
-                unsafe_unknown_colounms.append(solver + "_" + s)
-    unsafe_unknown_sheet = {k: category_dict[k] for k in unsafe_unknown_colounms}
-    return safe_unsafe_unknown_sheet, unsafe_unknown_sheet
 
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
@@ -109,7 +86,13 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
                 count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
 
     # compute lcr
-    lcr_solver_sets=[["z3","golem"]+[e]for e in ["vb_eldarica","vb_eldarica_original"]]
+    lcr_comparison_list=["vb_eldarica","vb_eldarica_original"]
+    for solver in [x for x in [solver_variation_folders_dict] if x not in ["z3","golem"]]:
+        if "prioritizing" in solver or "pruning" in solver:
+            lcr_comparison_list.append("vb_" + solver)
+        else:
+            lcr_comparison_list.append(solver)
+    lcr_solver_sets=[["z3","golem"]+[e]for e in lcr_comparison_list]
 
     for i,solver_set in enumerate(lcr_solver_sets):
         lcr_dict=compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,solver_set)
@@ -130,7 +113,7 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     # for lcr
     for i, solver_set in enumerate(lcr_solver_sets):
         for m in ["_lcr_n", "_lcr_c"]:
-            for solver in cross_solvers_list:
+            for solver in solver_set:
                 category_dict[solver + m+"["+str(i)+"]"].append(sum(category_dict[solver + m+"["+str(i)+"]"]))
 
 
