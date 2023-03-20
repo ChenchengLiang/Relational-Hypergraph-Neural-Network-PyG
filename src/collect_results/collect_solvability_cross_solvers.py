@@ -108,12 +108,46 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
             for solver in comparison_solver_list:
                 count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
 
-    # add largest contribution rank column for each solver
-    cross_solvers_list=["z3","golem","vb_eldarica"]
-    for solver in cross_solvers_list:
-        category_dict[solver + "_lcr"] = []
+    # compute lcr
+    lcr_solver_sets=[["z3","golem"]+[e]for e in ["vb_eldarica","vb_eldarica_original"]]
 
-    # todo compute lcr
+    for i,solver_set in enumerate(lcr_solver_sets):
+        lcr_dict=compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,solver_set)
+        for lcr in lcr_dict:
+            category_dict[lcr+"["+str(i)+"]"]=lcr_dict[lcr]
+
+    # cross_solvers_list = ["z3", "golem", "vb_eldarica"]
+    # lcr_dict=compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,cross_solvers_list)
+    # for lcr in lcr_dict:
+    #     category_dict[lcr]=lcr_dict[lcr]
+
+
+    # add total row
+    category_dict["category"].append("total")
+    for solver in comparison_solver_list:
+        for m in measurements:
+            category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
+    # for lcr
+    for i, solver_set in enumerate(lcr_solver_sets):
+        for m in ["_lcr_n", "_lcr_c"]:
+            for solver in cross_solvers_list:
+                category_dict[solver + m+"["+str(i)+"]"].append(sum(category_dict[solver + m+"["+str(i)+"]"]))
+
+
+    for k in category_dict:
+        print(k, len(category_dict[k]))
+
+    return category_dict
+
+
+def compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,cross_solvers_list):
+    # add largest contribution rank column for each solver
+    lcr_dict = {}
+    for m in ["_lcr_n","_lcr_c"]:
+        for s in cross_solvers_list:
+            lcr_dict[s + m] = []
+
+    # compute lcr
     for solver in cross_solvers_list:  # lcr column
         # get vb_satisfiability_list and vb_solving_time_list
         vb_satisfiability_list, vb_solving_time_list = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
@@ -129,48 +163,16 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
             vbssn_other_solvers, vbssc_other_solvers = compute_vbss(c, solvability_dict,
                                                                     vb_satisfiability_list_other_solvers,
                                                                     vb_solving_time_list_other_solvers)
-            print(c,solver,vbssn,vbssn_other_solvers)
-
-
 
             lcr_n = 1 - (vbssn_other_solvers / vbssn)
-            lcr_c = 1 - (vbssc_other_solvers / vbssc)
+            lcr_c = 1 - (vbssc / vbssc_other_solvers)
 
-            category_dict[solver + "_lcr"].append(lcr_n)
+            # print(c, "vb:", vbssn, "remove " + solver + ":", vbssn_other_solvers,"lcr_n:", lcr_n)
 
-    #
-    #
-    # for solver in comparison_solver_list: #lcr column
-    #     lcr_list=[]
-    #     for i, c in enumerate(category_dict["category"]):  # for each row
-    #         vb_solver=category_dict["vb_safe"][i]+category_dict["vb_unsafe"][i]
-    #
-    #         other_solvers=comparison_solver_list.copy()
-    #         other_solvers.remove(solver)
-    #         print(solver,other_solvers)
-    #         other_solvers_solving_list = []
-    #         for other_solver in other_solvers:
-    #             other_solvers_solving_list.append(category_dict[other_solver+"_safe"][i]+category_dict[other_solver+"_unsafe"][i])
-    #         vb_other_solvers=max(other_solvers_solving_list)
-    #
-    #         lcr=1-(vb_other_solvers/vb_solver)
-    #         lcr_list.append(lcr)
-    #
-    #     category_dict[solver+"_lcr"]=lcr_list
+            lcr_dict[solver + "_lcr_n"].append(lcr_n)
+            lcr_dict[solver + "_lcr_c"].append(lcr_c)
 
-    # add total row
-    category_dict["category"].append("total")
-    for solver in comparison_solver_list:
-        for m in measurements:
-            category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
-        category_dict[solver + "_lcr"].append(sum(category_dict[solver + "_lcr"]))
-
-
-    for k in category_dict:
-        print(k, len(category_dict[k]))
-
-    return category_dict
-
+    return lcr_dict
 
 def compute_vbss(c, solvability_dict, vb_satisfiability_list, vb_solving_time_list):
     vbssn = 0
@@ -330,10 +332,17 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
 
     # add virtual best columns for eldarica
     eldarica_variant_list= [s for s in comparison_solver_list if s not in ["z3","golem"]]
-    vb_satisfiability_eldarica, vb_solving_time_eldarica = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+    vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
         solvability_dict, eldarica_variant_list)
-    solvability_dict["vb_eldarica_satisfiability"] = vb_satisfiability_eldarica
-    solvability_dict["vb_eldarica_solving_time"] = vb_solving_time_eldarica
+    solvability_dict["vb_eldarica_satisfiability"] = vb_satisfiability
+    solvability_dict["vb_eldarica_solving_time"] = vb_solving_time
+
+    # add virtual best columns for original eldarica
+    eldarica_variant_list= [s for s in comparison_solver_list if s not in ["z3","golem"] and "prioritizing" not in s and "pruning" not in s]
+    vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+        solvability_dict, eldarica_variant_list)
+    solvability_dict["vb_eldarica_original_satisfiability"] = vb_satisfiability
+    solvability_dict["vb_eldarica_original_solving_time"] = vb_solving_time
 
 
     for k in solvability_dict:
