@@ -4,11 +4,11 @@ import os
 from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category
 import pandas as pd
 from tqdm import tqdm
-from src.CONSTANTS import graph_types, benchmark_timeout,eldarica_abstract_options
+from src.CONSTANTS import graph_types, benchmark_timeout, eldarica_abstract_options
 from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_clauses, \
     virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
-    virtual_best_solving_time_for_pruning, get_distinct_category_list,get_target_row_by_condition
+    virtual_best_solving_time_for_pruning, get_distinct_category_list, get_target_row_by_condition
 
 
 def main():
@@ -21,7 +21,7 @@ def main():
     eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off/train_data"
     eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-SEH/train_data"
     eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-only-rank/train_data"
-    eldarica_abstract_off_folder_pruning_rank_folder = ""#"/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-threshold-rank/train_data"
+    eldarica_abstract_off_folder_pruning_rank_folder = ""  # "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-threshold-rank/train_data"
     eldarica_abstract_off_folder_pruning_score_folder = ""
 
     eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term/train_data"
@@ -48,7 +48,8 @@ def main():
     solvability_dict = read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict)
 
     category_dict = category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict)
-    safe_unsafe_unknown_sheet,unsafe_unknown_sheet=category_dict_to_table(category_dict,solver_variation_folders_dict)
+    safe_unsafe_unknown_sheet, unsafe_unknown_sheet = category_dict_to_table(category_dict,
+                                                                             solver_variation_folders_dict)
 
     # write to excel
     with pd.ExcelWriter(summary_folder + "/" + "statistics_split_clauses_1.xlsx") as writer:
@@ -58,17 +59,16 @@ def main():
         pd.DataFrame(pd.DataFrame(unsafe_unknown_sheet)).to_excel(writer, sheet_name="unsafe_unknown")
 
 
-def category_dict_to_table(category_dict,solver_variation_folders_dict):
-
+def category_dict_to_table(category_dict, solver_variation_folders_dict):
     safe_unsafe_unknown_colounms = ["category"]
     for solver in solver_variation_folders_dict:
         if "pruning" not in solver:
-            for s in ["safe", "unsafe", "unknown","solving_time"]:
+            for s in ["safe", "unsafe", "unknown", "solving_time"]:
                 if "prioritizing" in solver or "pruning" in solver:
                     safe_unsafe_unknown_colounms.append("vb_" + solver + "_" + s)
                 else:
                     safe_unsafe_unknown_colounms.append(solver + "_" + s)
-    safe_unsafe_unknown_sheet = {k:category_dict[k] for k in safe_unsafe_unknown_colounms}
+    safe_unsafe_unknown_sheet = {k: category_dict[k] for k in safe_unsafe_unknown_colounms}
 
     unsafe_unknown_colounms = ["category"]
     for solver in solver_variation_folders_dict:
@@ -77,14 +77,14 @@ def category_dict_to_table(category_dict,solver_variation_folders_dict):
                 unsafe_unknown_colounms.append("vb_" + solver + "_" + s)
             else:
                 unsafe_unknown_colounms.append(solver + "_" + s)
-    unsafe_unknown_sheet={k:category_dict[k] for k in unsafe_unknown_colounms}
-    return safe_unsafe_unknown_sheet,unsafe_unknown_sheet
+    unsafe_unknown_sheet = {k: category_dict[k] for k in unsafe_unknown_colounms}
+    return safe_unsafe_unknown_sheet, unsafe_unknown_sheet
 
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
     categories = get_distinct_category_list(solvability_dict["category"])
-    measurements = ["safe", "unsafe", "unknown","solving_time"]
-    comparison_solver_list=["vb"]
+    measurements = ["safe", "unsafe", "unknown", "solving_time"]
+    comparison_solver_list = ["vb"]
     for solver in solver_variation_folders_dict:
         if "prioritizing" in solver or "pruning" in solver:
             comparison_solver_list.append("vb_" + solver)
@@ -97,7 +97,6 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
         for s in measurements:
             columns.append(solver + "_" + s)
 
-
     # initialize dict
     category_dict = {}
     assign_dict_key_empty_list(category_dict, columns)
@@ -109,29 +108,55 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
             for solver in comparison_solver_list:
                 count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
 
-
     # add largest contribution rank column for each solver
-    comparison_solver_list.remove("vb")
-    for solver in comparison_solver_list:
-        category_dict[solver + "_lcr"]=[]
+    cross_solvers_list=["z3","golem","vb_eldarica"]
+    for solver in cross_solvers_list:
+        category_dict[solver + "_lcr"] = []
 
-    for solver in comparison_solver_list: #lcr column
-        lcr_list=[]
-        for i, c in enumerate(category_dict["category"]):  # for each row
-            vb_solver=category_dict["vb_safe"][i]+category_dict["vb_unsafe"][i]
+    # todo compute lcr
+    for solver in cross_solvers_list:  # lcr column
+        # get vb_satisfiability_list and vb_solving_time_list
+        vb_satisfiability_list, vb_solving_time_list = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+            solvability_dict, cross_solvers_list)
+        # get vb_satisfiability_list and vb_solving_time_list from other solvers
+        other_solvers = cross_solvers_list.copy()
+        other_solvers.remove(solver)
+        vb_satisfiability_list_other_solvers, vb_solving_time_list_other_solvers = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+            solvability_dict, other_solvers)
 
-            other_solvers=comparison_solver_list.copy()
-            other_solvers.remove(solver)
-            other_solvers_solving_list = []
-            for other_solver in other_solvers:
-                other_solvers_solving_list.append(category_dict[other_solver+"_safe"][i]+category_dict[other_solver+"_unsafe"][i])
-            vb_other_solvers=max(other_solvers_solving_list)
+        for c in category_dict["category"]:
+            vbssn, vbssc = compute_vbss(c, solvability_dict, vb_satisfiability_list, vb_solving_time_list)
+            vbssn_other_solvers, vbssc_other_solvers = compute_vbss(c, solvability_dict,
+                                                                    vb_satisfiability_list_other_solvers,
+                                                                    vb_solving_time_list_other_solvers)
+            print(c,solver,vbssn,vbssn_other_solvers)
 
-            lcr=1-(vb_other_solvers/vb_solver)
-            lcr_list.append(lcr)
 
-        category_dict[solver+"_lcr"]=lcr_list
 
+            lcr_n = 1 - (vbssn_other_solvers / vbssn)
+            lcr_c = 1 - (vbssc_other_solvers / vbssc)
+
+            category_dict[solver + "_lcr"].append(lcr_n)
+
+    #
+    #
+    # for solver in comparison_solver_list: #lcr column
+    #     lcr_list=[]
+    #     for i, c in enumerate(category_dict["category"]):  # for each row
+    #         vb_solver=category_dict["vb_safe"][i]+category_dict["vb_unsafe"][i]
+    #
+    #         other_solvers=comparison_solver_list.copy()
+    #         other_solvers.remove(solver)
+    #         print(solver,other_solvers)
+    #         other_solvers_solving_list = []
+    #         for other_solver in other_solvers:
+    #             other_solvers_solving_list.append(category_dict[other_solver+"_safe"][i]+category_dict[other_solver+"_unsafe"][i])
+    #         vb_other_solvers=max(other_solvers_solving_list)
+    #
+    #         lcr=1-(vb_other_solvers/vb_solver)
+    #         lcr_list.append(lcr)
+    #
+    #     category_dict[solver+"_lcr"]=lcr_list
 
     # add total row
     category_dict["category"].append("total")
@@ -139,29 +164,39 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
         for m in measurements:
             category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
         category_dict[solver + "_lcr"].append(sum(category_dict[solver + "_lcr"]))
-    for m in measurements:
-        category_dict["vb_" + m].append(sum(category_dict["vb_" + m]))
 
 
     for k in category_dict:
-        print(k,len(category_dict[k]))
+        print(k, len(category_dict[k]))
 
     return category_dict
+
+
+def compute_vbss(c, solvability_dict, vb_satisfiability_list, vb_solving_time_list):
+    vbssn = 0
+    vbssc = 0
+    for category, vb_satisfiability, vb_solving_time in zip(solvability_dict["category"], vb_satisfiability_list,
+                                                            vb_solving_time_list):
+        if c in category and vb_satisfiability in ["safe", "unsafe"]:
+            vbssn += 1
+        if c in category:
+            vbssc += vb_solving_time
+    return vbssn, vbssc
 
 
 def count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver):
     count = 0
     solving_time = 0
-    for ca, sa,st in zip(solvability_dict["category"], solvability_dict[solver + "_satisfiability"],solvability_dict[solver + "_solving_time"]):
+    for ca, sa, st in zip(solvability_dict["category"], solvability_dict[solver + "_satisfiability"],
+                          solvability_dict[solver + "_solving_time"]):
         if c in ca and m == sa:
             count += 1
         if c in ca:
-            solving_time+=st
+            solving_time += st
     if "solving_time" == m:
         category_dict[solver + "_" + m].append(solving_time)
     else:
         category_dict[solver + "_" + m].append(count)
-
 
 
 def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict):
@@ -198,7 +233,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 json_file_suffix = "golem-solvability.JSON"
             elif "z3" in solver_variation:
                 json_file_suffix = "z3-solvability.JSON"
-            elif solver_variation in ["eldarica_abstract_off"]+["eldarica_abstract_"+x for x in eldarica_abstract_options]:
+            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in
+                                                                  eldarica_abstract_options]:
                 json_file_suffix = "eld-solvability.JSON"
             else:
                 json_file_suffix = "solvability.JSON"
@@ -220,7 +256,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                         virtual_best_solving_time_graphs = get_min_number_from_list(
                             [solving_time_CDHG, solving_time_CG], -0.001)
 
-                        satisfiability, solving_time = mask_results_by_benchmark_timeout(virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
+                        satisfiability, solving_time = mask_results_by_benchmark_timeout(
+                            virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
                         solvability_dict[solver_variation + "_" + "satisfiability"].append(satisfiability)
                         solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
 
@@ -255,10 +292,12 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
 
                         satisfiability, solving_time = mask_results_by_benchmark_timeout(
                             virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
-                        solvability_dict[solver_variation + "_" + "satisfiability"].append(str(satisfiability) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
-                                    virtual_best_clause_number_graphs) + "]")
-                        solvability_dict[solver_variation + "_" + "solving_time"].append(str(solving_time) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
-                                    virtual_best_clause_number_graphs) + "]")
+                        solvability_dict[solver_variation + "_" + "satisfiability"].append(
+                            str(satisfiability) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
+                                virtual_best_clause_number_graphs) + "]")
+                        solvability_dict[solver_variation + "_" + "solving_time"].append(
+                            str(solving_time) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
+                                virtual_best_clause_number_graphs) + "]")
 
                     else:  # no solvability file
                         for m in measurements:
@@ -278,13 +317,31 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                     solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
 
     # add virtual best columns
-    comparison_solver_list=[]
+    comparison_solver_list = []
     for k in solver_variation_folders_dict:
         if "pruning" in k or "prioritizing" in k:
-            comparison_solver_list.append("vb_"+k)
+            comparison_solver_list.append("vb_" + k)
         else:
             comparison_solver_list.append(k)
-    print("comparison_solver_list",comparison_solver_list)
+    vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+        solvability_dict, comparison_solver_list)
+    solvability_dict["vb_satisfiability"] = vb_satisfiability
+    solvability_dict["vb_solving_time"] = vb_solving_time
+
+    # add virtual best columns for eldarica
+    eldarica_variant_list= [s for s in comparison_solver_list if s not in ["z3","golem"]]
+    vb_satisfiability_eldarica, vb_solving_time_eldarica = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+        solvability_dict, eldarica_variant_list)
+    solvability_dict["vb_eldarica_satisfiability"] = vb_satisfiability_eldarica
+    solvability_dict["vb_eldarica_solving_time"] = vb_solving_time_eldarica
+
+
+    for k in solvability_dict:
+        print(k, len(solvability_dict[k]))
+    return solvability_dict
+
+
+def virtual_best_satisfiability_and_solving_time_for_a_solver_list(solvability_dict, comparison_solver_list):
     vb_satisfiability = []
     vb_solving_time = []
     for i, f in enumerate(solvability_dict["file_name"]):
@@ -295,15 +352,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
             one_file_vb_solving_time.append(solvability_dict[k + "_solving_time"][i])
 
         vb_satisfiability.append(virtual_best_satisfiability_from_list(one_file_vb_satisfiability))
-        vb_solving_time.append(get_min_number_from_list(one_file_vb_solving_time,-0.001))
-    solvability_dict["vb_satisfiability"] = vb_satisfiability
-    solvability_dict["vb_solving_time"] = vb_solving_time
-
-
-
-    for k in solvability_dict:
-        print(k, len(solvability_dict[k]))
-    return solvability_dict
+        vb_solving_time.append(get_min_number_from_list(one_file_vb_solving_time, -0.001))
+    return vb_satisfiability, vb_solving_time
 
 
 def virtual_best_cross_eldarica_variation(solver_variation, solvability_dict, virtual_best_satisfiability_graphs,
@@ -318,8 +368,8 @@ def virtual_best_cross_eldarica_variation(solver_variation, solvability_dict, vi
 
     satisfiability, solving_time = mask_results_by_benchmark_timeout(virtual_best_satisfiability,
                                                                      virtual_best_solving_time)
-    solvability_dict["vb_" +solver_variation + "_" + "satisfiability"].append(satisfiability)
-    solvability_dict["vb_" +solver_variation + "_" + "solving_time"].append(solving_time)
+    solvability_dict["vb_" + solver_variation + "_" + "satisfiability"].append(satisfiability)
+    solvability_dict["vb_" + solver_variation + "_" + "solving_time"].append(solving_time)
 
 
 def mask_results_by_benchmark_timeout(satisfiability, solving_time):
