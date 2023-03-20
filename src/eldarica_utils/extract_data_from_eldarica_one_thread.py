@@ -4,12 +4,12 @@ sys.path.append("../..")
 from src.utils import make_dirct, get_file_list
 import os
 from extract_data_utils import run_eldarica_with_shell
-
+from src.CONSTANTS import benchmark_timeout
 
 def main():
     parameters_pipeline = []
-    shell_timeout = int(60 * 60 * 3)
-    eldarica_timeout = 60 * 60 * 3
+    shell_timeout = int(benchmark_timeout)
+    eldarica_timeout = benchmark_timeout
     manual_abstract_options = ["empty", "term", "oct", "relEqs", "relIneqs"]
     predicted_abstract_options = ["predictedCG", "predictedCDHG"]
     other_abstract_options = ["unlabeled", "random", "mined"]
@@ -36,7 +36,7 @@ def main():
     # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off")
     # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -abstract:off")
 
-    # unsatcore: check solvability differernt threshold # 12*2*3 hours
+    # unsatcore: check solvability differernt threshold #benchmark_timeout* 12*2
     #need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
     threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
                       0.5]  # rank above this value remains
@@ -45,12 +45,12 @@ def main():
             parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
                 threshold) + " -hornGraphType:" + g +" -abstract:off ")
 
-    # unsatcore: check solvability for prioritized clauses 6 + 3 hours
+    # unsatcore: check solvability for prioritized clauses benchmark_timeout*3
     # parameters_pipeline.append(
-    #     " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:off ")
+    #     " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:term ")
     # for g in ["CDHG", "CG"]:
-    #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:off " )
-
+    #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:term " )
+    #
 
     # template_selection: get labeled templates # 3 hours
     # parameters_pipeline.append(" -mineTemplates -log ")

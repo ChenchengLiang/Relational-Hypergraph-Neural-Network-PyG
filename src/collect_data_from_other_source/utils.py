@@ -15,7 +15,7 @@ def collect_solving_info_from_other_solvers(folder,solver_location="z3", shell_t
     elif solver_name == "golem":
         solver_parameter_list = " "
     elif solver_name == "eld":
-        solver_parameter_list = " -abstract:off "
+        solver_parameter_list = " -abstract:term "
 
     shell_folder = make_dirct(os.path.join(os.path.dirname(folder), "shell_folder"))
     file_list = get_file_list(folder, "smt2")

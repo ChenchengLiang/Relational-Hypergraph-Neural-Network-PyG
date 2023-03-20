@@ -110,6 +110,8 @@ def make_dirct(d):
     except:
         print(str(d), "folder existed")
         return d
+
+
 def distinct_list(original_list):
     distinct_list = []
     for item in original_list:
@@ -117,28 +119,33 @@ def distinct_list(original_list):
             distinct_list.append(item)
     return distinct_list
 
+
 def count_generator(iter):
     return sum(1 for _ in iter)
 
-def read_a_json_field(json_obj,field_name):
+
+def read_a_json_field(json_obj, field_name):
     try:
-        field=json_obj[field_name][0]
+        field = json_obj[field_name][0]
         if "satisfiability" in field_name:
-            if field=="sat":
+            if field == "sat":
                 return "safe"
-            elif field=="unsat":
+            elif field == "unsat":
                 return "unsafe"
-            elif field=="unknown":
+            elif field == "unknown":
                 return "unknown"
-            elif field=="":
+            elif field == "":
+                return "unknown"
+            elif "memory" in field:
                 return "unknown"
             else:
                 return field
         else:
             return field
     except:
-        print("no field in json file:",field_name)
+        print("no field in json file:", field_name)
         return -1
+
 
 # calculate file size in KB, MB, GB
 def convert_bytes(size):

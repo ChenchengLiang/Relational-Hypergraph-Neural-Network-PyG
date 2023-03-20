@@ -4,7 +4,7 @@ import os
 from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category
 import pandas as pd
 from tqdm import tqdm
-from src.CONSTANTS import graph_types, benchmark_timeout
+from src.CONSTANTS import graph_types, benchmark_timeout,eldarica_abstract_options
 from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_clauses, \
     virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
@@ -18,11 +18,17 @@ def main():
     golem_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-golem/train_data"
     z3_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-z3/train_data"
 
-    eldarica_abstract_off_folder = golem_folder
-    eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/prioritize-normalized-rank/train_data"
-    eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/prioritize-only-rank/train_data"
-    eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/unsatcore-linear-mixed/threshold-rank/train_data"
+    eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off/train_data"
+    eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-SEH/train_data"
+    eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-only-rank/train_data"
+    eldarica_abstract_off_folder_pruning_rank_folder = ""#"/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-threshold-rank/train_data"
     eldarica_abstract_off_folder_pruning_score_folder = ""
+
+    eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term/train_data"
+    eldarica_abstract_term_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-SEH/train_data"
+    eldarica_abstract_term_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-only-rank/train_data"
+    eldarica_abstract_term_folder_pruning_rank_folder = ""
+    eldarica_abstract_term_folder_pruning_score_folder = ""
 
     full_file_folder = golem_folder
 
@@ -31,7 +37,13 @@ def main():
                                      "eldarica_abstract_off_prioritizing_SEH": eldarica_abstract_off_folder_prioritizing_SEH_folder,
                                      "eldarica_abstract_off_prioritizing_rank": eldarica_abstract_off_folder_prioritizing_rank_folder,
                                      "eldarica_abstract_off_pruning_rank": eldarica_abstract_off_folder_pruning_rank_folder,
-                                     "eldarica_abstract_off_pruning_score": eldarica_abstract_off_folder_pruning_score_folder}
+                                     "eldarica_abstract_off_pruning_score": eldarica_abstract_off_folder_pruning_score_folder,
+                                     "eldarica_abstract_term": eldarica_abstract_term_folder,
+                                     "eldarica_abstract_term_prioritizing_SEH": eldarica_abstract_term_folder_prioritizing_SEH_folder,
+                                     "eldarica_abstract_term_prioritizing_rank": eldarica_abstract_term_folder_prioritizing_rank_folder,
+                                     "eldarica_abstract_term_pruning_rank": eldarica_abstract_term_folder_pruning_rank_folder,
+                                     "eldarica_abstract_term_pruning_score": eldarica_abstract_term_folder_pruning_score_folder
+                                     }
 
     solvability_dict = read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict)
 
@@ -98,20 +110,17 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
                 count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
 
 
-    # todo add largest contribution rank column for each solver
-    #todo not involve vb
-    lcr_solvers=comparison_solver_list.copy()
-    lcr_solvers.remove("vb")
-    for solver in lcr_solvers:
+    # add largest contribution rank column for each solver
+    comparison_solver_list.remove("vb")
+    for solver in comparison_solver_list:
         category_dict[solver + "_lcr"]=[]
 
-
-    for solver in lcr_solvers: #lcr column
+    for solver in comparison_solver_list: #lcr column
         lcr_list=[]
         for i, c in enumerate(category_dict["category"]):  # for each row
             vb_solver=category_dict["vb_safe"][i]+category_dict["vb_unsafe"][i]
 
-            other_solvers=lcr_solvers.copy()
+            other_solvers=comparison_solver_list.copy()
             other_solvers.remove(solver)
             other_solvers_solving_list = []
             for other_solver in other_solvers:
@@ -130,6 +139,8 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
         for m in measurements:
             category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
         category_dict[solver + "_lcr"].append(sum(category_dict[solver + "_lcr"]))
+    for m in measurements:
+        category_dict["vb_" + m].append(sum(category_dict["vb_" + m]))
 
 
     for k in category_dict:
@@ -187,8 +198,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 json_file_suffix = "golem-solvability.JSON"
             elif "z3" in solver_variation:
                 json_file_suffix = "z3-solvability.JSON"
-            elif "eldarica_abstract_off" == solver_variation:
-                json_file_suffix = "golem-solvability.JSON"  # todo check this
+            elif solver_variation in ["eldarica_abstract_off"]+["eldarica_abstract_"+x for x in eldarica_abstract_options]:
+                json_file_suffix = "eld-solvability.JSON"
             else:
                 json_file_suffix = "solvability.JSON"
 
