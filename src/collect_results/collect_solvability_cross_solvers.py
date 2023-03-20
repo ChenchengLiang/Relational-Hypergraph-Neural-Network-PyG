@@ -87,22 +87,17 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
     # compute lcr
     lcr_comparison_list=["vb_eldarica","vb_eldarica_original"]
-    for solver in [x for x in [solver_variation_folders_dict] if x not in ["z3","golem"]]:
+    for solver in [x for x in solver_variation_folders_dict if x not in ["z3","golem"]]:
         if "prioritizing" in solver or "pruning" in solver:
             lcr_comparison_list.append("vb_" + solver)
         else:
             lcr_comparison_list.append(solver)
-    lcr_solver_sets=[["z3","golem"]+[e]for e in lcr_comparison_list]
+    lcr_solver_sets=[["z3","golem"]+[e] for e in lcr_comparison_list]
 
     for i,solver_set in enumerate(lcr_solver_sets):
         lcr_dict=compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,solver_set)
         for lcr in lcr_dict:
             category_dict[lcr+"["+str(i)+"]"]=lcr_dict[lcr]
-
-    # cross_solvers_list = ["z3", "golem", "vb_eldarica"]
-    # lcr_dict=compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,cross_solvers_list)
-    # for lcr in lcr_dict:
-    #     category_dict[lcr]=lcr_dict[lcr]
 
 
     # add total row
