@@ -117,8 +117,8 @@ def get_statistiics_in_one_folder(folder, second_folder="",z3_folder=z3_solvabil
     # write to excel
     with pd.ExcelWriter(summary_folder + "/" + folder_basename + "_statistics_split_clauses_1.xlsx") as writer:
         pd.DataFrame(pd.DataFrame(data_dict)).to_excel(writer, sheet_name=folder_basename)
-        pd.DataFrame(pd.DataFrame(category_summary)).to_excel(writer, sheet_name="category_summary")
-        pd.DataFrame(pd.DataFrame(merged_category_summary)).to_excel(writer, sheet_name="merged_category_summary")
+        pd.DataFrame(pd.DataFrame(category_summary)).transpose().to_excel(writer, sheet_name="category_summary")
+        pd.DataFrame(pd.DataFrame(merged_category_summary)).transpose().to_excel(writer, sheet_name="merged_category_summary")
         pd.DataFrame(pd.DataFrame(statistic_summary)).to_excel(writer, sheet_name="statistic_summary")
         pd.DataFrame(pd.DataFrame(clause_prioritize_summary)).to_excel(writer, sheet_name="clause_prioritize_summary")
         pd.DataFrame(pd.DataFrame(clause_pruning_summary)).to_excel(writer, sheet_name="clause_pruning_summary")

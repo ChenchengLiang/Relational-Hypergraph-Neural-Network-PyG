@@ -87,17 +87,22 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
     # compute lcr
     lcr_comparison_list=["vb_eldarica","vb_eldarica_original"]
+    # get cross solver comparison list
     for solver in [x for x in solver_variation_folders_dict if x not in ["z3","golem"]]:
         if "prioritizing" in solver or "pruning" in solver:
             lcr_comparison_list.append("vb_" + solver)
         else:
             lcr_comparison_list.append(solver)
     lcr_solver_sets=[["z3","golem"]+[e] for e in lcr_comparison_list]
+    # get eldarica comparison list
+    for a in eldarica_abstract_options+["off"]:
+        lcr_solver_sets.append(["eldarica_abstract_"+a]+["vb_eldarica_abstract_"+a+"_"+"prioritizing","vb_eldarica_abstract"+a+"_"+"pruning"])
+
 
     for i,solver_set in enumerate(lcr_solver_sets):
         lcr_dict=compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,solver_set)
         for lcr in lcr_dict:
-            category_dict[lcr+"["+str(i)+"]"]=lcr_dict[lcr]
+            category_dict["["+str(i)+"]"+lcr]=lcr_dict[lcr]
 
 
     # add total row
@@ -109,7 +114,7 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     for i, solver_set in enumerate(lcr_solver_sets):
         for m in ["_lcr_n", "_lcr_c"]:
             for solver in solver_set:
-                category_dict[solver + m+"["+str(i)+"]"].append(sum(category_dict[solver + m+"["+str(i)+"]"]))
+                category_dict["["+str(i)+"]"+solver + m].append(sum(category_dict["["+str(i)+"]"+solver + m]))
 
 
     for k in category_dict:
@@ -321,6 +326,16 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
         solvability_dict, eldarica_variant_list)
     solvability_dict["vb_eldarica_original_satisfiability"] = vb_satisfiability
     solvability_dict["vb_eldarica_original_solving_time"] = vb_solving_time
+    # add virtual best columns for prioritizing and pruning eldarica in each abstract
+    for a in eldarica_abstract_options+["off"]:
+        for strategy in ["prioritizing","pruning"]:
+            eldarica_variant_list = [s for s in comparison_solver_list if
+                                     s not in ["z3", "golem"] and strategy in s and a in s]
+            print("eldarica_variant_list",eldarica_variant_list)
+            vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+                solvability_dict, eldarica_variant_list)
+            solvability_dict["vb_eldarica_abstract_"+a+"_"+strategy+"_satisfiability"] = vb_satisfiability
+            solvability_dict["vb_eldarica_abstract_"+a+"_"+strategy+"_solving_time"] = vb_solving_time
 
 
     for k in solvability_dict:
