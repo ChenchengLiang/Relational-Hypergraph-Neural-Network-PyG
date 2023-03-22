@@ -12,8 +12,6 @@ from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_cl
 
 
 def main():
-    summary_folder = get_sumary_folder(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data")
 
     golem_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-golem/train_data"
     z3_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-z3/train_data"
@@ -21,7 +19,7 @@ def main():
     eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off/train_data"
     eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-SEH/train_data"
     eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-only-rank/train_data"
-    eldarica_abstract_off_folder_pruning_rank_folder = ""  # "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-threshold-rank/train_data"
+    eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-threshold-rank/train_data"
     eldarica_abstract_off_folder_pruning_score_folder = ""
 
     eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term/train_data"
@@ -30,7 +28,27 @@ def main():
     eldarica_abstract_term_folder_pruning_rank_folder = ""
     eldarica_abstract_term_folder_pruning_score_folder = ""
 
+    eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct/train_data"
+    eldarica_abstract_oct_folder_prioritizing_SEH_folder = ""
+    eldarica_abstract_oct_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_oct_folder_pruning_rank_folder = ""
+    eldarica_abstract_oct_folder_pruning_score_folder = ""
+
+    eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs/train_data"
+    eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = ""
+    eldarica_abstract_relEqs_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_relEqs_folder_pruning_rank_folder = ""
+    eldarica_abstract_relEqs_folder_pruning_score_folder = ""
+
+    eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs/train_data"
+    eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = ""
+    eldarica_abstract_relIneqs_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_relIneqs_folder_pruning_rank_folder = ""
+    eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
+
+
     full_file_folder = golem_folder
+    summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder))+"/data")
 
     solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
                                      "eldarica_abstract_off": eldarica_abstract_off_folder,
@@ -42,7 +60,22 @@ def main():
                                      "eldarica_abstract_term_prioritizing_SEH": eldarica_abstract_term_folder_prioritizing_SEH_folder,
                                      "eldarica_abstract_term_prioritizing_rank": eldarica_abstract_term_folder_prioritizing_rank_folder,
                                      "eldarica_abstract_term_pruning_rank": eldarica_abstract_term_folder_pruning_rank_folder,
-                                     "eldarica_abstract_term_pruning_score": eldarica_abstract_term_folder_pruning_score_folder
+                                     "eldarica_abstract_term_pruning_score": eldarica_abstract_term_folder_pruning_score_folder,
+                                     "eldarica_abstract_oct": eldarica_abstract_oct_folder,
+                                     "eldarica_abstract_oct_prioritizing_SEH": eldarica_abstract_oct_folder_prioritizing_SEH_folder,
+                                     "eldarica_abstract_oct_prioritizing_rank": eldarica_abstract_oct_folder_prioritizing_rank_folder,
+                                     "eldarica_abstract_oct_pruning_rank": eldarica_abstract_oct_folder_pruning_rank_folder,
+                                     "eldarica_abstract_oct_pruning_score": eldarica_abstract_oct_folder_pruning_score_folder,
+                                     "eldarica_abstract_relEqs": eldarica_abstract_relEqs_folder,
+                                     "eldarica_abstract_relEqs_prioritizing_SEH": eldarica_abstract_relEqs_folder_prioritizing_SEH_folder,
+                                     "eldarica_abstract_relEqs_prioritizing_rank": eldarica_abstract_relEqs_folder_prioritizing_rank_folder,
+                                     "eldarica_abstract_relEqs_pruning_rank": eldarica_abstract_relEqs_folder_pruning_rank_folder,
+                                     "eldarica_abstract_relEqs_pruning_score": eldarica_abstract_relEqs_folder_pruning_score_folder,
+                                     "eldarica_abstract_relIneqs": eldarica_abstract_relIneqs_folder,
+                                     "eldarica_abstract_relIneqs_prioritizing_SEH": eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder,
+                                     "eldarica_abstract_relIneqs_prioritizing_rank": eldarica_abstract_relIneqs_folder_prioritizing_rank_folder,
+                                     "eldarica_abstract_relIneqs_pruning_rank": eldarica_abstract_relIneqs_folder_pruning_rank_folder,
+                                     "eldarica_abstract_relIneqs_pruning_score": eldarica_abstract_relIneqs_folder_pruning_score_folder
                                      }
 
     solvability_dict = read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict)
@@ -96,7 +129,7 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     lcr_solver_sets=[["z3","golem"]+[e] for e in lcr_comparison_list]
     # get eldarica comparison list
     for a in eldarica_abstract_options+["off"]:
-        lcr_solver_sets.append(["eldarica_abstract_"+a]+["vb_eldarica_abstract_"+a+"_"+"prioritizing","vb_eldarica_abstract"+a+"_"+"pruning"])
+        lcr_solver_sets.append(["eldarica_abstract_"+a]+["vb_eldarica_abstract_"+a+"_"+"prioritizing","vb_eldarica_abstract_"+a+"_"+"pruning"])
 
 
     for i,solver_set in enumerate(lcr_solver_sets):
