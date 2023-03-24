@@ -29,14 +29,14 @@ def main():
     eldarica_abstract_term_folder_pruning_score_folder = ""
 
     eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct/train_data"
-    eldarica_abstract_oct_folder_prioritizing_SEH_folder = ""
-    eldarica_abstract_oct_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_oct_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-SEH/train_data"
+    eldarica_abstract_oct_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-only-rank/train_data"
     eldarica_abstract_oct_folder_pruning_rank_folder = ""
     eldarica_abstract_oct_folder_pruning_score_folder = ""
 
     eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs/train_data"
-    eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = ""
-    eldarica_abstract_relEqs_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-SEH/train_data"
+    eldarica_abstract_relEqs_folder_prioritizing_rank_folder = ""#running
     eldarica_abstract_relEqs_folder_pruning_rank_folder = ""
     eldarica_abstract_relEqs_folder_pruning_score_folder = ""
 
@@ -143,11 +143,41 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     for solver in comparison_solver_list:
         for m in measurements:
             category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
-    # for lcr
+    # add total row for lcr
     for i, solver_set in enumerate(lcr_solver_sets):
         for m in ["_lcr_n", "_lcr_c"]:
             for solver in solver_set:
                 category_dict["["+str(i)+"]"+solver + m].append(sum(category_dict["["+str(i)+"]"+solver + m]))
+
+
+    # add total-lcr row
+    category_dict["category"].append("total-lcr")
+    for solver in comparison_solver_list:
+        for m in measurements:
+            category_dict[solver + "_" + m].append("-")
+
+    # compute lcr
+    for i, solver_set in enumerate(lcr_solver_sets):
+        for solver in solver_set:  # lcr column
+            # get vb_satisfiability_list and vb_solving_time_list
+            vb_satisfiability_list, vb_solving_time_list = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+                solvability_dict, solver_set)
+            # get vb_satisfiability_list and vb_solving_time_list from other solvers
+            other_solvers = solver_set.copy()
+            other_solvers.remove(solver)
+            vb_satisfiability_list_other_solvers, vb_solving_time_list_other_solvers = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+                solvability_dict, other_solvers)
+            vbssn, vbssc = compute_vbss("", solvability_dict, vb_satisfiability_list, vb_solving_time_list)
+            vbssn_other_solvers, vbssc_other_solvers = compute_vbss("", solvability_dict,
+                                                                    vb_satisfiability_list_other_solvers,
+                                                                    vb_solving_time_list_other_solvers)
+
+            lcr_n = 1 - (vbssn_other_solvers / vbssn)
+            lcr_c = 1 - (vbssc / vbssc_other_solvers)
+            category_dict["[" + str(i) + "]" + solver + "_lcr_n"].append(lcr_n)
+            category_dict["[" + str(i) + "]" + solver + "_lcr_c"].append(lcr_c)
+
+
 
 
     for k in category_dict:
