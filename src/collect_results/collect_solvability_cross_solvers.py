@@ -25,7 +25,7 @@ def main():
     eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term/train_data"
     eldarica_abstract_term_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-SEH/train_data"
     eldarica_abstract_term_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-only-rank/train_data"
-    eldarica_abstract_term_folder_pruning_rank_folder = ""
+    eldarica_abstract_term_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-pruning-threshold-rank/train_data"
     eldarica_abstract_term_folder_pruning_score_folder = ""
 
     eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct/train_data"
@@ -36,13 +36,13 @@ def main():
 
     eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs/train_data"
     eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-SEH/train_data"
-    eldarica_abstract_relEqs_folder_prioritizing_rank_folder = ""#running
-    eldarica_abstract_relEqs_folder_pruning_rank_folder = ""
+    eldarica_abstract_relEqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-only-rank/train_data"
+    eldarica_abstract_relEqs_folder_pruning_rank_folder = ""#running
     eldarica_abstract_relEqs_folder_pruning_score_folder = ""
 
     eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs/train_data"
-    eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = ""
-    eldarica_abstract_relIneqs_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-SEH/train_data"
+    eldarica_abstract_relIneqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-only-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = ""
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
@@ -179,9 +179,9 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
 
 
-
-    for k in category_dict:
-        print(k, len(category_dict[k]))
+    #print category_dict column number
+    # for k in category_dict:
+    #     print(k, len(category_dict[k]))
 
     return category_dict
 
@@ -359,7 +359,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                                                           "pruning")
                 else:  # read from standard solvers
                     satisfiability = read_a_json_field(object, "satisfiability")
-                    solving_time = float(read_a_json_field(object, "solving_time"))
+                    solving_time = benchmark_timeout if satisfiability== "unknown" else float(read_a_json_field(object, "solving_time"))
+
                     satisfiability, solving_time = mask_results_by_benchmark_timeout(satisfiability, solving_time)
                     solvability_dict[solver_variation + "_" + "satisfiability"].append(satisfiability)
                     solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
@@ -403,6 +404,36 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
 
     for k in solvability_dict:
         print(k, len(solvability_dict[k]))
+
+    print("-"*10)
+    #todo: Check inconsistent between term+prioritizing and off+prioritizing
+
+    counter1=0
+    counter2=0
+    for f,off_s,off_st,off_p_s,off_p_st,term_s,term_st,term_p_s,term_p_st in zip(solvability_dict["file_name"],
+                                                   solvability_dict["eldarica_abstract_off_satisfiability"],
+                                                   solvability_dict["eldarica_abstract_off_solving_time"],
+                                                   solvability_dict["vb_eldarica_abstract_off_prioritizing_satisfiability"],
+                                                   solvability_dict["vb_eldarica_abstract_off_prioritizing_solving_time"],
+                                                   solvability_dict["eldarica_abstract_term_satisfiability"],
+                                                   solvability_dict["eldarica_abstract_term_solving_time"],
+                                                   solvability_dict["vb_eldarica_abstract_term_prioritizing_satisfiability"],
+                                                   solvability_dict["vb_eldarica_abstract_term_prioritizing_solving_time"]):
+        if term_p_s=="unknown" and off_p_s!="unknown":
+            counter1+=1
+            print("[1]",f, off_s, off_st, off_p_s, off_p_st)
+            print("[1]",f, term_s, term_st, term_p_s, term_p_st)
+        if off_p_s=="unknown" and term_p_s!="unknown":
+            counter2+=1
+            print("[2]",f, off_s, off_st, off_p_s, off_p_st)
+            print("[2]",f, term_s, term_st, term_p_s, term_p_st)
+    print("counter1",counter1)
+    print("counter2",counter2)
+
+
+
+
+
     return solvability_dict
 
 

@@ -572,11 +572,13 @@ def read_solving_time_from_json_file(file_list, statistic_dict):
 
 def get_fields_by_unsatcore_prioritize_clauses(json_obj, graph_type):
     suffix = "-" + "prioritizeClausesByUnsatCoreRank" + "-" + graph_type
+    solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
+    solving_time = benchmark_timeout if solving_time == -1 else solving_time / 1000
     satisfiability = decode_satisfiability(read_a_json_field(json_obj, "satisfiability" + suffix))
+    satisfiability = "unknown" if solving_time > benchmark_timeout else satisfiability
     cegar_iteration = int(float(read_a_json_field(json_obj, "cegarIterationNumber" + suffix)))
     cegar_iteration = max_cegar_iteration if cegar_iteration == -1 else cegar_iteration
-    solving_time = int(float(read_a_json_field(json_obj, "solvingTime" + suffix)))
-    solving_time = 10800 if solving_time == -1 else solving_time / 1000
+
     return satisfiability, solving_time, cegar_iteration
 
 
