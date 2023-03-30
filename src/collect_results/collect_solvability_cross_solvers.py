@@ -19,7 +19,8 @@ def main():
     eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off/train_data"
     eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-SEH/train_data"
     eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-only-rank/train_data"
-    eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-threshold-rank/train_data"
+    #todo check pruning results
+    eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-pruning-threshold-rank/train_data"
     eldarica_abstract_off_folder_pruning_score_folder = ""
 
     eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term/train_data"
@@ -395,7 +396,6 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
         for strategy in ["prioritizing","pruning"]:
             eldarica_variant_list = [s for s in comparison_solver_list if
                                      s not in ["z3", "golem"] and strategy in s and a in s]
-            print("eldarica_variant_list",eldarica_variant_list)
             vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
                 solvability_dict, eldarica_variant_list)
             solvability_dict["vb_eldarica_abstract_"+a+"_"+strategy+"_satisfiability"] = vb_satisfiability
@@ -406,32 +406,6 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
         print(k, len(solvability_dict[k]))
 
     print("-"*10)
-    #todo: Check inconsistent between term+prioritizing and off+prioritizing
-
-    counter1=0
-    counter2=0
-    for f,off_s,off_st,off_p_s,off_p_st,term_s,term_st,term_p_s,term_p_st in zip(solvability_dict["file_name"],
-                                                   solvability_dict["eldarica_abstract_off_satisfiability"],
-                                                   solvability_dict["eldarica_abstract_off_solving_time"],
-                                                   solvability_dict["vb_eldarica_abstract_off_prioritizing_satisfiability"],
-                                                   solvability_dict["vb_eldarica_abstract_off_prioritizing_solving_time"],
-                                                   solvability_dict["eldarica_abstract_term_satisfiability"],
-                                                   solvability_dict["eldarica_abstract_term_solving_time"],
-                                                   solvability_dict["vb_eldarica_abstract_term_prioritizing_satisfiability"],
-                                                   solvability_dict["vb_eldarica_abstract_term_prioritizing_solving_time"]):
-        if term_p_s=="unknown" and off_p_s!="unknown":
-            counter1+=1
-            print("[1]",f, off_s, off_st, off_p_s, off_p_st)
-            print("[1]",f, term_s, term_st, term_p_s, term_p_st)
-        if off_p_s=="unknown" and term_p_s!="unknown":
-            counter2+=1
-            print("[2]",f, off_s, off_st, off_p_s, off_p_st)
-            print("[2]",f, term_s, term_st, term_p_s, term_p_st)
-    print("counter1",counter1)
-    print("counter2",counter2)
-
-
-
 
 
     return solvability_dict

@@ -138,6 +138,8 @@ def read_a_json_field(json_obj, field_name):
                 return "unknown"
             elif "memory" in field:
                 return "unknown"
+            elif "error" in field:
+                return "unknown"
             else:
                 return field
         else:
