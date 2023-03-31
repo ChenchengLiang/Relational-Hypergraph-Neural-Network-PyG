@@ -6,7 +6,7 @@ import os
 from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category,copy_relative_files
 import pandas as pd
 from tqdm import tqdm
-from src.CONSTANTS import graph_types, benchmark_timeout, eldarica_abstract_options
+from src.CONSTANTS import graph_types, benchmark_timeout, eldarica_abstract_options,threshold_list
 from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_clauses, \
     virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
@@ -272,44 +272,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
     solvability_dict = {}
     assign_dict_key_empty_list(solvability_dict, record_fields)
 
-    # read pruning solvabilities for z3 and golem
-    z3_pruning_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore-linear-prune-for-other-solvers/pruned-test/z3/train_data"
-    golem_pruning_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore-linear-prune-for-other-solvers/pruned-test/golem/train_data"
-    threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
-                      0.5]
-    for solver,solver_folder in zip(["z3","golem"],[z3_pruning_folder,golem_pruning_folder]):
-        for file in tqdm(get_file_list(full_file_folder, "smt2"), desc="read files"):
-            basename = os.path.basename(file)
-            current_file = os.path.join(solver_folder, basename)
-            if os.path.exists(current_file):
-                vb_pruning_satisfiability_list = []
-                vb_pruning_solving_time_list = []
-                for t in threshold_list:
-                    for g in ["CDHG","CG"]:
-                        object_list=read_files(
-                                [current_file],
-                                file_type="pruned-"+g+"-"+str(t)+".smt2."+solver+"-solvability.JSON",
-                                read_function=read_json_file, disable_tqdm=True)
-                        for o in object_list:
-                            solving_time=read_a_json_field(o,"solving_time")
-                            satisfiability=read_a_json_field(o,"satisfiability")
-                            vb_pruning_satisfiability_list.append(satisfiability)
-                            vb_pruning_solving_time_list.append(solving_time)
-
-                vb_satisfiability="unknown"
-                vb_solving_time=benchmark_timeout
-                for s,st in zip(vb_pruning_satisfiability_list,vb_pruning_solving_time_list):
-                    if s =="unsafe":
-                        vb_satisfiability=s
-                        if st<vb_solving_time:
-                            vb_solving_time=st
-
-                for m, field in zip(measurements, [vb_satisfiability, vb_solving_time]):
-                    solvability_dict[solver + "_pruning_" + m].append(field)
-
-            else:
-                for m in measurements:
-                    solvability_dict[solver + "_pruning_" + m].append("miss info")
+    # read pruning solvability from standard solvers
+    read_pruning_solvability_for_standard_solvers(solvability_dict, full_file_folder, measurements)
 
 
     # read fixed fields
@@ -495,6 +459,46 @@ def mask_results_by_benchmark_timeout(satisfiability, solving_time):
         satisfiability = "unknown"
     return satisfiability, solving_time
 
+
+def read_pruning_solvability_for_standard_solvers(solvability_dict,full_file_folder,measurements):
+    # read pruning solvabilities for z3 and golem
+    z3_pruning_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore-linear-prune-for-other-solvers/pruned-test/z3/train_data"
+    golem_pruning_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore-linear-prune-for-other-solvers/pruned-test/golem/train_data"
+    for solver, solver_folder in zip(["z3", "golem"], [z3_pruning_folder, golem_pruning_folder]):
+        for file in tqdm(get_file_list(full_file_folder, "smt2"), desc="read files"):
+            basename = os.path.basename(file)
+            current_file = os.path.join(solver_folder, basename)
+            if os.path.exists(current_file):
+                vb_pruning_satisfiability_list = []
+                vb_pruning_solving_time_list = []
+                vb_pruning_option_list = []
+                for t in threshold_list:
+                    for g in ["CDHG", "CG"]:
+                        object_list = read_files(
+                            [current_file],
+                            file_type="pruned-" + g + "-" + str(t) + ".smt2." + solver + "-solvability.JSON",
+                            read_function=read_json_file, disable_tqdm=True)
+                        for o in object_list:
+                            solving_time = read_a_json_field(o, "solving_time")
+                            satisfiability = read_a_json_field(o, "satisfiability")
+                            vb_pruning_satisfiability_list.append(satisfiability)
+                            vb_pruning_solving_time_list.append(solving_time)
+                            vb_pruning_option_list.append(g + "-" + str(t))
+
+                vb_satisfiability = "unknown"
+                vb_solving_time = benchmark_timeout
+                for s, st,op in zip(vb_pruning_satisfiability_list, vb_pruning_solving_time_list,vb_pruning_option_list):
+                    if s == "unsafe":
+                        vb_satisfiability = s
+                        if st < vb_solving_time:
+                            vb_solving_time = st+"["+op+"]"
+
+                for m, field in zip(measurements, [vb_satisfiability, vb_solving_time]):
+                    solvability_dict[solver + "_pruning_" + m].append(field)
+
+            else:
+                for m in measurements:
+                    solvability_dict[solver + "_pruning_" + m].append("miss info")
 
 if __name__ == '__main__':
     main()

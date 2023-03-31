@@ -4,7 +4,7 @@ sys.path.append("../..")
 from src.utils import make_dirct, get_file_list
 import os
 from extract_data_utils import run_eldarica_with_shell
-from src.CONSTANTS import benchmark_timeout
+from src.CONSTANTS import benchmark_timeout,threshold_list
 
 def main():
     parameters_pipeline = []
@@ -38,8 +38,6 @@ def main():
 
     # unsatcore: check solvability differernt threshold #benchmark_timeout* 12*2
     #need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
-    threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
-                      0.5]  # rank above this value remains
     for g in ["CDHG", "CG"]:
         for threshold in threshold_list:  # reverse this list
             parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
@@ -50,6 +48,14 @@ def main():
     #     " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:relIneqs ")
     # for g in ["CDHG", "CG"]:
     #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:relIneqs " )
+
+    # description: output pruned CHCs in files 12*2*shell_timeout
+    # shell_timeout = int(60 * 20)
+    # for g in ["CDHG", "CG"]:
+    #     for threshold in threshold_list:  # reverse this list
+    #         parameters_pipeline.append(" -outputPrunedClauses -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
+    #             threshold) + " -hornGraphType:" + g + " -abstract:off ")
+
 
 
     # template_selection: get labeled templates # 3 hours
