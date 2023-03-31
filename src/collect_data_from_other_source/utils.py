@@ -2,11 +2,12 @@ import time
 import subprocess
 import json
 import os
-
+import glob
 from src.utils import get_file_list, unzip_file, compress_file, make_dirct
 import os
 from tqdm import tqdm
 from src.CONSTANTS import benchmark_timeout
+from shutil import copy,move
 
 
 def collect_solving_info_from_other_solvers(folder,solver_location="z3", shell_timeout=benchmark_timeout,solver_name="z3"):
@@ -20,13 +21,22 @@ def collect_solving_info_from_other_solvers(folder,solver_location="z3", shell_t
 
     shell_folder = make_dirct(os.path.join(os.path.dirname(folder), "shell_folder"))
     file_list = get_file_list(folder, "smt2")
+    #add pruned files
+    for ff in file_list:
+        file_list=file_list+glob.glob(ff[:-len(".zip")]+".pruned*")
+
     timeout_command = "timeout " + str(shell_timeout)
     for f in tqdm(file_list, desc="progress"):
         # unzip file
         unzip_file(f)
         f = f[:-len(".zip")]
-        # print info
-        base_file_name = os.path.basename(f)
+        if(not f.endswith(".smt2")):
+            move(f,f+".smt2")
+            smt2_file=f+".smt2"
+        else:
+            smt2_file=f
+
+        base_file_name = os.path.basename(smt2_file)
         print("base_file_name", base_file_name)
         shell_file_name = shell_folder + "/" + "run-ulimit" + "-" + base_file_name + ".sh"
 
@@ -34,7 +44,7 @@ def collect_solving_info_from_other_solvers(folder,solver_location="z3", shell_t
         with open(shell_file_name, "w") as ff:
             ff.write("#!/bin/sh\n")
             ff.write(
-                timeout_command + " " + solver_location + " "+ solver_parameter_list  +" " + f + " "  + "\n")
+                timeout_command + " " + solver_location + " "+ solver_parameter_list  +" " + smt2_file + " "  + "\n")
 
         # run shell
         log_file = folder + "/" + base_file_name + "."+solver_name +"-solvability.JSON"
@@ -44,8 +54,8 @@ def collect_solving_info_from_other_solvers(folder,solver_location="z3", shell_t
 
         # remove shell file and zip file again
         os.remove(shell_file_name)
-        compress_file([f], f + ".zip")
-        os.remove(f)
+        compress_file([smt2_file], f + ".zip")
+        os.remove(smt2_file)
 
 def run_one_shell(shell_file_name, log_file):
     initiall_dict = {"solving_time": ["10800"], "satisfiability": ["-1"]}

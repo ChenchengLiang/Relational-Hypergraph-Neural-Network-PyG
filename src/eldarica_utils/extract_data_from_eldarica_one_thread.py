@@ -19,7 +19,7 @@ def main():
     data_fold = ["train_data", "valid_data", "test_data"]
     file_type = "smt2"
 
-    # analysisClauses
+    # description: analysisClauses
     # parameters_pipeline.append(" -analysisClauses ")
 
     # description: get getSolvability # 15 hours
@@ -43,7 +43,7 @@ def main():
     for g in ["CDHG", "CG"]:
         for threshold in threshold_list:  # reverse this list
             parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
-                threshold) + " -hornGraphType:" + g +" -abstract:relEqs ")
+                threshold) + " -hornGraphType:" + g +" -abstract:oct ")
 
     # unsatcore: check solvability for prioritized clauses benchmark_timeout*3
     # parameters_pipeline.append(

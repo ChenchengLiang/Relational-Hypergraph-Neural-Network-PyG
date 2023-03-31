@@ -1,7 +1,9 @@
+import sys
+
 from src.utils import get_file_list, unzip_file, compress_file, make_dirct, read_a_json_field, \
     assign_dict_key_empty_list
 import os
-from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category
+from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category,copy_relative_files
 import pandas as pd
 from tqdm import tqdm
 from src.CONSTANTS import graph_types, benchmark_timeout, eldarica_abstract_options
@@ -19,7 +21,6 @@ def main():
     eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off/train_data"
     eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-SEH/train_data"
     eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-only-rank/train_data"
-    #todo check pruning results
     eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-pruning-threshold-rank/train_data"
     eldarica_abstract_off_folder_pruning_score_folder = ""
 
@@ -32,13 +33,13 @@ def main():
     eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct/train_data"
     eldarica_abstract_oct_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-SEH/train_data"
     eldarica_abstract_oct_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-only-rank/train_data"
-    eldarica_abstract_oct_folder_pruning_rank_folder = ""
+    eldarica_abstract_oct_folder_pruning_rank_folder = ""#running
     eldarica_abstract_oct_folder_pruning_score_folder = ""
 
     eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs/train_data"
     eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-SEH/train_data"
     eldarica_abstract_relEqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-only-rank/train_data"
-    eldarica_abstract_relEqs_folder_pruning_rank_folder = ""#running
+    eldarica_abstract_relEqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relEqs_folder_pruning_score_folder = ""
 
     eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs/train_data"
@@ -146,9 +147,10 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
             category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
     # add total row for lcr
     for i, solver_set in enumerate(lcr_solver_sets):
-        for m in ["_lcr_n", "_lcr_c"]:
+        for m in [" lcr_n ", " lcr_c "]:
             for solver in solver_set:
-                category_dict["["+str(i)+"]"+solver + m].append(sum(category_dict["["+str(i)+"]"+solver + m]))
+                category_dict["[" + str(i) + "]" + m + solver].append(
+                    sum(category_dict["[" + str(i) + "]" + m + solver]))
 
 
     # add total-lcr row
@@ -175,8 +177,8 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
             lcr_n = 1 - (vbssn_other_solvers / vbssn)
             lcr_c = 1 - (vbssc / vbssc_other_solvers)
-            category_dict["[" + str(i) + "]" + solver + "_lcr_n"].append(lcr_n)
-            category_dict["[" + str(i) + "]" + solver + "_lcr_c"].append(lcr_c)
+            category_dict["[" + str(i) + "]" + " lcr_n " + solver ].append(lcr_n)
+            category_dict["[" + str(i) + "]" + " lcr_c " + solver].append(lcr_c)
 
 
 
@@ -184,15 +186,16 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     # for k in category_dict:
     #     print(k, len(category_dict[k]))
 
+
     return category_dict
 
 
-def compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,cross_solvers_list):
+def compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict, cross_solvers_list):
     # add largest contribution rank column for each solver
     lcr_dict = {}
-    for m in ["_lcr_n","_lcr_c"]:
+    for m in [" lcr_n ", " lcr_c "]:
         for s in cross_solvers_list:
-            lcr_dict[s + m] = []
+            lcr_dict[m + s] = []
 
     # compute lcr
     for solver in cross_solvers_list:  # lcr column
@@ -216,8 +219,8 @@ def compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,cross_sol
 
             # print(c, "vb:", vbssn, "remove " + solver + ":", vbssn_other_solvers,"lcr_n:", lcr_n)
 
-            lcr_dict[solver + "_lcr_n"].append(lcr_n)
-            lcr_dict[solver + "_lcr_c"].append(lcr_c)
+            lcr_dict[" lcr_n " + solver ].append(lcr_n)
+            lcr_dict[" lcr_c " + solver ].append(lcr_c)
 
     return lcr_dict
 
@@ -260,17 +263,61 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
             record_fields.append(sv + "_" + m)
             if "prioritizing" in sv or "pruning" in sv:
                 record_fields.append("vb_" + sv + "_" + m)
+        if sv in["z3","golem"]:
+            for m in measurements:
+                record_fields.append(sv + "_pruning_" + m)
     record_fields = other_fields + smt_measurements + record_fields
 
     # initialize solvability dict
     solvability_dict = {}
     assign_dict_key_empty_list(solvability_dict, record_fields)
 
+    # read pruning solvabilities for z3 and golem
+    z3_pruning_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore-linear-prune-for-other-solvers/pruned-test/z3/train_data"
+    golem_pruning_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore-linear-prune-for-other-solvers/pruned-test/golem/train_data"
+    threshold_list = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4,
+                      0.5]
+    for solver,solver_folder in zip(["z3","golem"],[z3_pruning_folder,golem_pruning_folder]):
+        for file in tqdm(get_file_list(full_file_folder, "smt2"), desc="read files"):
+            basename = os.path.basename(file)
+            current_file = os.path.join(solver_folder, basename)
+            if os.path.exists(current_file):
+                vb_pruning_satisfiability_list = []
+                vb_pruning_solving_time_list = []
+                for t in threshold_list:
+                    for g in ["CDHG","CG"]:
+                        object_list=read_files(
+                                [current_file],
+                                file_type="pruned-"+g+"-"+str(t)+".smt2."+solver+"-solvability.JSON",
+                                read_function=read_json_file, disable_tqdm=True)
+                        for o in object_list:
+                            solving_time=read_a_json_field(o,"solving_time")
+                            satisfiability=read_a_json_field(o,"satisfiability")
+                            vb_pruning_satisfiability_list.append(satisfiability)
+                            vb_pruning_solving_time_list.append(solving_time)
+
+                vb_satisfiability="unknown"
+                vb_solving_time=benchmark_timeout
+                for s,st in zip(vb_pruning_satisfiability_list,vb_pruning_solving_time_list):
+                    if s =="unsafe":
+                        vb_satisfiability=s
+                        if st<vb_solving_time:
+                            vb_solving_time=st
+
+                for m, field in zip(measurements, [vb_satisfiability, vb_solving_time]):
+                    solvability_dict[solver + "_pruning_" + m].append(field)
+
+            else:
+                for m in measurements:
+                    solvability_dict[solver + "_pruning_" + m].append("miss info")
+
+
     # read fixed fields
     file_list = get_file_list(full_file_folder, "smt2")
     for sm in smt_measurements:
         solvability_dict[sm] = [x[sm] for x in
                                 read_files(file_list, file_type="", read_function=read_smt2_category)]
+
 
     # read solvabilities by file
     for file in tqdm(file_list, desc="read files"):

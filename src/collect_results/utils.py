@@ -48,7 +48,7 @@ def read_files(file_list, file_type="solvability.JSON", read_function=read_json_
             exception_folder=make_dirct(os.path.dirname(os.path.dirname(file))+"/unzip_exceptions")
             copy_relative_files(file_name,exception_folder)
         json_obj = {}
-        json_obj["file_name"] = json_file[:-len(file_type) - 1]
+        json_obj["file_name"] =  json_file[:-len(file_type) - 1]
         if os.path.exists(json_file):
             json_obj["file_size"] = os.path.getsize(json_file)
             json_obj["file_size_h"] = convert_bytes(os.path.getsize(json_file))
