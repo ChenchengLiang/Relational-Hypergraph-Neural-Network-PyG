@@ -15,7 +15,7 @@ def main():
     for i, l in enumerate(divided_list):
         current_folder = make_dirct(folder + "-part-" + str(i))
         for f in l:
-            copy(f, current_folder)
+            copy_relative_files(f[:-len(".zip")], current_folder)
 
 
 def divide_list(lst, n):
