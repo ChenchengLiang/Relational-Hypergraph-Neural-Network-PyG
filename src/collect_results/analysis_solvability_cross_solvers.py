@@ -4,6 +4,25 @@ import itertools
 
 
 def main():
+
+    #read_gain_and_lose()
+
+
+
+    #todo find interesting numbers in category summary
+    df = pd.read_excel(
+        '/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx',
+        sheet_name='category_summary', header=0)
+
+    # Convert the DataFrame to a dictionary
+    category_summary_dict = df.to_dict(orient='list')
+    #todo max safe
+    for index,_ in enumerate(category_summary_dict["category"][:-1]): #for each raw
+        print(category_summary_dict["category"][index])
+        print("golem_safe",category_summary_dict["golem_safe"][index])
+
+
+def read_gain_and_lose():
     # Read the Excel file into a Pandas DataFrame
     df = pd.read_excel(
         '/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx',
@@ -12,52 +31,68 @@ def main():
     # Convert the DataFrame to a dictionary
     solvability_dict = df.to_dict(orient='list')
 
-
-
     comparison_options = ["off"] + eldarica_abstract_options
 
     # gain and lose number of problems
     for strategy_option in ["prioritizing_SEH", "pruning_rank"]:
-        print("-"*10)
+        print("-" * 10)
         # gain problems dict
         gain_list_dict = {}
+        lose_list_dict = {}
         for eldarica_option in comparison_options:
             gain_list = []
+            lose_list = []
             for name, original, strategy, in zip(solvability_dict["file_name"],
-                                                       solvability_dict["eldarica_abstract_" + eldarica_option + "_satisfiability"],
-                                                       solvability_dict[
-                                                           "eldarica_abstract_" + eldarica_option + "_"+strategy_option+"_satisfiability"]):
-                strategy= strategy[:strategy.find("[")] if "[" in strategy else strategy
+                                                 solvability_dict[
+                                                     "eldarica_abstract_" + eldarica_option + "_satisfiability"],
+                                                 solvability_dict[
+                                                     "eldarica_abstract_" + eldarica_option + "_" + strategy_option + "_satisfiability"]):
+                strategy = strategy[:strategy.find("[")] if "[" in strategy else strategy
                 if original == "unknown" and strategy != "unknown" and strategy != "miss info":
                     gain_list.append(name)
+                if original != "unknown" and strategy == "unknown":  # notice that miss info is not counted
+                    lose_list.append(name)
+
             gain_list_dict[eldarica_option + "_gain_list"] = gain_list
-            print(eldarica_option + " gains by "+strategy_option+" ", len(gain_list))
+            lose_list_dict[eldarica_option + "_lose_list"] = lose_list
 
+        for k in gain_list_dict:
+            print(k, len(gain_list_dict[k]))
         common_combination(gain_list_dict, comparison_options, "gain")
-
-
 
         print("-" * 10)
 
-        # lose problems dict
-        lose_list_dict = {}
-        for eldarica_option in comparison_options:
+        for k in lose_list_dict:
+            print(k, len(lose_list_dict[k]))
+        common_combination(lose_list_dict, comparison_options, "lose")
+
+        print("-" * 10)
+        # gain and lose number for z3 and golem
+        for strategy_option in ["z3", "golem"]:
+            print("-" * 10)
+            # gain problems dict
+            gain_list_dict = {}
+            lose_list_dict = {}
+            gain_list = []
             lose_list = []
             for name, original, strategy, in zip(solvability_dict["file_name"],
-                                                       solvability_dict["eldarica_abstract_" + eldarica_option + "_satisfiability"],
-                                                       solvability_dict[
-                                                           "eldarica_abstract_" + eldarica_option + "_"+strategy_option+"_satisfiability"]):
-                strategy = strategy[:strategy.find("[")] if "[" in strategy else strategy
+                                                 solvability_dict[strategy_option + "_satisfiability"],
+                                                 solvability_dict[strategy_option + "_pruning" + "_satisfiability"]):
+                if original == "unknown" and strategy != "unknown" and strategy != "miss info":
+                    gain_list.append(name)
                 if original != "unknown" and strategy == "unknown":  # notice that miss info is not counted
                     lose_list.append(name)
-            lose_list_dict[eldarica_option + "_lose_list"] = lose_list
-            print(eldarica_option + " loses by "+strategy_option+" ", len(lose_list))
 
+            gain_list_dict[strategy_option + "_gain_list"] = gain_list
+            lose_list_dict[strategy_option + "_lose_list"] = lose_list
 
-        common_combination(lose_list_dict,comparison_options,"lose")
+            for k in gain_list_dict:
+                print(k, len(gain_list_dict[k]))
 
+            print("-" * 10)
 
-    #todo find interesting numbers in category summary
+            for k in lose_list_dict:
+                print(k, len(lose_list_dict[k]))
 
 
 
