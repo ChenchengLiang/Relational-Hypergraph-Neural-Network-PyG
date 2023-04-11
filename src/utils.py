@@ -142,6 +142,8 @@ def read_a_json_field(json_obj, field_name):
                 return "unknown"
             else:
                 return field
+        elif "solving_time" in field_name:
+            return float(field)
         else:
             return field
     except:

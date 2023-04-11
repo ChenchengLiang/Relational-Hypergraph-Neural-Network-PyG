@@ -22,13 +22,13 @@ def main():
     eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-SEH/train_data"
     eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-only-rank/train_data"
     eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-pruning-threshold-rank/train_data"
-    eldarica_abstract_off_folder_pruning_score_folder = ""
+    eldarica_abstract_off_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-pruning-normalized-scores/train_data"
 
     eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term/train_data"
     eldarica_abstract_term_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-SEH/train_data"
     eldarica_abstract_term_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-only-rank/train_data"
     eldarica_abstract_term_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-pruning-threshold-rank/train_data"
-    eldarica_abstract_term_folder_pruning_score_folder = ""
+    eldarica_abstract_term_folder_pruning_score_folder = ""#running
 
     eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct/train_data"
     eldarica_abstract_oct_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-SEH/train_data"
@@ -45,7 +45,7 @@ def main():
     eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs/train_data"
     eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-SEH/train_data"
     eldarica_abstract_relIneqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-only-rank/train_data"
-    eldarica_abstract_relIneqs_folder_pruning_rank_folder = ""#wait to run
+    eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
 
@@ -179,6 +179,8 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
             lcr_c = 1 - (vbssc / vbssc_other_solvers)
             category_dict["[" + str(i) + "]" + " lcr_n " + solver ].append(lcr_n)
             category_dict["[" + str(i) + "]" + " lcr_c " + solver].append(lcr_c)
+
+
 
 
 
@@ -463,7 +465,7 @@ def mask_results_by_benchmark_timeout(satisfiability, solving_time):
 def read_pruning_solvability_for_standard_solvers(solvability_dict,full_file_folder,measurements):
     # read pruning solvabilities for z3 and golem
     z3_pruning_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-z3-pruning-615/train_data"
-    golem_pruning_folder = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/unsatcore-linear-prune-for-other-solvers/pruned-test/golem/train_data"
+    golem_pruning_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-golem-pruning-708/train_data"
     for solver, solver_folder in zip(["z3", "golem"], [z3_pruning_folder, golem_pruning_folder]):
         for file in tqdm(get_file_list(full_file_folder, "smt2"), desc="read files"):
             basename = os.path.basename(file)
@@ -484,22 +486,22 @@ def read_pruning_solvability_for_standard_solvers(solvability_dict,full_file_fol
                             vb_pruning_satisfiability_list.append(satisfiability)
                             vb_pruning_solving_time_list.append(solving_time)
                             vb_pruning_option_list.append(g + "-" + str(t))
-
                 vb_satisfiability = "unknown"
                 vb_solving_time = benchmark_timeout
-                for i,(s, st,op) in enumerate(zip(vb_pruning_satisfiability_list, vb_pruning_solving_time_list,vb_pruning_option_list)):
+                vb_op="CDHG-0.0"
+                for s, st,op in zip(vb_pruning_satisfiability_list, vb_pruning_solving_time_list,vb_pruning_option_list):
                     if s == "unsafe":
                         vb_satisfiability = s
                         if st < vb_solving_time:
-                            vb_solving_time = st+"["+op+"]"
+                            vb_solving_time = st
+                            vb_op=op
 
-                for m, field in zip(measurements, [vb_satisfiability, vb_solving_time]):
+                for m, field in zip(measurements, [vb_satisfiability, str(vb_solving_time)+"["+vb_op+"]"]):
                     solvability_dict[solver + "_pruning_" + m].append(field)
 
             else:
                 for m in measurements:
                     solvability_dict[solver + "_pruning_" + m].append("miss info")
 
-    #sys.exit(0)
 if __name__ == '__main__':
     main()
