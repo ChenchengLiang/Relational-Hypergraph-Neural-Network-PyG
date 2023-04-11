@@ -318,10 +318,11 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                         virtual_best_solving_time_graphs = get_min_number_from_list(
                             [solving_time_CDHG, solving_time_CG], -0.001)
 
-                        satisfiability, solving_time = mask_results_by_benchmark_timeout(
+                        virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs = mask_results_by_benchmark_timeout(
                             virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
-                        solvability_dict[solver_variation + "_" + "satisfiability"].append(satisfiability)
-                        solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
+
+                        solvability_dict[solver_variation + "_" + "satisfiability"].append(virtual_best_satisfiability_graphs)
+                        solvability_dict[solver_variation + "_" + "solving_time"].append(virtual_best_solving_time_graphs)
 
                     else:  # no solvability file
                         for m in measurements:
@@ -352,13 +353,14 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                             clause_number_after_pruning_list_CDHG, clause_number_after_pruning_list_CG, -0.001)
                         # compound field = field[virtual_best_threshold_graphs][virtual_best_clause_number_graphs]
 
-                        satisfiability, solving_time = mask_results_by_benchmark_timeout(
+                        virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs = mask_results_by_benchmark_timeout(
                             virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
+
                         solvability_dict[solver_variation + "_" + "satisfiability"].append(
-                            str(satisfiability) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
+                            str(virtual_best_satisfiability_graphs) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
                                 virtual_best_clause_number_graphs) + "]")
                         solvability_dict[solver_variation + "_" + "solving_time"].append(
-                            str(solving_time) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
+                            str(virtual_best_solving_time_graphs) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
                                 virtual_best_clause_number_graphs) + "]")
 
                     else:  # no solvability file
@@ -366,6 +368,7 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                             solvability_dict[solver_variation + "_" + m].append("miss info")
                         virtual_best_satisfiability_graphs = "unknown"
                         virtual_best_solving_time_graphs = benchmark_timeout
+
                     # virtual best of eldarica
                     virtual_best_cross_eldarica_variation(solver_variation, solvability_dict,
                                                           virtual_best_satisfiability_graphs,
@@ -444,6 +447,7 @@ def virtual_best_cross_eldarica_variation(solver_variation, solvability_dict, vi
     eldarica_base_variation = solver_variation[:solver_variation.find("_" + option)]
     satisfiability_abstract = solvability_dict[eldarica_base_variation + "_satisfiability"][-1]
     solving_time_abstract = solvability_dict[eldarica_base_variation + "_solving_time"][-1]
+
     virtual_best_satisfiability = virtual_best_satisfiability_from_list(
         [virtual_best_satisfiability_graphs, satisfiability_abstract])
     virtual_best_solving_time = get_min_number_from_list(
