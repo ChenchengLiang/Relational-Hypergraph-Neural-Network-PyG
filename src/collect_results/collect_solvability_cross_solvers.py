@@ -28,13 +28,13 @@ def main():
     eldarica_abstract_term_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-SEH/train_data"
     eldarica_abstract_term_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-only-rank/train_data"
     eldarica_abstract_term_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-pruning-threshold-rank/train_data"
-    eldarica_abstract_term_folder_pruning_score_folder = ""#running
+    eldarica_abstract_term_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-pruning-normalized-scores/train_data"
 
     eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct/train_data"
     eldarica_abstract_oct_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-SEH/train_data"
     eldarica_abstract_oct_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-only-rank/train_data"
     eldarica_abstract_oct_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-pruning-threshold-rank/train_data"
-    eldarica_abstract_oct_folder_pruning_score_folder = ""
+    eldarica_abstract_oct_folder_pruning_score_folder = ""#running
 
     eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs/train_data"
     eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-SEH/train_data"
@@ -105,6 +105,7 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
     # get column names
     columns = ["category"]
+    columns.append("number_predicted")
     for solver in comparison_solver_list:
         for s in measurements:
             columns.append(solver + "_" + s)
@@ -119,6 +120,14 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
         for m in measurements:
             for solver in comparison_solver_list:
                 count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver)
+
+    # get number of predicted
+    for c in categories:
+        count = 0
+        for ca, sa in zip(solvability_dict["category"], solvability_dict["eldarica_abstract_off_prioritizing_SEH_satisfiability"]):
+            if c in ca and sa != "miss info":
+                count += 1
+        category_dict["number_predicted"].append(count)
 
     # compute lcr
     lcr_comparison_list=["vb_eldarica","vb_eldarica_original"]
@@ -142,9 +151,12 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
     # add total row
     category_dict["category"].append("total")
+    category_dict["number_predicted"].append(sum(category_dict["number_predicted"]))
     for solver in comparison_solver_list:
         for m in measurements:
             category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
+
+
     # add total row for lcr
     for i, solver_set in enumerate(lcr_solver_sets):
         for m in [" lcr_n ", " lcr_c "]:
@@ -155,6 +167,7 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
     # add total-lcr row
     category_dict["category"].append("total-lcr")
+    category_dict["number_predicted"].append("-")
     for solver in comparison_solver_list:
         for m in measurements:
             category_dict[solver + "_" + m].append("-")
@@ -185,8 +198,8 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
 
     #print category_dict column number
-    # for k in category_dict:
-    #     print(k, len(category_dict[k]))
+    for k in category_dict:
+        print(k, len(category_dict[k]))
 
 
     return category_dict

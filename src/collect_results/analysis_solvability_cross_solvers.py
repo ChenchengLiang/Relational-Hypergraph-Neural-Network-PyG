@@ -5,22 +5,10 @@ import itertools
 
 def main():
 
-    #read_gain_and_lose()
+    read_gain_and_lose()
 
 
-
-    #todo find interesting numbers in category summary
-    df = pd.read_excel(
-        '/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx',
-        sheet_name='category_summary', header=0)
-
-    # Convert the DataFrame to a dictionary
-    category_summary_dict = df.to_dict(orient='list')
-    #todo max safe
-    for index,_ in enumerate(category_summary_dict["category"][:-1]): #for each raw
-        print(category_summary_dict["category"][index])
-        print("golem_safe",category_summary_dict["golem_safe"][index])
-
+    sort_solvability_by_category()
 
 def read_gain_and_lose():
     # Read the Excel file into a Pandas DataFrame
@@ -35,7 +23,7 @@ def read_gain_and_lose():
 
     # gain and lose number of problems
     for strategy_option in ["prioritizing_SEH", "pruning_rank"]:
-        print("-" * 10)
+        print("-" * 10+strategy_option+"-" * 10)
         # gain problems dict
         gain_list_dict = {}
         lose_list_dict = {}
@@ -50,7 +38,7 @@ def read_gain_and_lose():
                 strategy = strategy[:strategy.find("[")] if "[" in strategy else strategy
                 if original == "unknown" and strategy != "unknown" and strategy != "miss info":
                     gain_list.append(name)
-                if original != "unknown" and strategy == "unknown":  # notice that miss info is not counted
+                if original in ["safe","unsafe"] and strategy == "unknown":  # notice that miss info is not counted
                     lose_list.append(name)
 
             gain_list_dict[eldarica_option + "_gain_list"] = gain_list
@@ -80,7 +68,7 @@ def read_gain_and_lose():
                                                  solvability_dict[strategy_option + "_pruning" + "_satisfiability"]):
                 if original == "unknown" and strategy != "unknown" and strategy != "miss info":
                     gain_list.append(name)
-                if original != "unknown" and strategy == "unknown":  # notice that miss info is not counted
+                if original in ["safe","unsafe"] and strategy == "unknown":  # notice that miss info is not counted
                     lose_list.append(name)
 
             gain_list_dict[strategy_option + "_gain_list"] = gain_list
@@ -94,7 +82,38 @@ def read_gain_and_lose():
             for k in lose_list_dict:
                 print(k, len(lose_list_dict[k]))
 
+def sort_solvability_by_category():
+    # find interesting numbers in category summary
+    df = pd.read_excel(
+        '/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx',
+        sheet_name='category_summary', header=0)
 
+    # Convert the DataFrame to a dictionary
+    category_summary_dict = df.to_dict(orient='list')
+    # sort solvability
+    for index, _ in enumerate(category_summary_dict["category"][:-1]):  # for each raw
+        print("-" * 10)
+        number_of_benchmark_in_category = category_summary_dict["vb_safe"][index] + category_summary_dict["vb_unsafe"][
+            index] + category_summary_dict["vb_unknown"][index]
+        print("benchmark category: ", category_summary_dict["category"][index].strip())
+        print("number of problems:", number_of_benchmark_in_category)
+        print("number of predicted:", category_summary_dict["number_predicted"][index])
+        safe_list = []
+        unsafe_list = []
+        unknown_list = []
+        for k in category_summary_dict:
+            if "_safe" in k:
+                safe_list.append((k[:k.rfind("_")], category_summary_dict[k][index]))
+            if "_unsafe" in k:
+                unsafe_list.append((k[:k.rfind("_")], category_summary_dict[k][index]))
+            if "_unknown" in k:
+                unknown_list.append((k[:k.rfind("_")], category_summary_dict[k][index]))
+        safe_list = sorted(safe_list, key=lambda pair: pair[1], reverse=True)
+        unsafe_list = sorted(unsafe_list, key=lambda pair: pair[1], reverse=True)
+        unknown_list = sorted(unknown_list, key=lambda pair: pair[1], reverse=False)
+        print("safe_list", safe_list)
+        print("unsafe_list", unsafe_list)
+        print("unknown_list", unknown_list)
 
 def common_combination(data_dict,comparison_options,comparison_type):
     print("-" * 10)
