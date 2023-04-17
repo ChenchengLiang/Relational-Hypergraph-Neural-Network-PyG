@@ -1,0 +1,36 @@
+# build image command: apptainer build image.sif my_recipe.def
+# use image command: apptainer exec  image.sif z3
+BootStrap: docker
+From: continuumio/miniconda3
+#ubuntu:20.04
+
+
+%post
+    apt-get -y update
+    apt-get -y install pip
+    conda install pip
+    pip install tqdm
+    apt-get update && apt-get install -y build-essential python python-dev python-setuptools git
+    apt-get install libgmp-dev -y
+
+    apt-get update
+    apt-get install unzip
+    apt-get install apt-transport-https curl gnupg -yqq
+    echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list
+    echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.list.d/sbt_old.list
+    curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/scalasbt-release.gpg --import
+    chmod 644 /etc/apt/trusted.gpg.d/scalasbt-release.gpg
+    apt-get update
+    apt-get install sbt -y
+    apt-get install default-jdk -y
+
+    cd /usr/local/bin
+    wget http://logicrunch.it.uu.se:4096/~wv/eldarica/eldarica-bin-nightly.zip
+    unzip  eldarica-bin-nightly.zip
+    rm eldarica-bin-nightly.zip
+    chmod +x eld
+
+
+
+%labels
+    Chencheng Liang

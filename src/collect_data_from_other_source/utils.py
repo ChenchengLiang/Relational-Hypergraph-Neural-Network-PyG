@@ -58,7 +58,7 @@ def collect_solving_info_from_other_solvers(folder,solver_location="z3", shell_t
         os.remove(smt2_file)
 
 def run_one_shell(shell_file_name, log_file):
-    initiall_dict = {"solving_time": ["10800"], "satisfiability": ["-1"]}
+    initiall_dict = {"solving_time": [str(benchmark_timeout)], "satisfiability": ["-1"]}
     # Open a file for writing
     with open(log_file, "w") as outfile:
         # Write the dictionary to the file as JSON

@@ -34,13 +34,13 @@ def main():
     eldarica_abstract_oct_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-SEH/train_data"
     eldarica_abstract_oct_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-only-rank/train_data"
     eldarica_abstract_oct_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-pruning-threshold-rank/train_data"
-    eldarica_abstract_oct_folder_pruning_score_folder = ""#running
+    eldarica_abstract_oct_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-pruning-normalized-scores/train_data"
 
     eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs/train_data"
     eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-SEH/train_data"
     eldarica_abstract_relEqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-only-rank/train_data"
     eldarica_abstract_relEqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-pruning-threshold-rank/train_data"
-    eldarica_abstract_relEqs_folder_pruning_score_folder = ""
+    eldarica_abstract_relEqs_folder_pruning_score_folder = ""#running
 
     eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs/train_data"
     eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-SEH/train_data"

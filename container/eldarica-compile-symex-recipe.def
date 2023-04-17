@@ -24,20 +24,17 @@ From: continuumio/miniconda3
     apt-get install sbt -y
     apt-get install default-jdk -y
 
+
+
     cd /usr/local/bin
-    wget http://logicrunch.it.uu.se:4096/~wv/eldarica/eldarica-bin-nightly.zip
-    unzip  eldarica-bin-nightly.zip
-    rm eldarica-bin-nightly.zip
+    git clone https://github.com/ChenchengLiang/eldarica -b symex
+    cd eldarica
+    sbt assembly
+
+    cp * -r ../
+    cd ..
+    rm eldarica -r
     chmod +x eld
-
-
-
-    #cd /usr/local/bin
-    #git clone https://github.com/uuverifiers/eldarica
-    #cd eldarica
-    #sbt assembly
-    #chmod +x eld
-
 
 %labels
     Chencheng Liang

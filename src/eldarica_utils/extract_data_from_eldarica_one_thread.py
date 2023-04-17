@@ -41,7 +41,7 @@ def main():
     for g in ["CDHG", "CG"]:
         for threshold in threshold_list:  # reverse this list
             parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
-                threshold) + " -hornGraphType:" + g +" -abstract:oct " )
+                threshold) + " -hornGraphType:" + g +" -abstract:relEqs " )
 
     # unsatcore: check solvability for prioritized clauses benchmark_timeout*3
     # parameters_pipeline.append(
