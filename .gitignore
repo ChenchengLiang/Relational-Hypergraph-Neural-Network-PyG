@@ -1,5 +1,7 @@
 /*
-!/demo_data/*
+!/benchmarks/one-example-demo-unsatcore-CDHG/train_data/raw/*.zip
+!/benchmarks/one-example-demo-unsatcore-CDHG/valid_data/raw/*.zip
+!/benchmarks/one-example-demo-unsatcore-CDHG/test_data/raw/*.zip
 !/src/*.py
 /src/debug_main.py
 !/src/cluster_utils
@@ -13,3 +15,4 @@
 !/requirements.txt
 !/setup.py
 !/container/*.def
+
