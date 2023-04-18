@@ -1,5 +1,6 @@
 /*
-!/src.*.py
+!/src/*.py
+/src/debug_main.py
 !/src/cluster_utils
 !/src/collect_data_from_other_source
 !/src/collect_results
@@ -10,4 +11,5 @@
 !/README.md
 !/requirements.txt
 !/setup.py
+!/container/*.def
 !/benchmarks/one-example-demo-unsatcore-CDHG
