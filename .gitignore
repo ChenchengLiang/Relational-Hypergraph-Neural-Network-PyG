@@ -1,4 +1,5 @@
 /*
+!/demo_data/*
 !/src/*.py
 /src/debug_main.py
 !/src/cluster_utils
@@ -12,4 +13,3 @@
 !/requirements.txt
 !/setup.py
 !/container/*.def
-!/benchmarks/one-example-demo-unsatcore-CDHG
