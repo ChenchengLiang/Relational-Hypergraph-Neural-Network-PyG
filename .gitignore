@@ -1,4 +1,5 @@
 **/__pycache__/
+**/*.pt
 /.idea
 /tutorial
 /cluster-results
@@ -8,6 +9,8 @@
 /venv
 /benchmarks/*
 !/benchmarks/one-example-demo-unsatcore-CDHG/
+/benchmarks/one-example-demo-unsatcore-CDHG/figures
+/benchmarks/one-example-demo-unsatcore-CDHG/model
 /src/*
 !/src/*.py
 /src/debug_main.py

@@ -4,9 +4,9 @@
 
 
 We first build [Apptainer](https://apptainer.org/docs/admin/main/index.html) images (similar to docker) to be our environment.
-
 Apptainer installation instructions can be find [here](https://apptainer.org/docs/admin/main/installation.html).
 
+If you don't use container, you can also follow the command in .def files mentioned following to install everything.
 
 #### 1. Eldarica container
 In the folder container of this repository, build a Eldarica image by:
@@ -101,11 +101,12 @@ In each raw folder, we put our train, valid, and test data.
 
 * Start training and prediction by:
 ```
-apptainer exec ../container/python_image.sif python3 demo.py ../benchmark/one-example-demo-unsatcore-CDHG
+apptainer exec ../container/python_image.sif python3 demo.py ../benchmarks/one-example-demo-unsatcore-CDHG
 ```
-This command use the container python_image.sif to run the python script demo.py, and the parameter "../benchmark/one-example-demo-unsatcore-CDHG" is the path to the folder we just built.
+This command use the container python_image.sif to run the python script demo.py, and the parameter "../benchmarks/one-example-demo-unsatcore-CDHG" is the path to the folder we just built.
 Notice that the data folder name "one-example-demo-unsatcore-CDHG" matters, because it contains the information of the graph type (CDHG) and label type (unsatcore).
 
-After the training, in your browser you can see the training data and prediction result in http://127.0.0.1:5000
+After the training, in your browser you can see the training data and prediction result in http://127.0.0.1:5000.
+The training figures are included in "one-example-demo-unsatcore-CDHG/figures".
 
-In benchmark/one-example-demo/test_data, you can see the predicted labels in the file ".hyperEdgeGraph.JSON" or ".monoDirectionLayerGraph.JSON" depending the parameter -getHornGraph:CDHG or -getHornGraph:CG.
+In "one-example-demo-unsatcore-CDHG/test_data/predicted", you can see the predicted labels in the file ".hyperEdgeGraph.JSON" or ".monoDirectionLayerGraph.JSON" depending the parameter -getHornGraph:CDHG or -getHornGraph:CG.
