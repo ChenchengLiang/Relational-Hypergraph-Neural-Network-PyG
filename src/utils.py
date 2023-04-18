@@ -78,6 +78,11 @@ def compress_file(inp_file_names, out_zip_file):
     finally:
         zf.close()
 
+def compress_data(folder):
+    for f in get_file_list(folder, "smt2", ""):
+        for ff in glob.glob(f + "*"):
+            compress_file([ff], ff + ".zip")
+            os.remove(ff)
 
 def read_one_filed(file_name, field_name):
     with open(file_name) as f:

@@ -11,11 +11,12 @@ from src.models import Hyper_classification, Full_connected_model, GNN_classific
 from src.predict import predict
 from src.data_utils.read_data import get_data
 from src.train import train
-from src.utils import write_predicted_label_to_JSON_file, send_email
+from src.utils import write_predicted_label_to_JSON_file, send_email,compress_data
 from src.cluster_utils.utils import get_task_by_folder_name
 from src.train_utils import get_parameter_summary
 from torch_geometric.profile import get_model_size, count_parameters, get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
+import glob
 
 
 # import wandb
@@ -77,8 +78,7 @@ def run_one_experiment(input_params
                        # _cg_edge_types=[], _embedding_size=64, _message_normalization=False,_inter_layer_norm=True,
                        # _GPU=True,_regression_layer_norm=True,_patient=20
                        ) -> object:
-
-
+    compress_files(input_params["benchmark"])
 
     gnn_name_map = {"GCNConv": GCNConv, "SAGEConv": SAGEConv, "FiLMConv": FiLMConv, "HyperConv": HyperConv}
     task_num_class_dict = {"argument_binary_classification": 2, "template_binary_classification": 2,
@@ -201,3 +201,11 @@ def run_one_experiment(input_params
     write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, params["task_type"],
                                        root=opj(params["benchmark"], "test_data"))
     return predicted_accuracy
+
+
+def compress_files(benchmark):
+    for fold in ["train_data","valid_data","test_data"]:
+        folder=benchmark+"/"+fold+"/raw"
+        if len(glob.glob(folder+"/*.zip"))==0 and len(glob.glob(folder+"/*"))!=0:
+            compress_data(folder)
+

@@ -5,8 +5,8 @@ from cluster_utils.utils import get_task_by_folder_name
 
 
 def main():
-    benchmarks = ["../benchmarks/unsatcore_pipeline_small-train-CDHG",
-                  "../benchmarks/unsatcore_pipeline_small-train-CG",
+    benchmarks = ["/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/one-example-demo-unsatcore",#CDHG
+                  #"/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/one-example-demo",#CG
                   ]
 
     # load data
@@ -20,11 +20,11 @@ def main():
 
 def _train(benchmarks):
     experiment_date = False
-    # models = ["hyper_GCN", "GNN"]f
+    # models = ["hyper_GCN", "GNN"]
     models = ["hyper_GCN"]
     gnns = [SAGEConv, FiLMConv, GCNConv]
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
-    task = benchmarks[0]
+    task = get_task_by_folder_name(benchmarks[0])
     num_gnn_layers = [2]  # 8 works best
     dropout_rate = [  # all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},

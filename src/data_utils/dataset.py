@@ -1,3 +1,5 @@
+import glob
+
 import torch
 from torch_geometric.data import Dataset, Data
 from src.utils import get_file_list, unzip_file, read_one_filed, convert_constant_to_category
