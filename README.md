@@ -1,6 +1,6 @@
-Relational-Hypergraph-Neural-Network-PyG
 
-## Build Enviroment:
+
+## Build Environment:
 
 
 We first build [Apptainer](https://apptainer.org/docs/admin/main/index.html) images (similar to docker) to be our environment.
@@ -68,7 +68,7 @@ where the parameter -mineCounterExample:common and -mineCounterExample:union den
 -abstract:off denotes we turn off manual heuristics for generating abstraction in the solving process.
 
 Then you will get following files in the same folder:
-* a file with suffix ".simplified" which stores the simplified Horn clauses so when we read predicted label back to Eldarica we don't simplifiy them again.
+* a file with suffix ".simplified" which stores the simplified Horn clauses so when we read predicted label back to Eldarica we don't simplify them again.
 * a file with suffix ".counterExampleIndex.JSON" in which the field counterExampleIndices tells which clause should be labelled to 1, and others will be labelled to 0.
 * a file with suffix ".log" which records the time consumption of this command 
 

@@ -1,7 +1,14 @@
-/*
-!/benchmarks/one-example-demo-unsatcore-CDHG/train_data/raw/*.zip
-!/benchmarks/one-example-demo-unsatcore-CDHG/valid_data/raw/*.zip
-!/benchmarks/one-example-demo-unsatcore-CDHG/test_data/raw/*.zip
+**/__pycache__/
+/.idea
+/tutorial
+/cluster-results
+/hyper-parameters
+/eldarica-graph-generation*
+/data
+/venv
+/benchmarks/*
+!/benchmarks/one-example-demo-unsatcore-CDHG/
+/src/*
 !/src/*.py
 /src/debug_main.py
 !/src/cluster_utils
@@ -9,10 +16,12 @@
 !/src/collect_results
 !/src/data_utils
 !/src/eldarica_utils
+/src/eldarica_utils/local_*
 !/src/shell_utils
 !/LICENSE.md
 !/README.md
 !/requirements.txt
 !/setup.py
+/container/*
 !/container/*.def
 
