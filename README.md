@@ -94,15 +94,17 @@ This command means, go to the path under src, then run the Python image to start
 
 
 Then we build training data folder:
-In the folder benchmark/one-example-demo, we have three folders: train_data, valid_data, test_data.
+In the folder benchmark/one-example-demo-unsatcore-CDHG, we have three folders: train_data, valid_data, test_data.
 And, for each folder there is a subfolder named "raw".
 In each raw folder, we put our train, valid, and test data.
 
+
 * Start training and prediction by:
 ```
-apptainer exec ../container/python_image.sif python3 demo.py ../benchmark/one-example-demo
+apptainer exec ../container/python_image.sif python3 demo.py ../benchmark/one-example-demo-unsatcore-CDHG
 ```
-This command use the container python_image.sif to run the python script demo.py, and the parameter "../benchmark/one-example-demo" is the path to the folder we just built.
+This command use the container python_image.sif to run the python script demo.py, and the parameter "../benchmark/one-example-demo-unsatcore-CDHG" is the path to the folder we just built.
+Notice that the data folder name "one-example-demo-unsatcore-CDHG" matters, because it contains the information of the graph type (CDHG) and label type (unsatcore).
 
 After the training, in your browser you can see the training data and prediction result in http://127.0.0.1:5000
 
