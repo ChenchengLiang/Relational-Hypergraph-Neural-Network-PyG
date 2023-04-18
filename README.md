@@ -91,7 +91,7 @@ First we need to start a mlflow server by:
 cd src; apptainer exec ../container/python_image.sif mlflow ui
 ```
 This command means, go to the path under src, then run the Python image to start a mlflow server.
-
+Notice that you should not close this terminal while training and observe the results, otherwise the server will be closed.
 
 Then we build training data folder:
 In the folder benchmark/one-example-demo-unsatcore-CDHG, we have three folders: train_data, valid_data, test_data.
@@ -99,9 +99,9 @@ And, for each folder there is a subfolder named "raw".
 In each raw folder, we put our train, valid, and test data.
 
 
-* Start training and prediction by:
+* Start training and prediction in a new terminal by:
 ```
-apptainer exec ../container/python_image.sif python3 demo.py ../benchmarks/one-example-demo-unsatcore-CDHG
+cd src; apptainer exec ../container/python_image.sif python3 demo.py ../benchmarks/one-example-demo-unsatcore-CDHG
 ```
 This command use the container python_image.sif to run the python script demo.py, and the parameter "../benchmarks/one-example-demo-unsatcore-CDHG" is the path to the folder we just built.
 Notice that the data folder name "one-example-demo-unsatcore-CDHG" matters, because it contains the information of the graph type (CDHG) and label type (unsatcore).
