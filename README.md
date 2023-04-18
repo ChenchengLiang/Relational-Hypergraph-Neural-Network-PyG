@@ -110,3 +110,6 @@ After the training, in your browser you can see the training data and prediction
 The training figures are included in "one-example-demo-unsatcore-CDHG/figures".
 
 In "one-example-demo-unsatcore-CDHG/test_data/predicted", you can see the predicted labels in the file ".hyperEdgeGraph.JSON" or ".monoDirectionLayerGraph.JSON" depending the parameter -getHornGraph:CDHG or -getHornGraph:CG.
+
+Try to replace the relatieve paths to absolute paths 
+if there are some problems caused by path (e.g., didn't read data in list).

@@ -1,5 +1,5 @@
-import glob
-
+import sys
+sys.path.append("../../")
 import torch
 from torch_geometric.data import Dataset, Data
 from src.utils import get_file_list, unzip_file, read_one_filed, convert_constant_to_category
@@ -13,7 +13,7 @@ class HornGraphDataset(Dataset):
                 root = Where the dataset should be stored. This folder is split
                 """
         self.root = root
-        self.num_classes = params["num_classes"]
+        #self.num_classes = params["num_classes"]
         self.token_map = token_map
         self.graph_type = params["graph_type"]
         self.learning_task = params["learning_task"]

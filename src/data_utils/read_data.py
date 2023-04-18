@@ -1,3 +1,5 @@
+import sys
+sys.path.append("../../")
 from os.path import join as opj
 
 import mlflow
@@ -7,7 +9,6 @@ from src.utils import remove_processed_file, unzip_file, read_one_filed, get_fil
 from src.plots import draw_label_pie_chart
 from torch_geometric.loader import DataLoader
 import os
-import glob
 
 
 def get_data(params):

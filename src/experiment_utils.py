@@ -17,6 +17,8 @@ from src.train_utils import get_parameter_summary
 from torch_geometric.profile import get_model_size, count_parameters, get_data_size
 from torch_geometric.profile.utils import byte_to_megabyte
 import glob
+import sys
+sys.path.append("../")
 
 
 # import wandb
