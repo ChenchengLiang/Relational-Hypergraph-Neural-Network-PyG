@@ -25,7 +25,7 @@ If you see help information of Eldarica, then you have successfully built the im
 #### 2. Python container
 In the folder container of this repository, build a Python image by:
 ```
-apptainer build python_image.sif alvis_recipe-A100.def
+apptainer build python_image.sif alvis_recipe.def
 ```
 Run this image by:
 ```
@@ -93,15 +93,17 @@ cd src; apptainer exec ../container/python_image.sif mlflow ui
 This command means, go to the path under src, then run the Python image to start a mlflow server.
 
 
-Build training data folder:
+Then we build training data folder:
 In the folder benchmark/one-example-demo, we have three folders: train_data, valid_data, test_data.
 And, for each folder there is a subfolder named "raw".
 In each raw folder, we put our train, valid, and test data.
 
-Then we can start training and prediction by:
+* Start training and prediction by:
 ```
-apptainer exec ../container/python_image.sif demo.py
+apptainer exec ../container/python_image.sif python3 demo.py ../benchmark/one-example-demo
 ```
+This command use the container python_image.sif to run the python script demo.py, and the parameter "../benchmark/one-example-demo" is the path to the folder we just built.
 
-In your browser you can see the training data and prediction result in http://127.0.0.1:5000
+After the training, in your browser you can see the training data and prediction result in http://127.0.0.1:5000
 
+In benchmark/one-example-demo/test_data, you can see the predicted labels in the file ".hyperEdgeGraph.JSON" or ".monoDirectionLayerGraph.JSON" depending the parameter -getHornGraph:CDHG or -getHornGraph:CG.

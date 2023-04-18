@@ -1,10 +1,10 @@
 import sys
 
-from src.experiment_utils import run_one_experiment
-from src.layers import HyperConv
+from experiment_utils import run_one_experiment
+from layers import HyperConv
 
 def main():
-    folder_name = "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/one-example-demo-unsatcore-CDHG"#sys.argv[1]
+    folder_name = sys.argv[1]
     params = {"benchmark": folder_name, "experiment_date": True, "experiment_name": "load_data", "reload_data": True,
               "gnn": HyperConv.__name__, "cdhg_edge_types": ["relationSymbolArgumentEdge", "guardEdge",
                                                              "ASTLeftEdge", "ASTRightEdge",
@@ -21,7 +21,7 @@ def main():
 
     benchmarks = [folder_name]
 
-    # load data
+    # train
     for _benchmark in benchmarks:
         run_one_experiment(params)
 
