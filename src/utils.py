@@ -78,6 +78,13 @@ def compress_file(inp_file_names, out_zip_file):
     finally:
         zf.close()
 
+def comress_relative_files(file,delete_original_file =False):
+    for f in glob.glob(file+ "*"):
+        if not f.endswith(".zip"):
+            compress_file([f], f+".zip")
+            if delete_original_file == True:
+                os.remove(f)
+
 def compress_data(folder):
     for f in get_file_list(folder, "smt2", ""):
         for ff in glob.glob(f + "*"):
@@ -98,6 +105,13 @@ def unzip_file(zip_file, verbose=False):
     else:
         if verbose == True:
             print("zip file " + zip_file + " not existed")
+
+def unzip_relative_files(file,delete_original_zip_file =False):
+    for f in glob.glob(file+ "*"):
+        if ".zip" in f:
+            unzip_file(f)
+            if delete_original_zip_file==True:
+                os.remove(f)
 
 
 def manual_flatten(target_list):
@@ -144,7 +158,7 @@ def read_a_json_field(json_obj, field_name):
             elif "memory" in field:
                 return "unknown"
             elif "error" in field:
-                return "unknown"
+                return "unknown" #todo: check this
             else:
                 return field
         elif "solving_time" in field_name:
@@ -152,7 +166,7 @@ def read_a_json_field(json_obj, field_name):
         else:
             return field
     except:
-        print("no field in json file:", field_name)
+        print(json_obj,"no field in json file:", field_name)
         return -1
 
 

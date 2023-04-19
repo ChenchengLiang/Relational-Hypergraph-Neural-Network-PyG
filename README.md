@@ -90,14 +90,15 @@ These JSON files store the graph structure and corresponding labels.
 
 
 #### 3. Train and prediction [Python] 
-First we need to start a mlflow server by:
+* First we need to start a mlflow server by:
 ```
 cd src; apptainer exec ../container/python_image.sif mlflow ui
 ```
 This command means, go to the path under src, then run the Python image to start a mlflow server.
-Notice that you should not close this terminal while training and observe the results, otherwise the server will be closed.
+Notice that before start this server, it is better first close other mlflow servers.
+This mlflow server terminal should not close while training and observe the results.
 
-Then we build training data folder:
+* Then we build training data folder:
 In the folder benchmark/one-example-demo-unsatcore-CDHG, we have three folders: train_data, valid_data, test_data.
 And, for each folder there is a subfolder named "raw".
 In each raw folder, we put our train, valid, and test data.

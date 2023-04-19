@@ -9,8 +9,12 @@ from src.CONSTANTS import benchmark_timeout
 def main():
     folder = sys.argv[1]
     solver_location = sys.argv[2]
+    try:
+        solver_parameter = sys.argv[3]  # -abstract:off -sym:1 -hornGraphType:CG
+    except:
+        solver_parameter = " "
     collect_solving_info_from_other_solvers(folder, solver_location=solver_location, shell_timeout=benchmark_timeout,
-                                            solver_name=os.path.basename(solver_location))  # z3solver_location = sys.argv[2]
+                                            solver_name=os.path.basename(solver_location),solver_parameter=solver_parameter)
 
 
 

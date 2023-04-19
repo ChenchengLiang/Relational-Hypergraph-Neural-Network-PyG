@@ -48,11 +48,17 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
+    eldarica_symex_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/symex-test"
+    eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG")
+    eldarica_symex_folder_CG= os.path.join(eldarica_symex_folder, "CG")
+
 
     full_file_folder = golem_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder))+"/data")
 
     solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
+                                     "eldarica_symex_CDHG":eldarica_symex_folder_CDHG,
+                                     "eldarica_symex_CG":eldarica_symex_folder_CG,
                                      "eldarica_abstract_off": eldarica_abstract_off_folder,
                                      "eldarica_abstract_off_prioritizing_SEH": eldarica_abstract_off_folder_prioritizing_SEH_folder,
                                      "eldarica_abstract_off_prioritizing_rank": eldarica_abstract_off_folder_prioritizing_rank_folder,
@@ -308,9 +314,10 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 json_file_suffix = "golem-solvability.JSON"
             elif "z3" in solver_variation:
                 json_file_suffix = "z3-solvability.JSON"
-            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in
-                                                                  eldarica_abstract_options]:
+            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in eldarica_abstract_options]:
                 json_file_suffix = "eld-solvability.JSON"
+            elif solver_variation in ["eldarica_symex_CDHG","eldarica_symex_CG"]:
+                json_file_suffix = "simplified.smt2.eld-solvability.JSON"
             else:
                 json_file_suffix = "solvability.JSON"
 
@@ -388,12 +395,20 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                                                           virtual_best_solving_time_graphs, measurements,
                                                           "pruning")
                 else:  # read from standard solvers
-                    satisfiability = read_a_json_field(object, "satisfiability")
-                    solving_time = benchmark_timeout if satisfiability== "unknown" else float(read_a_json_field(object, "solving_time"))
+                    if len(object) > 1:  # has solvability file
+                        satisfiability = read_a_json_field(object, "satisfiability")
+                        solving_time = benchmark_timeout if satisfiability == "unknown" else float(
+                            read_a_json_field(object, "solving_time"))
 
-                    satisfiability, solving_time = mask_results_by_benchmark_timeout(satisfiability, solving_time)
-                    solvability_dict[solver_variation + "_" + "satisfiability"].append(satisfiability)
-                    solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
+                        satisfiability, solving_time = mask_results_by_benchmark_timeout(satisfiability, solving_time)
+                        solvability_dict[solver_variation + "_" + "satisfiability"].append(satisfiability)
+                        solvability_dict[solver_variation + "_" + "solving_time"].append(solving_time)
+
+                    else:  # no solvability file
+                        solvability_dict[solver_variation + "_satisfiability"].append("miss info")
+                        solvability_dict[solver_variation + "_solving_time"].append(benchmark_timeout)
+
+
 
     # add virtual best columns
     comparison_solver_list = []

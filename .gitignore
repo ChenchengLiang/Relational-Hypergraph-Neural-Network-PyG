@@ -5,6 +5,7 @@
 /cluster-results
 /hyper-parameters
 /eldarica-graph-generation*
+/eldarica-symex
 /data
 /venv
 /benchmarks/*
