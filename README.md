@@ -13,11 +13,14 @@ In the folder container of this repository, build a Eldarica image by:
 ```
 apptainer build eldarica_image.sif eldarica-compile-unsatcore-recipe.def
 ```
+This cmmand build an image named eldarica_image.sif, and the recipe file is eldarica-compile-unsatcore-recipe.def.
+eldarica_image.sif contains Eldarica and its dependencies.
+
 Run this image by:
 ```
 apptainer exec eldarica_image.sif eld -h
 ```
-where `exec` means execute the image, and `eld` is the command of calling Eldarica. `-h` is the parameter of Eldarica
+where `exec` means execute the image eldarica_image.sif, and `eld` is the command of calling Eldarica. `-h` is the parameter of Eldarica
 
 If you see help information of Eldarica, then you have successfully built the image.
 
@@ -31,7 +34,8 @@ Run this image by:
 ```
 apptainer exec python_image.sif mlflow ui
 ```
-
+Then you will see the mlflow server running in your browser 
+by visiting http://127.0.0.1:5000. This server is used to receive and visualize the training results.
 
 ## Reproduce instructions:
 
