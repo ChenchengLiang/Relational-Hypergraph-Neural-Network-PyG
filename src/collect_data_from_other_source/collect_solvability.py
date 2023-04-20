@@ -15,7 +15,7 @@ def main():
     except:
         solver_parameter = " "
 
-    collect_solving_info_from_other_solvers(folder, solver_location=solver_location, shell_timeout=30,solver_name=os.path.basename(solver_location),solver_parameter=solver_parameter) #z3
+    collect_solving_info_from_other_solvers(folder, solver_location=solver_location, shell_timeout=120, solver_name=os.path.basename(solver_location),solver_parameter=solver_parameter) #z3
 
 
 

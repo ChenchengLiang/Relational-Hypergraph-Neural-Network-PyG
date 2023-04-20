@@ -1,4 +1,4 @@
-# build image command: apptainer build image.sif my_recipe.def
+# build image command: apptainer build image-eldarica.sif eldarica-compile-symex-recipe.def
 # use image command: apptainer exec  image.sif z3
 BootStrap: docker
 From: continuumio/miniconda3
@@ -28,6 +28,7 @@ From: continuumio/miniconda3
 
     cd /usr/local/bin
     git clone https://github.com/ChenchengLiang/eldarica -b symex
+    #git clone https://github.com/uuverifiers/eldarica -b symex
     cd eldarica
     sbt assembly
 

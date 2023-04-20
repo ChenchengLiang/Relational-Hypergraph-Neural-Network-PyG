@@ -3,10 +3,11 @@ import sys
 from src.utils import get_file_list, unzip_file, compress_file, make_dirct, read_a_json_field, \
     assign_dict_key_empty_list
 import os
-from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category,copy_relative_files
+from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category, \
+    copy_relative_files
 import pandas as pd
 from tqdm import tqdm
-from src.CONSTANTS import graph_types, benchmark_timeout, eldarica_abstract_options,threshold_list
+from src.CONSTANTS import graph_types, benchmark_timeout, eldarica_abstract_options, threshold_list
 from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_clauses, \
     virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
@@ -14,51 +15,84 @@ from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_cl
 
 
 def main():
+    # golem_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-golem/train_data"
+    # z3_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-z3/train_data"
+    #
+    # eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off/train_data"
+    # eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-SEH/train_data"
+    # eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-only-rank/train_data"
+    # eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-pruning-threshold-rank/train_data"
+    # eldarica_abstract_off_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-pruning-normalized-scores/train_data"
+    #
+    # eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term/train_data"
+    # eldarica_abstract_term_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-SEH/train_data"
+    # eldarica_abstract_term_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-only-rank/train_data"
+    # eldarica_abstract_term_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-pruning-threshold-rank/train_data"
+    # eldarica_abstract_term_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-pruning-normalized-scores/train_data"
+    #
+    # eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct/train_data"
+    # eldarica_abstract_oct_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-SEH/train_data"
+    # eldarica_abstract_oct_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-only-rank/train_data"
+    # eldarica_abstract_oct_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-pruning-threshold-rank/train_data"
+    # eldarica_abstract_oct_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-pruning-normalized-scores/train_data"
+    #
+    # eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs/train_data"
+    # eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-SEH/train_data"
+    # eldarica_abstract_relEqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-only-rank/train_data"
+    # eldarica_abstract_relEqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-pruning-threshold-rank/train_data"
+    # eldarica_abstract_relEqs_folder_pruning_score_folder = ""#running need rerun unknown part-5-237
+    #
+    # eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs/train_data"
+    # eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-SEH/train_data"
+    # eldarica_abstract_relIneqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-only-rank/train_data"
+    # eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
+    # eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
-    golem_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-golem/train_data"
-    z3_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-z3/train_data"
+    golem_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-golem/test_data"
+    z3_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-z3/test_data"
 
-    eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off/train_data"
-    eldarica_abstract_off_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-SEH/train_data"
-    eldarica_abstract_off_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-prioritize-only-rank/train_data"
-    eldarica_abstract_off_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-pruning-threshold-rank/train_data"
-    eldarica_abstract_off_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-off-pruning-normalized-scores/train_data"
+    eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
+    eldarica_abstract_off_folder_prioritizing_SEH_folder = ""
+    eldarica_abstract_off_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_off_folder_pruning_rank_folder = ""
+    eldarica_abstract_off_folder_pruning_score_folder = ""
 
-    eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term/train_data"
-    eldarica_abstract_term_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-SEH/train_data"
-    eldarica_abstract_term_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-prioritize-only-rank/train_data"
-    eldarica_abstract_term_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-pruning-threshold-rank/train_data"
-    eldarica_abstract_term_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-term-pruning-normalized-scores/train_data"
+    eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
+    eldarica_abstract_term_folder_prioritizing_SEH_folder = ""
+    eldarica_abstract_term_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_term_folder_pruning_rank_folder = ""
+    eldarica_abstract_term_folder_pruning_score_folder = ""
 
-    eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct/train_data"
-    eldarica_abstract_oct_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-SEH/train_data"
-    eldarica_abstract_oct_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-prioritize-only-rank/train_data"
-    eldarica_abstract_oct_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-pruning-threshold-rank/train_data"
-    eldarica_abstract_oct_folder_pruning_score_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-oct-pruning-normalized-scores/train_data"
+    eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
+    eldarica_abstract_oct_folder_prioritizing_SEH_folder = ""
+    eldarica_abstract_oct_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_oct_folder_pruning_rank_folder = ""
+    eldarica_abstract_oct_folder_pruning_score_folder = ""
 
-    eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs/train_data"
-    eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-SEH/train_data"
-    eldarica_abstract_relEqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-prioritize-only-rank/train_data"
-    eldarica_abstract_relEqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relEqs-pruning-threshold-rank/train_data"
-    eldarica_abstract_relEqs_folder_pruning_score_folder = ""#running
+    eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
+    eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = ""
+    eldarica_abstract_relEqs_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_relEqs_folder_pruning_rank_folder = ""
+    eldarica_abstract_relEqs_folder_pruning_score_folder = ""  # running need rerun unknown part-5-237
 
-    eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs/train_data"
-    eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-SEH/train_data"
-    eldarica_abstract_relIneqs_folder_prioritizing_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-prioritize-only-rank/train_data"
-    eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
+    eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
+    eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = ""
+    eldarica_abstract_relIneqs_folder_prioritizing_rank_folder = ""
+    eldarica_abstract_relIneqs_folder_pruning_rank_folder = ""
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
     eldarica_symex_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/symex-test"
+    eldarica_symex_folder_original = os.path.join(eldarica_symex_folder, "original")
     eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG")
-    eldarica_symex_folder_CG= os.path.join(eldarica_symex_folder, "CG")
-
+    eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG")
 
     full_file_folder = golem_folder
-    summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder))+"/data")
+    summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
 
     solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
-                                     "eldarica_symex_CDHG":eldarica_symex_folder_CDHG,
-                                     "eldarica_symex_CG":eldarica_symex_folder_CG,
+                                     "eldarica_symex_original": eldarica_symex_folder_original,
+                                     "eldarica_symex_CDHG": eldarica_symex_folder_CDHG,
+                                     "eldarica_symex_CG": eldarica_symex_folder_CG,
                                      "eldarica_abstract_off": eldarica_abstract_off_folder,
                                      "eldarica_abstract_off_prioritizing_SEH": eldarica_abstract_off_folder_prioritizing_SEH_folder,
                                      "eldarica_abstract_off_prioritizing_rank": eldarica_abstract_off_folder_prioritizing_rank_folder,
@@ -97,15 +131,19 @@ def main():
         pd.DataFrame(pd.DataFrame(category_dict)).transpose().to_excel(writer, sheet_name="category_summary_transpose")
 
 
-
-
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
     categories = get_distinct_category_list(solvability_dict["category"])
-    measurements = ["safe", "unsafe", "unknown", "solving_time"]
+    measurements = ["safe", "unsafe", "unknown", "miss info", "solving_time"]
     comparison_solver_list = ["vb"]
     for solver in solver_variation_folders_dict:
         if "prioritizing" in solver or "pruning" in solver:
             comparison_solver_list.append("vb_" + solver)
+        elif "eldarica_symex_original" in solver:
+            comparison_solver_list.append("eldarica_symex_original")
+            comparison_solver_list.append("vb_eldarica_symex_prioritize")
+            comparison_solver_list.append("vb_eldarica_symex")
+        elif solver in ["eldarica_symex_CDHG", "eldarica_symex_CG"]:
+            pass
         else:
             comparison_solver_list.append(solver)
 
@@ -130,30 +168,30 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     # get number of predicted
     for c in categories:
         count = 0
-        for ca, sa in zip(solvability_dict["category"], solvability_dict["eldarica_abstract_off_prioritizing_SEH_satisfiability"]):
+        for ca, sa in zip(solvability_dict["category"],
+                          solvability_dict["eldarica_abstract_off_prioritizing_SEH_satisfiability"]):
             if c in ca and sa != "miss info":
                 count += 1
         category_dict["number_predicted"].append(count)
 
     # compute lcr
-    lcr_comparison_list=["vb_eldarica","vb_eldarica_original"]
+    lcr_comparison_list = ["vb_eldarica", "vb_eldarica_original"]
     # get cross solver comparison list
-    for solver in [x for x in solver_variation_folders_dict if x not in ["z3","golem"]]:
+    for solver in [x for x in solver_variation_folders_dict if x not in ["z3", "golem"]]:
         if "prioritizing" in solver or "pruning" in solver:
             lcr_comparison_list.append("vb_" + solver)
         else:
             lcr_comparison_list.append(solver)
-    lcr_solver_sets=[["z3","golem"]+[e] for e in lcr_comparison_list]
+    lcr_solver_sets = [["z3", "golem"] + [e] for e in lcr_comparison_list]
     # get eldarica comparison list
-    for a in eldarica_abstract_options+["off"]:
-        lcr_solver_sets.append(["eldarica_abstract_"+a]+["vb_eldarica_abstract_"+a+"_"+"prioritizing","vb_eldarica_abstract_"+a+"_"+"pruning"])
+    for a in eldarica_abstract_options + ["off"]:
+        lcr_solver_sets.append(["eldarica_abstract_" + a] + ["vb_eldarica_abstract_" + a + "_" + "prioritizing",
+                                                             "vb_eldarica_abstract_" + a + "_" + "pruning"])
 
-
-    for i,solver_set in enumerate(lcr_solver_sets):
-        lcr_dict=compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict,solver_set)
+    for i, solver_set in enumerate(lcr_solver_sets):
+        lcr_dict = compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict, solver_set)
         for lcr in lcr_dict:
-            category_dict["["+str(i)+"]"+lcr]=lcr_dict[lcr]
-
+            category_dict["[" + str(i) + "]" + lcr] = lcr_dict[lcr]
 
     # add total row
     category_dict["category"].append("total")
@@ -162,14 +200,12 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
         for m in measurements:
             category_dict[solver + "_" + m].append(sum(category_dict[solver + "_" + m]))
 
-
     # add total row for lcr
     for i, solver_set in enumerate(lcr_solver_sets):
         for m in [" lcr_n ", " lcr_c "]:
             for solver in solver_set:
                 category_dict["[" + str(i) + "]" + m + solver].append(
                     sum(category_dict["[" + str(i) + "]" + m + solver]))
-
 
     # add total-lcr row
     category_dict["category"].append("total-lcr")
@@ -196,17 +232,12 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
 
             lcr_n = 1 - (vbssn_other_solvers / vbssn)
             lcr_c = 1 - (vbssc / vbssc_other_solvers)
-            category_dict["[" + str(i) + "]" + " lcr_n " + solver ].append(lcr_n)
+            category_dict["[" + str(i) + "]" + " lcr_n " + solver].append(lcr_n)
             category_dict["[" + str(i) + "]" + " lcr_c " + solver].append(lcr_c)
 
-
-
-
-
-    #print category_dict column number
+    # print category_dict column number
     for k in category_dict:
         print(k, len(category_dict[k]))
-
 
     return category_dict
 
@@ -240,10 +271,11 @@ def compute_lcr_for_one_set_of_solvers(solvability_dict, category_dict, cross_so
 
             # print(c, "vb:", vbssn, "remove " + solver + ":", vbssn_other_solvers,"lcr_n:", lcr_n)
 
-            lcr_dict[" lcr_n " + solver ].append(lcr_n)
-            lcr_dict[" lcr_c " + solver ].append(lcr_c)
+            lcr_dict[" lcr_n " + solver].append(lcr_n)
+            lcr_dict[" lcr_c " + solver].append(lcr_c)
 
     return lcr_dict
+
 
 def compute_vbss(c, solvability_dict, vb_satisfiability_list, vb_solving_time_list):
     vbssn = 0
@@ -284,7 +316,12 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
             record_fields.append(sv + "_" + m)
             if "prioritizing" in sv or "pruning" in sv:
                 record_fields.append("vb_" + sv + "_" + m)
-        if sv in["z3","golem"]:
+        if "eldarica_symex_original" in sv:
+            for m in measurements:
+                record_fields.append("vb_eldarica_symex_prioritize" + "_" + m)
+            for m in measurements:
+                record_fields.append("vb_eldarica_symex" + "_" + m)
+        if sv in ["z3", "golem"]:
             for m in measurements:
                 record_fields.append(sv + "_pruning_" + m)
     record_fields = other_fields + smt_measurements + record_fields
@@ -296,13 +333,11 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
     # read pruning solvability from standard solvers
     read_pruning_solvability_for_standard_solvers(solvability_dict, full_file_folder, measurements)
 
-
     # read fixed fields
     file_list = get_file_list(full_file_folder, "smt2")
     for sm in smt_measurements:
         solvability_dict[sm] = [x[sm] for x in
                                 read_files(file_list, file_type="", read_function=read_smt2_category)]
-
 
     # read solvabilities by file
     for file in tqdm(file_list, desc="read files"):
@@ -314,9 +349,11 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 json_file_suffix = "golem-solvability.JSON"
             elif "z3" in solver_variation:
                 json_file_suffix = "z3-solvability.JSON"
-            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in eldarica_abstract_options]:
+            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in
+                                                                  eldarica_abstract_options] + [
+                "eldarica_symex_original"]:
                 json_file_suffix = "eld-solvability.JSON"
-            elif solver_variation in ["eldarica_symex_CDHG","eldarica_symex_CG"]:
+            elif solver_variation in ["eldarica_symex_CDHG", "eldarica_symex_CG"]:
                 json_file_suffix = "simplified.smt2.eld-solvability.JSON"
             else:
                 json_file_suffix = "solvability.JSON"
@@ -341,12 +378,14 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                         virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs = mask_results_by_benchmark_timeout(
                             virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
 
-                        solvability_dict[solver_variation + "_" + "satisfiability"].append(virtual_best_satisfiability_graphs)
-                        solvability_dict[solver_variation + "_" + "solving_time"].append(virtual_best_solving_time_graphs)
+                        solvability_dict[solver_variation + "_" + "satisfiability"].append(
+                            virtual_best_satisfiability_graphs)
+                        solvability_dict[solver_variation + "_" + "solving_time"].append(
+                            virtual_best_solving_time_graphs)
 
                     else:  # no solvability file
-                        for m in measurements:
-                            solvability_dict[solver_variation + "_" + m].append("miss info")
+                        solvability_dict[solver_variation + "_satisfiability"].append("miss info")
+                        solvability_dict[solver_variation + "_solving_time"].append(benchmark_timeout)
                         virtual_best_satisfiability_graphs = "unknown"
                         virtual_best_solving_time_graphs = benchmark_timeout
 
@@ -377,15 +416,17 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                             virtual_best_satisfiability_graphs, virtual_best_solving_time_graphs)
 
                         solvability_dict[solver_variation + "_" + "satisfiability"].append(
-                            str(virtual_best_satisfiability_graphs) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
+                            str(virtual_best_satisfiability_graphs) + "[" + str(
+                                virtual_best_threshold_graphs) + "]" + "[" + str(
                                 virtual_best_clause_number_graphs) + "]")
                         solvability_dict[solver_variation + "_" + "solving_time"].append(
-                            str(virtual_best_solving_time_graphs) + "[" + str(virtual_best_threshold_graphs) + "]" + "[" + str(
+                            str(virtual_best_solving_time_graphs) + "[" + str(
+                                virtual_best_threshold_graphs) + "]" + "[" + str(
                                 virtual_best_clause_number_graphs) + "]")
 
                     else:  # no solvability file
-                        for m in measurements:
-                            solvability_dict[solver_variation + "_" + m].append("miss info")
+                        solvability_dict[solver_variation + "_satisfiability"].append("miss info")
+                        solvability_dict[solver_variation + "_solving_time"].append(benchmark_timeout)
                         virtual_best_satisfiability_graphs = "unknown"
                         virtual_best_solving_time_graphs = benchmark_timeout
 
@@ -394,6 +435,7 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                                                           virtual_best_satisfiability_graphs,
                                                           virtual_best_solving_time_graphs, measurements,
                                                           "pruning")
+
                 else:  # read from standard solvers
                     if len(object) > 1:  # has solvability file
                         satisfiability = read_a_json_field(object, "satisfiability")
@@ -408,8 +450,6 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                         solvability_dict[solver_variation + "_satisfiability"].append("miss info")
                         solvability_dict[solver_variation + "_solving_time"].append(benchmark_timeout)
 
-
-
     # add virtual best columns
     comparison_solver_list = []
     for k in solver_variation_folders_dict:
@@ -423,34 +463,43 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
     solvability_dict["vb_solving_time"] = vb_solving_time
 
     # add virtual best columns for eldarica
-    eldarica_variant_list= [s for s in comparison_solver_list if s not in ["z3","golem"]]
+    eldarica_variant_list = [s for s in comparison_solver_list if s not in ["z3", "golem"]]
     vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
         solvability_dict, eldarica_variant_list)
     solvability_dict["vb_eldarica_satisfiability"] = vb_satisfiability
     solvability_dict["vb_eldarica_solving_time"] = vb_solving_time
 
     # add virtual best columns for original eldarica
-    eldarica_variant_list= [s for s in comparison_solver_list if s not in ["z3","golem"] and "prioritizing" not in s and "pruning" not in s]
+    eldarica_variant_list = [s for s in comparison_solver_list if
+                             s not in ["z3", "golem"] and "prioritizing" not in s and "pruning" not in s]
     vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
         solvability_dict, eldarica_variant_list)
     solvability_dict["vb_eldarica_original_satisfiability"] = vb_satisfiability
     solvability_dict["vb_eldarica_original_solving_time"] = vb_solving_time
     # add virtual best columns for prioritizing and pruning eldarica in each abstract
-    for a in eldarica_abstract_options+["off"]:
-        for strategy in ["prioritizing","pruning"]:
+    for a in eldarica_abstract_options + ["off"]:
+        for strategy in ["prioritizing", "pruning"]:
             eldarica_variant_list = [s for s in comparison_solver_list if
                                      s not in ["z3", "golem"] and strategy in s and a in s]
             vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
                 solvability_dict, eldarica_variant_list)
-            solvability_dict["vb_eldarica_abstract_"+a+"_"+strategy+"_satisfiability"] = vb_satisfiability
-            solvability_dict["vb_eldarica_abstract_"+a+"_"+strategy+"_solving_time"] = vb_solving_time
+            solvability_dict["vb_eldarica_abstract_" + a + "_" + strategy + "_satisfiability"] = vb_satisfiability
+            solvability_dict["vb_eldarica_abstract_" + a + "_" + strategy + "_solving_time"] = vb_solving_time
 
+    # merge symex CDHG and CG and add vb_symex column
+    vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+        solvability_dict, ["eldarica_symex_CDHG", "eldarica_symex_CG"])
+    solvability_dict["vb_eldarica_symex_prioritize_satisfiability"] = vb_satisfiability
+    solvability_dict["vb_eldarica_symex_prioritize_solving_time"] = vb_solving_time
+    vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+        solvability_dict, ["vb_eldarica_symex_prioritize", "eldarica_symex_original"])
+    solvability_dict["vb_eldarica_symex_satisfiability"] = vb_satisfiability
+    solvability_dict["vb_eldarica_symex_solving_time"] = vb_solving_time
 
     for k in solvability_dict:
         print(k, len(solvability_dict[k]))
 
-    print("-"*10)
-
+    print("-" * 10)
 
     return solvability_dict
 
@@ -494,7 +543,7 @@ def mask_results_by_benchmark_timeout(satisfiability, solving_time):
     return satisfiability, solving_time
 
 
-def read_pruning_solvability_for_standard_solvers(solvability_dict,full_file_folder,measurements):
+def read_pruning_solvability_for_standard_solvers(solvability_dict, full_file_folder, measurements):
     # read pruning solvabilities for z3 and golem
     z3_pruning_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-z3-pruning-615/train_data"
     golem_pruning_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-golem-pruning-708/train_data"
@@ -520,20 +569,22 @@ def read_pruning_solvability_for_standard_solvers(solvability_dict,full_file_fol
                             vb_pruning_option_list.append(g + "-" + str(t))
                 vb_satisfiability = "unknown"
                 vb_solving_time = benchmark_timeout
-                vb_op="CDHG-0.0"
-                for s, st,op in zip(vb_pruning_satisfiability_list, vb_pruning_solving_time_list,vb_pruning_option_list):
+                vb_op = "CDHG-0.0"
+                for s, st, op in zip(vb_pruning_satisfiability_list, vb_pruning_solving_time_list,
+                                     vb_pruning_option_list):
                     if s == "unsafe":
                         vb_satisfiability = s
                         if st < vb_solving_time:
                             vb_solving_time = st
-                            vb_op=op
+                            vb_op = op
 
-                for m, field in zip(measurements, [vb_satisfiability, str(vb_solving_time)+"["+vb_op+"]"]):
+                for m, field in zip(measurements, [vb_satisfiability, str(vb_solving_time) + "[" + vb_op + "]"]):
                     solvability_dict[solver + "_pruning_" + m].append(field)
 
             else:
                 for m in measurements:
                     solvability_dict[solver + "_pruning_" + m].append("miss info")
+
 
 if __name__ == '__main__':
     main()
