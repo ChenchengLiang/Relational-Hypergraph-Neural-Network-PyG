@@ -1,5 +1,5 @@
 # build image command: apptainer build image-eldarica.sif eldarica-compile-symex-recipe.def
-# use image command: apptainer exec  image.sif z3
+# use image command: apptainer exec  image-eldarica.sif eld
 BootStrap: docker
 From: continuumio/miniconda3
 #ubuntu:20.04

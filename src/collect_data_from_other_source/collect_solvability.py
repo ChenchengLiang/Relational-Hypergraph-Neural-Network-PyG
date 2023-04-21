@@ -6,6 +6,7 @@ from src.utils import get_file_list, unzip_file, compress_file, make_dirct
 import os
 from tqdm import tqdm
 from utils import run_one_shell,collect_solving_info_from_other_solvers
+from src.CONSTANTS import benchmark_timeout
 
 def main():
     folder = sys.argv[1]
@@ -15,7 +16,7 @@ def main():
     except:
         solver_parameter = " "
 
-    collect_solving_info_from_other_solvers(folder, solver_location=solver_location, shell_timeout=120, solver_name=os.path.basename(solver_location),solver_parameter=solver_parameter) #z3
+    collect_solving_info_from_other_solvers(folder, solver_location=solver_location, shell_timeout=benchmark_timeout, solver_name=os.path.basename(solver_location),solver_parameter=solver_parameter) #z3
 
 
 

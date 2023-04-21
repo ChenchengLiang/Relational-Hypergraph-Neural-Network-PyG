@@ -545,8 +545,8 @@ def mask_results_by_benchmark_timeout(satisfiability, solving_time):
 
 def read_pruning_solvability_for_standard_solvers(solvability_dict, full_file_folder, measurements):
     # read pruning solvabilities for z3 and golem
-    z3_pruning_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-z3-pruning-615/train_data"
-    golem_pruning_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/uppmax-golem-pruning-708/train_data"
+    z3_pruning_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/uppmax-z3-pruning-615/train_data"
+    golem_pruning_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/uppmax-golem-pruning-708/train_data"
     for solver, solver_folder in zip(["z3", "golem"], [z3_pruning_folder, golem_pruning_folder]):
         for file in tqdm(get_file_list(full_file_folder, "smt2"), desc="read files"):
             basename = os.path.basename(file)
