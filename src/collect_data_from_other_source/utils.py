@@ -66,8 +66,8 @@ def collect_solving_info_from_other_solvers(folder, solver_location="z3", shell_
             if (not f.endswith(".smt2")):
                 move(smt2_file, smt2_file[:-len(".smt2")])
 
-        # zip file again
-        comress_relative_files(index_file, delete_original_file=True)
+            # zip file again
+            comress_relative_files(index_file, delete_original_file=True)
 
 
 def run_one_shell(shell_file_name, log_file,solver_parameter=" "):
