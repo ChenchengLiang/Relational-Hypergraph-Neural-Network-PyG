@@ -81,10 +81,12 @@ def main():
     # eldarica_abstract_relIneqs_folder_pruning_rank_folder = ""
     # eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
-    eldarica_symex_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/symex-test"
-    eldarica_symex_folder_original = os.path.join(eldarica_symex_folder, "original")
-    eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG")
-    eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG")
+    eldarica_symex_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/symex"
+    eldarica_symex_folder_original = os.path.join(eldarica_symex_folder, "original/train_data")
+    eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-coef-1000/train_data")
+    eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-coef-1000/train_data")
+    # eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-reverse/train_data")
+    # eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-reverse/train_data")
 
     full_file_folder = golem_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")

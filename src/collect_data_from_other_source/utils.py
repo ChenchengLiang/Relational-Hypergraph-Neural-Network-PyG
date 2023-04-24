@@ -31,7 +31,7 @@ def collect_solving_info_from_other_solvers(folder, solver_location="z3", shell_
             file_list_dict[index] = file_list_dict[index] + glob.glob(index + ".pruned*")
         if os.path.exists(index + ".simplified.zip"):
             file_list_dict[index] = file_list_dict[index] + [index + ".simplified.zip"]
-
+    print("file_list_dict", file_list_dict)
     timeout_command = "timeout " + str(shell_timeout)
     for index_file in tqdm(file_list_dict, desc="progress"):
         # unzip file
@@ -66,8 +66,8 @@ def collect_solving_info_from_other_solvers(folder, solver_location="z3", shell_
             if (not f.endswith(".smt2")):
                 move(smt2_file, smt2_file[:-len(".smt2")])
 
-            # zip file again
-            comress_relative_files(index_file, delete_original_file=True)
+        # zip file again
+        comress_relative_files(index_file, delete_original_file=True)
 
 
 def run_one_shell(shell_file_name, log_file,solver_parameter=" "):

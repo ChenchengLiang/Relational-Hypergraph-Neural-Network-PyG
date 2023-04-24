@@ -13,7 +13,7 @@ In the folder container of this repository, build a Eldarica image by:
 ```
 apptainer build eldarica_image.sif eldarica-compile-unsatcore-recipe.def
 ```
-This cmmand build an image named eldarica_image.sif, and the recipe file is eldarica-compile-unsatcore-recipe.def.
+This command build an image named eldarica_image.sif, and the recipe file is eldarica-compile-unsatcore-recipe.def.
 eldarica_image.sif contains Eldarica and its dependencies.
 
 Run this image by:
@@ -77,7 +77,6 @@ Then you will get following files in the same folder:
 * a file with suffix ".log" which records the time consumption of this command 
 
 #### 2. Draw Horn clause graphs with labels [Eldarica]: 
-   
 ```
 apptainer exec eldarica_image.sif eld <path_to_smt2_file> -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off
 ```

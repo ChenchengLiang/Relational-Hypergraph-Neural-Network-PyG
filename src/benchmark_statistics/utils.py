@@ -231,6 +231,8 @@ def virtual_best_satisfiability_from_list(s):
         return "safe"
     elif "unsafe" in s:
         return "unsafe"
+    elif all(element == "miss info" for element in s):
+        return "miss info"
     else:
         return "unknown"
 
