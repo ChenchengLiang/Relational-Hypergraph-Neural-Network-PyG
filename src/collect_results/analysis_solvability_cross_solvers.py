@@ -1,29 +1,72 @@
 import pandas as pd
 from src.CONSTANTS import eldarica_abstract_options
 import itertools
+from src.plots import scatter_plot
+from src.utils import make_dirct
 
 
 def main():
+    excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"
 
-    read_gain_and_lose()
+    # read_gain_and_lose(excel_file)
+
+    # sort_solvability_by_category()
+
+    draw_common_unsafe_solving_time(excel_file)
 
 
-    sort_solvability_by_category()
-
-def read_gain_and_lose():
+def draw_common_unsafe_solving_time(excel_file):
     # Read the Excel file into a Pandas DataFrame
-    df = pd.read_excel(
-        '/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx',
-        sheet_name='data', header=0)
+    solvability_dict = read_solvability_dict(excel_file)
+    scatter_folder = make_dirct(
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots")
+
+    comparison_pairs = [["eldarica_abstract_off", "vb_eldarica_abstract_off_prioritizing_SEH"],
+                        ["eldarica_abstract_off", "vb_eldarica_abstract_off_prioritizing_rank"],
+                        ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_rank"],
+                        ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_score"],
+                        ["eldarica_symex_original", "vb_eldarica_symex_prioritize"],
+                        ["eldarica_symex_original", "vb_eldarica_symex"]]
+
+    for pair in comparison_pairs:
+        original_solving_time_list = []
+        strategy_solving_time_list = []
+        satisfiability_list = []
+        file_name_list = []
+        for name, original_s, strategy_s, original_st, strategy_st in zip(solvability_dict["file_name"],
+                                                                          solvability_dict[pair[0] + "_satisfiability"],
+                                                                          solvability_dict[pair[1] + "_satisfiability"],
+                                                                          solvability_dict[pair[0] + "_solving_time"],
+                                                                          solvability_dict[pair[1] + "_solving_time"]):
+            if original_s == strategy_s and original_s != "unknown":
+                file_name_list.append(name)
+                satisfiability_list.append(original_s)
+                original_solving_time_list.append(original_st)
+                strategy_solving_time_list.append(strategy_st)
+
+        scatter_plot(x_data=original_solving_time_list, y_data=strategy_solving_time_list, z_data=satisfiability_list,
+                     x_axis=pair[0], y_axis=pair[1], folder=scatter_folder, data_text=file_name_list,
+                     name="Solving time (second)")
+
+
+def read_solvability_dict(excel_file):
+    # Read the Excel file into a Pandas DataFrame
+    df = pd.read_excel(excel_file, sheet_name='data', header=0)
 
     # Convert the DataFrame to a dictionary
     solvability_dict = df.to_dict(orient='list')
+    return solvability_dict
+
+
+def read_gain_and_lose(excel_file):
+    # Read the Excel file into a Pandas DataFrame
+    solvability_dict = read_solvability_dict(excel_file)
 
     comparison_options = ["off"] + eldarica_abstract_options
 
     # gain and lose number of problems
     for strategy_option in ["prioritizing_SEH", "pruning_rank"]:
-        print("-" * 10+strategy_option+"-" * 10)
+        print("-" * 10 + strategy_option + "-" * 10)
         # gain problems dict
         gain_list_dict = {}
         lose_list_dict = {}
@@ -38,7 +81,7 @@ def read_gain_and_lose():
                 strategy = strategy[:strategy.find("[")] if "[" in strategy else strategy
                 if original == "unknown" and strategy != "unknown" and strategy != "miss info":
                     gain_list.append(name)
-                if original in ["safe","unsafe"] and strategy == "unknown":  # notice that miss info is not counted
+                if original in ["safe", "unsafe"] and strategy == "unknown":  # notice that miss info is not counted
                     lose_list.append(name)
 
             gain_list_dict[eldarica_option + "_gain_list"] = gain_list
@@ -68,7 +111,7 @@ def read_gain_and_lose():
                                                  solvability_dict[strategy_option + "_pruning" + "_satisfiability"]):
                 if original == "unknown" and strategy != "unknown" and strategy != "miss info":
                     gain_list.append(name)
-                if original in ["safe","unsafe"] and strategy == "unknown":  # notice that miss info is not counted
+                if original in ["safe", "unsafe"] and strategy == "unknown":  # notice that miss info is not counted
                     lose_list.append(name)
 
             gain_list_dict[strategy_option + "_gain_list"] = gain_list
@@ -81,6 +124,7 @@ def read_gain_and_lose():
 
             for k in lose_list_dict:
                 print(k, len(lose_list_dict[k]))
+
 
 def sort_solvability_by_category():
     # find interesting numbers in category summary
@@ -115,14 +159,16 @@ def sort_solvability_by_category():
         print("unsafe_list", unsafe_list)
         print("unknown_list", unknown_list)
 
-def common_combination(data_dict,comparison_options,comparison_type):
+
+def common_combination(data_dict, comparison_options, comparison_type):
     print("-" * 10)
     for pair in itertools.combinations(comparison_options, 2):
-        common_file = set(data_dict[pair[0] + "_"+comparison_type+"_list"]).intersection(
-            set(data_dict[pair[1] + "_"+comparison_type+"_list"]))
-        print("common "+comparison_type+" ", pair, len(common_file))
+        common_file = set(data_dict[pair[0] + "_" + comparison_type + "_list"]).intersection(
+            set(data_dict[pair[1] + "_" + comparison_type + "_list"]))
+        print("common " + comparison_type + " ", pair, len(common_file))
         # different_file = set(common_list_dict[pair[0]+"_solved_unknown_list"]).difference(set(common_list_dict[pair[1]+"_solved_unknown_list"]))
         # print("different solvable ",pair,len(different_file))
+
 
 if __name__ == '__main__':
     main()

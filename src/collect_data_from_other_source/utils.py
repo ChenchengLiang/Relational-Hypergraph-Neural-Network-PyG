@@ -26,12 +26,13 @@ def collect_solving_info_from_other_solvers(folder, solver_location="z3", shell_
     file_list_dict = {f: [] for f in file_list}
     # add pruned and simplified files
     for index in file_list:
-        file_list_dict[index] = file_list_dict[index] + [index + ".zip"]
+        # add original file
+        #file_list_dict[index] = file_list_dict[index] + [index + ".zip"]
         if len(glob.glob(index + ".pruned*"))!=0:
             file_list_dict[index] = file_list_dict[index] + glob.glob(index + ".pruned*")
         if os.path.exists(index + ".simplified.zip"):
             file_list_dict[index] = file_list_dict[index] + [index + ".simplified.zip"]
-    print("file_list_dict", file_list_dict)
+    #print("file_list_dict", file_list_dict)
     timeout_command = "timeout " + str(shell_timeout)
     for index_file in tqdm(file_list_dict, desc="progress"):
         # unzip file
