@@ -11,11 +11,13 @@ import plotly.express as px
 import plotly.io as pio
 import numpy as np
 from src.utils import count_generator, make_dirct
+import math
+from src.CONSTANTS import benchmark_timeout
 
 plt.style.use("ggplot")
 
 
-def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name):
+def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name, scale="linear"):
     fig = go.Figure()
     if len(z_data) != 0:
         x_data_1, y_data_1, text_data_1, x_data_2, y_data_2, text_data_2, x_data_3, y_data_3, text_data_3 = [], [], [], [], [], [], [], [], []
@@ -44,7 +46,7 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
         fig.add_trace(go.Scatter(x=x_data, y=y_data, marker=dict(color='blue'), mode='markers', name='marker'))
 
     # Add a diagonal line
-    max_value = max(x_data + y_data)
+    max_value = benchmark_timeout#max(x_data + y_data)
     fig.add_trace(
         go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal", line=dict(color="gray")))
 
@@ -53,6 +55,14 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
         title_x=0.5,
         xaxis_title=x_axis,
         yaxis_title=y_axis)
+    fig.update_xaxes(type=scale)
+    fig.update_yaxes(type=scale)
+    fig.update_layout(
+        xaxis_tickvals=[0.1, 1, 10, 100, 1200],
+        xaxis_ticktext=["0.1", "1", "10", "100", "1200"])
+    fig.update_layout(
+        yaxis_tickvals=[0.1, 1, 10, 100, 1200],
+        yaxis_ticktext=["0.1", "1", "10", "100", "1200"])
     plot_file_name = name + "-" + x_axis + "-vs-" + y_axis
     save_file_name = os.path.join(folder, plot_file_name)
     # fig.update_yaxes(type="linear")
@@ -155,7 +165,7 @@ def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="", plot_name
                               "prioritizeClausesByUnsatCoreRank-CG-only score": "CG-score",
                               "prioritizeClausesByUnsatCoreRank-CDHG-score with existed heuristics": "CDHG-SEH",
                               "prioritizeClausesByUnsatCoreRank-CDHG-only score": "CDHG-score",
-                              "only score": "score","score with existed heuristics": "SEH"}
+                              "only score": "score", "score with existed heuristics": "SEH"}
     lines = []
     for k in cactus:
         cactus_without_zero = [0] + [x for x in cactus[k] if x != 0]
@@ -182,5 +192,5 @@ def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="", plot_name
         yaxis_title='Time limit (s)')
     fig.update_yaxes(type=scale)
     fig.write_html(summary_folder + "/" + plot_name + key_word + "-" + scale + "-cactus.html")
-    fig.update_layout(height=700, width=800,autosize=True)
+    fig.update_layout(height=700, width=800, autosize=True)
     fig.write_image(summary_folder + "/" + plot_name + key_word + "-" + scale + "-cactus.png")

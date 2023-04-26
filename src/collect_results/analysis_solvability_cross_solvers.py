@@ -26,7 +26,7 @@ def draw_common_unsafe_solving_time(excel_file):
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_rank"],
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_score"],
                         ["eldarica_symex_original", "vb_eldarica_symex_prioritize"],
-                        ["eldarica_symex_original", "vb_eldarica_symex"]]
+                        ["eldarica_symex_original", "pf_eldarica_symex"]]
 
     for pair in comparison_pairs:
         original_solving_time_list = []
@@ -46,7 +46,7 @@ def draw_common_unsafe_solving_time(excel_file):
 
         scatter_plot(x_data=original_solving_time_list, y_data=strategy_solving_time_list, z_data=satisfiability_list,
                      x_axis=pair[0], y_axis=pair[1], folder=scatter_folder, data_text=file_name_list,
-                     name="Solving time (second)")
+                     name="Solving time (second)",scale="log")
 
 
 def read_solvability_dict(excel_file):
