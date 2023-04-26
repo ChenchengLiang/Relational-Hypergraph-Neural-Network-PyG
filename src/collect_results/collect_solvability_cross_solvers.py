@@ -48,39 +48,6 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
-    # golem_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-golem/test_data"
-    # z3_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-z3/test_data"
-    #
-    # eldarica_abstract_off_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
-    # eldarica_abstract_off_folder_prioritizing_SEH_folder = ""
-    # eldarica_abstract_off_folder_prioritizing_rank_folder = ""
-    # eldarica_abstract_off_folder_pruning_rank_folder = ""
-    # eldarica_abstract_off_folder_pruning_score_folder = ""
-    #
-    # eldarica_abstract_term_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
-    # eldarica_abstract_term_folder_prioritizing_SEH_folder = ""
-    # eldarica_abstract_term_folder_prioritizing_rank_folder = ""
-    # eldarica_abstract_term_folder_pruning_rank_folder = ""
-    # eldarica_abstract_term_folder_pruning_score_folder = ""
-    #
-    # eldarica_abstract_oct_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
-    # eldarica_abstract_oct_folder_prioritizing_SEH_folder = ""
-    # eldarica_abstract_oct_folder_prioritizing_rank_folder = ""
-    # eldarica_abstract_oct_folder_pruning_rank_folder = ""
-    # eldarica_abstract_oct_folder_pruning_score_folder = ""
-    #
-    # eldarica_abstract_relEqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
-    # eldarica_abstract_relEqs_folder_prioritizing_SEH_folder = ""
-    # eldarica_abstract_relEqs_folder_prioritizing_rank_folder = ""
-    # eldarica_abstract_relEqs_folder_pruning_rank_folder = ""
-    # eldarica_abstract_relEqs_folder_pruning_score_folder = ""  # running need rerun unknown part-5-237
-    #
-    # eldarica_abstract_relIneqs_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
-    # eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder = ""
-    # eldarica_abstract_relIneqs_folder_prioritizing_rank_folder = ""
-    # eldarica_abstract_relIneqs_folder_pruning_rank_folder = ""
-    # eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
-
     eldarica_symex_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/symex"
     eldarica_symex_folder_original = os.path.join(eldarica_symex_folder, "original/train_data")
     eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-reverse-coef-1000/train_data")
@@ -88,7 +55,8 @@ def main():
     # eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-reverse/train_data")
     # eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-reverse/train_data")
 
-    full_file_folder = eldarica_symex_folder_CDHG  # golem_folder
+    test_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
+    full_file_folder = eldarica_symex_folder_CDHG  # test_folder   # golem_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
 
     solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
@@ -137,21 +105,18 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     categories = get_distinct_category_list(solvability_dict["category"])
     measurements = ["safe", "unsafe", "unknown", "miss info", "solving_time"]
     comparison_solver_list = ["vb"]
-    for solver in solver_variation_folders_dict:
-        if "prioritizing" in solver or "pruning" in solver:
-            comparison_solver_list.append("vb_" + solver)
-        elif "eldarica_symex_original" in solver:
-            comparison_solver_list.append("eldarica_symex_original")
-            comparison_solver_list.append("vb_eldarica_symex_prioritize")
-            comparison_solver_list.append("vb_eldarica_symex")
-        elif solver in ["eldarica_symex_CDHG", "eldarica_symex_CG"]:
-            pass
-        elif solver in ["z3", "golem"]:
-            comparison_solver_list.append(solver)
-            comparison_solver_list.append(solver+"_pruning")
-            comparison_solver_list.append("vb_" + solver)
-        else:
-            comparison_solver_list.append(solver)
+    for solver in ["golem", "z3"]:
+        comparison_solver_list.append(solver)
+        comparison_solver_list.append(solver + "_pruning")
+        comparison_solver_list.append("pf_" + solver)
+    comparison_solver_list.append("eldarica_symex_original")
+    comparison_solver_list.append("vb_eldarica_symex_prioritize")
+    comparison_solver_list.append("pf_eldarica_symex")
+    for a in eldarica_abstract_options + ["off"]:
+        comparison_solver_list.append("eldarica_abstract_" + a)
+        for strategy in ["prioritizing_SEH", "prioritizing_rank", "pruning_rank", "pruning_score"]:
+            comparison_solver_list.append("vb_eldarica_abstract_" + a + "_" + strategy)
+            comparison_solver_list.append("pf_eldarica_abstract_" + a + "_" + strategy)
 
     # get column names
     columns = ["category"]
@@ -303,7 +268,8 @@ def count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_d
         if c in ca and m == sa:
             count += 1
         if c in ca:
-            solving_time += st
+            solving_time += read_solving_time_from_differernt_formats(st)
+            # solving_time += st
 
     if "solving_time" == m:
         category_dict[solver + "_" + m].append(solving_time)
@@ -327,12 +293,12 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
             for m in measurements:
                 record_fields.append("vb_eldarica_symex_prioritize" + "_" + m)
             for m in measurements:
-                record_fields.append("vb_eldarica_symex" + "_" + m)
+                record_fields.append("pf_eldarica_symex" + "_" + m)
         if sv in ["z3", "golem"]:
             for m in measurements:
                 record_fields.append(sv + "_pruning_" + m)
             for m in measurements:
-                record_fields.append("vb_" + sv + m)
+                record_fields.append("pf_" + sv + "_" + m)
     record_fields = other_fields + smt_measurements + record_fields
 
     # initialize solvability dict
@@ -398,11 +364,16 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                         virtual_best_satisfiability_graphs = "unknown"
                         virtual_best_solving_time_graphs = benchmark_timeout
 
-                    # virtual best of eldarica
-                    virtual_best_cross_eldarica_variation(solver_variation, solvability_dict,
-                                                          virtual_best_satisfiability_graphs,
-                                                          virtual_best_solving_time_graphs, measurements,
-                                                          "prioritizing")
+                    # virtual best of Prioritizing CDHG and CG
+
+                    solvability_dict["vb_" + solver_variation + "_" + "satisfiability"].append(
+                        virtual_best_satisfiability_graphs)
+                    solvability_dict["vb_" + solver_variation + "_" + "solving_time"].append(
+                        virtual_best_solving_time_graphs)
+                    # profolio_eldarica_variation(solver_variation, solvability_dict,
+                    #                                       virtual_best_satisfiability_graphs,
+                    #                                       virtual_best_solving_time_graphs, measurements,
+                    #                                       "prioritizing")
 
                 elif "pruning" in solver_variation:  # read from pruning eldarica variations
                     if len(object) > 1:  # has solvability file
@@ -439,11 +410,15 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                         virtual_best_satisfiability_graphs = "unknown"
                         virtual_best_solving_time_graphs = benchmark_timeout
 
-                    # virtual best of eldarica
-                    virtual_best_cross_eldarica_variation(solver_variation, solvability_dict,
-                                                          virtual_best_satisfiability_graphs,
-                                                          virtual_best_solving_time_graphs, measurements,
-                                                          "pruning")
+                    # virtual best of pruning CDHG and CG
+                    solvability_dict["vb_" + solver_variation + "_" + "satisfiability"].append(
+                        virtual_best_satisfiability_graphs)
+                    solvability_dict["vb_" + solver_variation + "_" + "solving_time"].append(
+                        virtual_best_solving_time_graphs)
+                    # profolio_eldarica_variation(solver_variation, solvability_dict,
+                    #                                       virtual_best_satisfiability_graphs,
+                    #                                       virtual_best_solving_time_graphs, measurements,
+                    #                                       "pruning")
 
                 else:  # read from standard solvers
                     if len(object) > 1:  # has solvability file
@@ -486,24 +461,32 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
     solvability_dict["vb_eldarica_original_satisfiability"] = vb_satisfiability
     solvability_dict["vb_eldarica_original_solving_time"] = vb_solving_time
 
-    # add virtual best columns for prioritizing and pruning eldarica in each abstract
-    # todo: vb (original, CDHG, CG), vb (CDHG, CG)
+    # add profolio for eldarica variations
     for a in eldarica_abstract_options + ["off"]:
-        for strategy in ["prioritizing", "pruning"]:
-            eldarica_variant_list = [s for s in comparison_solver_list if
-                                     s not in ["z3", "golem"] and strategy in s and a in s]
+        for strategy in ["prioritizing_SEH", "prioritizing_rank", "pruning_rank", "pruning_score"]:
+            eldarica_variant_list = ["vb_eldarica_abstract_" + a + "_" + strategy, "eldarica_abstract_" + a]
             vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
                 solvability_dict, eldarica_variant_list)
-            solvability_dict["vb_eldarica_abstract_" + a + "_" + strategy + "_satisfiability"] = vb_satisfiability
-            solvability_dict["vb_eldarica_abstract_" + a + "_" + strategy + "_solving_time"] = vb_solving_time
+            solvability_dict["pf_eldarica_abstract_" + a + "_" + strategy + "_satisfiability"] = vb_satisfiability
+            solvability_dict["pf_eldarica_abstract_" + a + "_" + strategy + "_solving_time"] = vb_solving_time
 
-    # add virtual best columns for z3 and golem
+    for a in eldarica_abstract_options + ["off"]:
+        for tup in [["prioritizing", "prioritizing_SEH", "prioritizing_rank"],
+                    ["pruning", "pruning_rank", "pruning_score"]]:
+            eldarica_variant_list = ["vb_eldarica_abstract_" + a + "_" + tup[1],
+                                     "vb_eldarica_abstract_" + a + "_" + tup[2]]
+            vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+                solvability_dict, eldarica_variant_list)
+            solvability_dict["vb_eldarica_abstract_" + a + "_" + tup[0] + "_satisfiability"] = vb_satisfiability
+            solvability_dict["vb_eldarica_abstract_" + a + "_" + tup[0] + "_solving_time"] = vb_solving_time
+
+    # add profolio  columns for z3 and golem
     for solver in ["z3", "golem"]:
         solver_variant_list = [solver, solver + "_pruning"]
         vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
             solvability_dict, solver_variant_list)
-        solvability_dict["vb_" + solver + "_satisfiability"] = vb_satisfiability
-        solvability_dict["vb_" + solver + "_solving_time"] = vb_solving_time
+        solvability_dict["pf_" + solver + "_satisfiability"] = vb_satisfiability
+        solvability_dict["pf_" + solver + "_solving_time"] = vb_solving_time
 
     # merge symex CDHG and CG and add vb_symex column
     vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
@@ -512,8 +495,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
     solvability_dict["vb_eldarica_symex_prioritize_solving_time"] = vb_solving_time
     vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
         solvability_dict, ["vb_eldarica_symex_prioritize", "eldarica_symex_original"])
-    solvability_dict["vb_eldarica_symex_satisfiability"] = vb_satisfiability
-    solvability_dict["vb_eldarica_symex_solving_time"] = vb_solving_time
+    solvability_dict["pf_eldarica_symex_satisfiability"] = vb_satisfiability
+    solvability_dict["pf_eldarica_symex_solving_time"] = vb_solving_time
 
     for k in solvability_dict:
         print(k, len(solvability_dict[k]))
@@ -531,15 +514,7 @@ def virtual_best_satisfiability_and_solving_time_for_a_solver_list(solvability_d
         one_file_vb_solving_time = []
         for k in comparison_solver_list:
             one_file_vb_satisfiability.append(solvability_dict[k + "_satisfiability"][i])
-            # deal with miss info, unknown, solving_time[CDHG-threshold] format
-            read_solving_time = str(solvability_dict[k + "_solving_time"][i])
-            if read_solving_time in ["miss info", "unknown"]:
-                solving_time = benchmark_timeout
-            elif "[" in read_solving_time:
-                solving_time = float(read_solving_time[:read_solving_time.find("[")])
-
-            else:
-                solving_time = float(read_solving_time)
+            solving_time = read_solving_time_from_differernt_formats(solvability_dict[k + "_solving_time"][i])
 
             one_file_vb_solving_time.append(solving_time)
 
@@ -548,8 +523,21 @@ def virtual_best_satisfiability_and_solving_time_for_a_solver_list(solvability_d
     return vb_satisfiability, vb_solving_time
 
 
-def virtual_best_cross_eldarica_variation(solver_variation, solvability_dict, virtual_best_satisfiability_graphs,
-                                          virtual_best_solving_time_graphs, measurements, option):
+def read_solving_time_from_differernt_formats(read_solving_time):
+    # deal with miss info, unknown, solving_time[CDHG-threshold] format
+    read_solving_time = str(read_solving_time)
+    if read_solving_time in ["miss info", "unknown"]:
+        solving_time = benchmark_timeout
+    elif "[" in read_solving_time:
+        solving_time = float(read_solving_time[:read_solving_time.find("[")])
+
+    else:
+        solving_time = float(read_solving_time)
+    return solving_time
+
+
+def profolio_eldarica_variation(solver_variation, solvability_dict, virtual_best_satisfiability_graphs,
+                                virtual_best_solving_time_graphs, measurements, option):
     eldarica_base_variation = solver_variation[:solver_variation.find("_" + option)]
     satisfiability_abstract = solvability_dict[eldarica_base_variation + "_satisfiability"][-1]
     solving_time_abstract = solvability_dict[eldarica_base_variation + "_solving_time"][-1]
@@ -561,8 +549,8 @@ def virtual_best_cross_eldarica_variation(solver_variation, solvability_dict, vi
 
     satisfiability, solving_time = mask_results_by_benchmark_timeout(virtual_best_satisfiability,
                                                                      virtual_best_solving_time)
-    solvability_dict["vb_" + solver_variation + "_" + "satisfiability"].append(satisfiability)
-    solvability_dict["vb_" + solver_variation + "_" + "solving_time"].append(solving_time)
+    solvability_dict["pf_" + solver_variation + "_" + "satisfiability"].append(satisfiability)
+    solvability_dict["pf_" + solver_variation + "_" + "solving_time"].append(solving_time)
 
 
 def mask_results_by_benchmark_timeout(satisfiability, solving_time):
