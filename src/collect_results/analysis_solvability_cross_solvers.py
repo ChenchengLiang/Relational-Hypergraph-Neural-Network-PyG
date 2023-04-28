@@ -26,9 +26,18 @@ def draw_common_unsafe_solving_time(excel_file):
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_rank"],
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_score"],
                         ["eldarica_symex_original", "vb_eldarica_symex_prioritize"],
-                        ["eldarica_symex_original", "pf_eldarica_symex"]]
+                        #["eldarica_symex_original", "pf_eldarica_symex"]
+                        ]
 
+    axis_name_map={"eldarica_abstract_off":"Original", "vb_eldarica_abstract_off_prioritizing_SEH":"prioritizing score+",
+              "vb_eldarica_abstract_off_prioritizing_rank":"Prioritizing score",
+              "vb_eldarica_abstract_off_pruning_rank":"Pruning rank", "vb_eldarica_abstract_off_pruning_score":"Pruning score",
+              "eldarica_symex_original":"Original", "vb_eldarica_symex_prioritize":"Prioritizing score"}
     for pair in comparison_pairs:
+        if "symex" in pair[0]:
+            engine= "symbolic execution"
+        else:
+            engine="predicate abstraction"
         original_solving_time_list = []
         strategy_solving_time_list = []
         satisfiability_list = []
@@ -38,15 +47,15 @@ def draw_common_unsafe_solving_time(excel_file):
                                                                           solvability_dict[pair[1] + "_satisfiability"],
                                                                           solvability_dict[pair[0] + "_solving_time"],
                                                                           solvability_dict[pair[1] + "_solving_time"]):
-            if original_s == strategy_s and original_s != "unknown":
+            if original_s == strategy_s and original_s == "unsafe":
                 file_name_list.append(name)
                 satisfiability_list.append(original_s)
                 original_solving_time_list.append(original_st)
                 strategy_solving_time_list.append(strategy_st)
 
         scatter_plot(x_data=original_solving_time_list, y_data=strategy_solving_time_list, z_data=satisfiability_list,
-                     x_axis=pair[0], y_axis=pair[1], folder=scatter_folder, data_text=file_name_list,
-                     name="Solving time (second)",scale="log")
+                     x_axis=axis_name_map[pair[0]], y_axis=axis_name_map[pair[1]], folder=scatter_folder, data_text=file_name_list,
+                     name="Solving time (second)"+"<br>Solver engine: "+engine,scale="log")
 
 
 def read_solvability_dict(excel_file):

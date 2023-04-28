@@ -51,7 +51,7 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
         go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal", line=dict(color="gray")))
 
     fig.update_layout(
-        title=name,
+        title=name+"<br>Number of common files:"+str(len(x_data)),
         title_x=0.5,
         xaxis_title=x_axis,
         yaxis_title=y_axis)
