@@ -35,10 +35,10 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
                 y_data_3.append(y)
                 text_data_3.append(t)
         fig.add_trace(go.Scatter(x=x_data_1, y=y_data_1, text=text_data_1, marker=dict(color='green'), mode='markers',
-                                 name='safe'))
+                                 name='sat'))
         fig.add_trace(go.Scatter(x=x_data_2, y=y_data_2, text=text_data_2, marker=dict(color='blue', symbol="diamond"),
                                  mode='markers',
-                                 name='unsafe'))  # size=10
+                                 name='unsat'))  # size=10
         fig.add_trace(
             go.Scatter(x=x_data_3, y=y_data_3, text=text_data_3, marker=dict(color='red', symbol="x"), mode='markers',
                        name='unknown'))
