@@ -38,10 +38,10 @@ def main():
 
     # unsatcore: check solvability differernt threshold #benchmark_timeout* 12*2
     #need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
-    for g in ["CDHG", "CG"]:
-        for threshold in threshold_list:  # reverse this list
-            parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
-                threshold) + " -hornGraphType:" + g +" -abstract:relEqs " )
+    # for g in ["CDHG", "CG"]:
+    #     for threshold in threshold_list:  # reverse this list
+    #         parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
+    #             threshold) + " -hornGraphType:" + g +" -abstract:relEqs " )
 
     # unsatcore: check solvability for prioritized clauses benchmark_timeout*3
     # parameters_pipeline.append(
@@ -50,11 +50,11 @@ def main():
     #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:relIneqs " )
 
     # description: output pruned CHCs in files 12*2*shell_timeout
-    # shell_timeout = int(60 * 20)
-    # for g in ["CDHG", "CG"]:
-    #     for threshold in threshold_list:  # reverse this list
-    #         parameters_pipeline.append(" -outputPrunedClauses -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
-    #             threshold) + " -hornGraphType:" + g + " -abstract:off ")
+    shell_timeout = int(60 * 20)
+    for g in ["CDHG", "CG"]:
+        for threshold in threshold_list:  # reverse this list
+            parameters_pipeline.append(" -outputPrunedClauses -hornGraphLabelType:unsatCore -unsatCoreThreshold:" + str(
+                threshold) + " -hornGraphType:" + g + " -abstract:off ")
 
 
 

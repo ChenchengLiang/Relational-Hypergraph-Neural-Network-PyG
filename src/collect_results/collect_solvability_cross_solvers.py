@@ -50,8 +50,8 @@ def main():
 
     eldarica_symex_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/symex"
     eldarica_symex_folder_original = os.path.join(eldarica_symex_folder, "original/train_data")
-    # eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-reverse-coef-1000/train_data")
-    # eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-reverse-coef-1000/train_data")
+    # eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-priority-queue-coef-1000+constraint-size/train_data")
+    # eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-priority-queue-coef-1000+constraint-size/train_data")
     eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-priority-queue-coef-1000/train_data")
     eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-priority-queue-coef-1000/train_data")
 

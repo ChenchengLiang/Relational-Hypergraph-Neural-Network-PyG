@@ -45,13 +45,24 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
     else:
         fig.add_trace(go.Scatter(x=x_data, y=y_data, marker=dict(color='blue'), mode='markers', name='marker'))
 
+    # compute points above and under the diagonal
+    above_diagonal, under_diagonal, on_diagonal = 0, 0, 0
+    for x, y in zip(x_data, y_data):
+        if x < y:
+            above_diagonal += 1
+        elif x > y:
+            under_diagonal += 1
+        else:
+            on_diagonal += 1
+
     # Add a diagonal line
-    max_value = benchmark_timeout#max(x_data + y_data)
+    max_value = benchmark_timeout  # max(x_data + y_data)
     fig.add_trace(
         go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal", line=dict(color="gray")))
 
     fig.update_layout(
-        title=name+"<br>Number of common files:"+str(len(x_data)),
+        title=name + "<br>Number of common files:" + str(len(x_data)) + "<br>above/under/on diagonal:" + str(
+            above_diagonal) + "/" + str(under_diagonal) + "/" + str(on_diagonal),
         title_x=0.5,
         xaxis_title=x_axis,
         yaxis_title=y_axis)
