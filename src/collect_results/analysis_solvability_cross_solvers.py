@@ -6,7 +6,7 @@ from src.utils import make_dirct
 
 
 def main():
-    excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"
+    excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_symex--priority-queue-1000.xlsx"
 
     # read_gain_and_lose(excel_file)
 
@@ -47,7 +47,7 @@ def draw_common_unsafe_solving_time(excel_file):
                                                                           solvability_dict[pair[1] + "_satisfiability"],
                                                                           solvability_dict[pair[0] + "_solving_time"],
                                                                           solvability_dict[pair[1] + "_solving_time"]):
-            if original_s == strategy_s and original_s!="unknown":#original_s == "unsafe":
+            if original_s == strategy_s and original_s!="unknown":# and original_s == "unsafe":
                 file_name_list.append(name)
                 satisfiability_list.append(original_s)
                 original_solving_time_list.append(original_st)

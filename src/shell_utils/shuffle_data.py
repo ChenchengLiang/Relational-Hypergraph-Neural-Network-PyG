@@ -9,6 +9,7 @@ def main():
     folder = sys.argv[1]
     file_list = get_file_list(folder, "smt2")
     file_list_number=len(file_list)
+    #shuffle
     random.seed(42)
     for i in range(5):
         random.shuffle(file_list)

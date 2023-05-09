@@ -49,14 +49,14 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
     eldarica_symex_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/symex"
-    eldarica_symex_folder_original = os.path.join(eldarica_symex_folder, "original/train_data")
+    eldarica_symex_folder_original = os.path.join(eldarica_symex_folder, "original/1555/MQueue/train_data")
     # eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-priority-queue-coef-1000+constraint-size/train_data")
     # eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-priority-queue-coef-1000+constraint-size/train_data")
     eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-priority-queue-coef-1000/train_data")
     eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-priority-queue-coef-1000/train_data")
 
     test_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
-    full_file_folder = eldarica_symex_folder_CDHG  # test_folder   # golem_folder
+    full_file_folder = golem_folder #eldarica_symex_folder_CDHG  # test_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
 
     solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
@@ -324,11 +324,9 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 json_file_suffix = "golem-solvability.JSON"
             elif "z3" in solver_variation:
                 json_file_suffix = "z3-solvability.JSON"
-            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in
-                                                                  eldarica_abstract_options] + [
-                "eldarica_symex_original"]:
+            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in eldarica_abstract_options]:
                 json_file_suffix = "eld-solvability.JSON"
-            elif solver_variation in ["eldarica_symex_CDHG", "eldarica_symex_CG"]:
+            elif solver_variation in ["eldarica_symex_CDHG", "eldarica_symex_CG", "eldarica_symex_original"]:
                 json_file_suffix = "simplified.smt2.eld-solvability.JSON"
             else:
                 json_file_suffix = "solvability.JSON"
