@@ -30,26 +30,26 @@ def main():
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     task = get_task_by_folder_name(folder_1)
     # todo add inner layer control to graph conv operator
-    num_gnn_layers = [2,4]  # 8 works best
+    num_gnn_layers = [2,4,8]  # 8 works best
     dropout_rate = [  # all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
-        {"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
+        #{"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.5, "gnn_inner_layer_dropout_rate": 0.5},
         # {"gnn_dropout_rate": 0.4, "mlp_dropout_rate": 0.2, "gnn_inner_layer_dropout_rate": 0.0},
         # {"gnn_dropout_rate": 0.8, "mlp_dropout_rate": 0.8, "gnn_inner_layer_dropout_rate": 0.0}
     ]
-    num_linear_layers = [2]  # 2 works
+    num_linear_layers = [2,8]  # 2 works
     data_loader_shuffle = [False]
-    use_intermediate_gnn_results = [False]
+    use_intermediate_gnn_results = [False,True]
     message_normalization = [False]
     add_backward_edges = [False]
     add_global_edges = [True]
     self_loop = [True]
     gradient_clip = [True]
     inter_layer_norm = [True]
-    embedding_size = [64]
+    embedding_size = [32,64]
     epochs = 200
-    patient = 100
-    dense_every_num_layers = 2
+    patient = 50
+    dense_every_num_layers = 1
     residual_every_num_layers = 2
     GPU = [True]
     reload_data = False

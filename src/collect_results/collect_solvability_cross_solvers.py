@@ -49,14 +49,12 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
     eldarica_symex_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/symex"
-    eldarica_symex_folder_original = os.path.join(eldarica_symex_folder, "original/1555/MQueue/train_data")
-    # eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-priority-queue-coef-1000+constraint-size/train_data")
-    # eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-priority-queue-coef-1000+constraint-size/train_data")
+    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/original-symex/train_data"
     eldarica_symex_folder_CDHG = os.path.join(eldarica_symex_folder, "CDHG-priority-queue-coef-1000/train_data")
     eldarica_symex_folder_CG = os.path.join(eldarica_symex_folder, "CG-priority-queue-coef-1000/train_data")
 
     test_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
-    full_file_folder = golem_folder #eldarica_symex_folder_CDHG  # test_folder
+    full_file_folder = eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
 
     solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
