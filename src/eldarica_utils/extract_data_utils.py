@@ -9,7 +9,7 @@ import subprocess
 import glob
 import json
 import numpy as np
-
+from shutil import copy, move
 
 
 def run_eldarica_with_shell(file, shell_timeout, solver_parameter_list, shell_folder,solver_location = "../../eldarica-graph-generation/eld "):

@@ -6,7 +6,7 @@ from src.utils import make_dirct
 
 
 def main():
-    excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_symex--priority-queue-1000.xlsx"
+    excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/symex-score.xlsx"
 
     # read_gain_and_lose(excel_file)
 
