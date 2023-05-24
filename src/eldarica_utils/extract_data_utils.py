@@ -89,3 +89,5 @@ def get_eldarica_option_by_shortest_solving_Time(file):
                         maxKeyValue[1] = solvingTime
         print(os.path.basename(file), "maxKeyValue", maxKeyValue[0], ":", maxKeyValue[1])
         return abstracOptionDict[maxKeyValue[0]]
+    else:
+        return ""

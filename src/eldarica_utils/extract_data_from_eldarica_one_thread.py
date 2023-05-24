@@ -4,11 +4,11 @@ sys.path.append("../..")
 from src.utils import make_dirct, get_file_list
 import os
 from extract_data_utils import run_eldarica_with_shell
-from src.CONSTANTS import benchmark_timeout,threshold_list
+from src.CONSTANTS import benchmark_timeout,threshold_list,data_extraction_timeout
 
 def main():
     parameters_pipeline = []
-    shell_timeout = int(benchmark_timeout)
+    shell_timeout = int(data_extraction_timeout)
     eldarica_timeout = benchmark_timeout
     manual_abstract_options = ["empty", "term", "oct", "relEqs", "relIneqs"]
     predicted_abstract_options = ["predictedCG", "predictedCDHG"]

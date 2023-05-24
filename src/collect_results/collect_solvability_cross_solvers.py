@@ -12,6 +12,7 @@ from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_cl
     virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
     virtual_best_solving_time_for_pruning, get_distinct_category_list, get_target_row_by_condition
+from src.collect_results.utils import draw_common_unsafe_solving_time
 
 
 def main():
@@ -49,12 +50,13 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
     #eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-contraint-sum/train_data"
-    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/new/train_data"
+    #eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/new/train_data"
+    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/alvis/train_data"
 
     #eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-SEH-CDHG/train_data"
     #eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-SEH-CG/train_data"
-    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-score+birthTime+conctraintSum/CDHG/train_data"
-    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-score+birthTime+conctraintSum/CG/train_data"
+    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-rank+new-birthTime-inverse/CDHG/train_data"
+    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-rank+new-birthTime-inverse/CG/train_data"
     test_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
     full_file_folder = eldarica_symex_folder_CDHG#eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
@@ -100,6 +102,9 @@ def main():
         pd.DataFrame(pd.DataFrame(category_dict)).to_excel(writer, sheet_name="category_summary")
         pd.DataFrame(pd.DataFrame(category_dict)).transpose().to_excel(writer, sheet_name="category_summary_transpose")
 
+    #draw common solving time scatter plots
+    excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"
+    draw_common_unsafe_solving_time(excel_file)
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
     categories = get_distinct_category_list(solvability_dict["category"])
