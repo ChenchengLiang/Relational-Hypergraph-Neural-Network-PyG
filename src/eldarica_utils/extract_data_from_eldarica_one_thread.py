@@ -9,7 +9,7 @@ from src.CONSTANTS import benchmark_timeout,threshold_list,data_extraction_timeo
 def main():
     parameters_pipeline = []
     shell_timeout = int(data_extraction_timeout)
-    eldarica_timeout = benchmark_timeout
+    eldarica_timeout = data_extraction_timeout
     manual_abstract_options = ["empty", "term", "oct", "relEqs", "relIneqs"]
     predicted_abstract_options = ["predictedCG", "predictedCDHG"]
     other_abstract_options = ["unlabeled", "random", "mined"]
@@ -33,8 +33,8 @@ def main():
     parameters_pipeline.append(" -mineCounterExample:common -abstract:off")
 
     # unsatcore: construct graphs # 6 hours
-    # parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off")
-    # parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -abstract:off")
+    #parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off")
+    #parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -abstract:off")
 
     # unsatcore: check solvability differernt threshold #benchmark_timeout* 12*2
     #need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list

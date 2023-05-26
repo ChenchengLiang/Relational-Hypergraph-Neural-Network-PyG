@@ -10,12 +10,16 @@ from src.plots import scatter_plot
 from openpyxl import load_workbook
 
 def summarize_excel_files():
-    excel_files = ["symex-birthTime","symex-new-birthTime","symex-constraintSum","symex-score+constrainSum",
-                   "symex-only-score-100","symex-only-score-1000","symex-only-score-10000",
-                   "symex-socre+birthTime","symex-score+new-birthTime","symex-score+birthTime+constrainSum",
+    excel_files = ["symex-random",
+                   "symex-birthTime","symex-new-birthTime","symex-constraintSum","symex-score+constrainSum",
+                   "symex-only-score-100","symex-only-score-1000","symex-only-score-1000-inverse","symex-only-score-10000",
+                   "symex-socre+birthTime","symex-score+new-birthTime","symex-new-birthTime-inverse","symex-score+birthTime+constrainSum",
                    "symex-rank","symex-rank-inverse","symex-rank+birthTime","symex-rank+new-birthTime",
                    "symex-rank+new-birthTime-inverse",
-                   "symex-rank+birthTime+constraintSum",]
+                   "symex-rank+birthTime+constraintSum",
+                   "symex-two-queues","symex-two-queue-score-1000","symex-two-queues-random",
+                   #"symex-two-queue-score-rank"
+                   ]
     columns = ["category"]+["original_safe","original_unsafe"]+manual_flatten([[f + "_safe", f + "_unsafe"] for f in excel_files])
     output_dict = {x: [] for x in columns}
 
