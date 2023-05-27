@@ -30,11 +30,11 @@ def main():
     #parameters_pipeline.append(" -getSolvability " + " -abstract:off ")
 
     # unsatcore: get labeled data # 3 hours
-    parameters_pipeline.append(" -mineCounterExample:common -abstract:off")
+    #parameters_pipeline.append(" -mineCounterExample:common -abstract:off")
 
     # unsatcore: construct graphs # 6 hours
-    #parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off")
-    #parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -abstract:off")
+    parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off")
+    parameters_pipeline.append(" -getHornGraph:CG -hornGraphLabelType:unsatCore -abstract:off")
 
     # unsatcore: check solvability differernt threshold #benchmark_timeout* 12*2
     #need match initial field in Eldarica and benchmark_statistics.utils in Python with threshold list
