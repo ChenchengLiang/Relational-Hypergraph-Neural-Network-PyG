@@ -27,10 +27,10 @@ def main():
     #     for s in split_clause_option:
     #         parameters_pipeline.append(
     #             " -getSolvability " + " -abstract:" + a + " -splitClauses:" + s + " -t:" + str(eldarica_timeout) )
-    #parameters_pipeline.append(" -getSolvability " + " -abstract:off ")
+    # parameters_pipeline.append(" -getSolvability " + " -abstract:off ")
 
     # unsatcore: get labeled data # 3 hours
-    #parameters_pipeline.append(" -mineCounterExample:common -abstract:off")
+    #parameters_pipeline.append(" -mineCounterExample:minimal ")
 
     # unsatcore: construct graphs # 6 hours
     parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off")
