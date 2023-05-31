@@ -67,7 +67,7 @@ def get_data(params):
     draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in train_data), params["benchmark"], "train-data")
     draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in valid_data), params["benchmark"], "valid-data")
     draw_label_pie_chart(params["num_classes"], lambda: (t.y for t in test_data), params["benchmark"], "test-data")
-    class_weight = [1 - (v / sum(dataset_distribution_values)) for v in dataset_distribution_values] if params[
+    class_weight = [(1 - (v / sum(dataset_distribution_values))) * 10 for v in dataset_distribution_values] if params[
                                                                                                             "use_class_weight"] == True else [
         1 for v in dataset_distribution_values]
     print("class_weight", class_weight)

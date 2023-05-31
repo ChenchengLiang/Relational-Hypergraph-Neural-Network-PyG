@@ -28,7 +28,7 @@ def run_one_epoch(params, model, data_loader, optimizer, ls_func, device, train=
             pred = model(batch)
             if params["task_type"] == "binary_classification":
                 loss = ls_func(torch.squeeze(pred), batch.y.float(),
-                               pos_weight=torch.tensor(params["class_weight"][1] * 10))
+                               pos_weight=torch.tensor(params["class_weight"][1]))
                 sigmoid_pred = torch.sigmoid(pred)
                 raw_predicted_list.append(sigmoid_pred.cpu().detach().numpy())
                 predicted_list.append(np.rint(sigmoid_pred.cpu().detach().numpy()))
@@ -108,6 +108,7 @@ def train(train_loader, valid_loader, model, device, params):
         valid_acc, flatten_predicted_list, flatten_label_list = get_accuracy(predicted_list, label_list)
         valid_acc_list.append(valid_acc)
         mlflow.log_metric("valid accuracy", '{:e}'.format(valid_acc), epoch)
+
         mlflow.log_metric("epoch", epoch, epoch)
 
         #save best model by loss

@@ -56,7 +56,7 @@ def main():
     reload_data = False
     regression_layer_norm = False
     fix_random_seed = [True]
-    use_class_weight = [True]
+    use_class_weight = [True,False]
     learning_rate = [0.0001]
     activation = ["relu"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
