@@ -25,7 +25,6 @@ def run_one_epoch(params, model, data_loader, optimizer, ls_func, device, train=
             batch = batch[0]
         batch.to(device)  # Use GPU
         try:
-
             pred = model(batch)
             if params["task_type"] == "binary_classification":
                 loss = ls_func(torch.squeeze(pred), batch.y.float(),
@@ -78,6 +77,7 @@ def train(train_loader, valid_loader, model, device, params):
     valid_loss_list = []
     train_acc_list = []
     valid_acc_list = []
+    best_acc = 0
     best_loss = 10000000
     best_epoch = 0
     for epoch in tqdm(range(params["epochs"]), desc="Training progress"):
@@ -110,8 +110,17 @@ def train(train_loader, valid_loader, model, device, params):
         mlflow.log_metric("valid accuracy", '{:e}'.format(valid_acc), epoch)
         mlflow.log_metric("epoch", epoch, epoch)
 
+        #save best model by loss
         if valid_loss <= best_loss:
             best_loss = valid_loss
+            best_epoch = epoch
+            torch.save(model, os.path.join(model_folder, "best_model.pth"))
+            draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"],
+                                  params["benchmark"], name="best-valid-" + params["task_type"], acc=valid_acc)
+
+        # save best model by accuracy
+        if valid_acc >= best_acc:
+            best_acc = valid_acc
             best_epoch = epoch
             torch.save(model, os.path.join(model_folder, "best_model.pth"))
             draw_confusion_matrix(flatten_predicted_list, flatten_label_list, params["num_classes"],
@@ -125,7 +134,7 @@ def train(train_loader, valid_loader, model, device, params):
             return model
 
         if epoch - best_epoch >= params["patient"]:
-            torch.save(model, os.path.join(model_folder, "best_model.pth"))
+            torch.save(model, os.path.join(model_folder, "final_epoch_model.pth"))
             mlflow.log_metric("early stop epoch", epoch)
             train_valid_plot(train_loss_list, valid_loss_list, params["benchmark"], field="loss")
             train_valid_plot(train_acc_list, valid_acc_list, params["benchmark"], field="acc")
