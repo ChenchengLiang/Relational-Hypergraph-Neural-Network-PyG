@@ -112,7 +112,7 @@ def train(train_loader, valid_loader, model, device, params):
         mlflow.log_metric("epoch", epoch, epoch)
 
         #save best model by loss
-        if valid_loss <= best_loss:
+        if valid_loss < best_loss:
             best_loss = valid_loss
             best_epoch = epoch
             torch.save(model, os.path.join(model_folder, "best_model.pth"))
@@ -120,7 +120,7 @@ def train(train_loader, valid_loader, model, device, params):
                                   params["benchmark"], name="best-valid-" + params["task_type"], acc=valid_acc)
 
         # save best model by accuracy
-        if valid_acc >= best_acc:
+        if valid_acc > best_acc:
             best_acc = valid_acc
             best_epoch = epoch
             torch.save(model, os.path.join(model_folder, "best_model.pth"))
