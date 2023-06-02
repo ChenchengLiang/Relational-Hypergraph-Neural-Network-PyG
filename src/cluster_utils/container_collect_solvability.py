@@ -7,10 +7,10 @@ from src.collect_data_from_other_source.utils import collect_solving_info_from_o
 from src.CONSTANTS import benchmark_timeout
 
 def main():
-    folder = sys.argv[1]
-    solver_location = sys.argv[2]
+    folder = sys.argv[1] # "/home/cheli243/Desktop/debug/symex/4723"
+    solver_location = sys.argv[2] # "/home/cheli243/Desktop/CodeToGit/eldarica-fork-symex/assembly/eld"
     try:
-        solver_parameter = sys.argv[3]  # -abstract:off -sym:1 -hornGraphType:CG
+        solver_parameter = sys.argv[3]  # -abstract:off -sym:1 -hornGraphType:CDHG
     except:
         solver_parameter = " "
     print("solver_parameter", solver_parameter)

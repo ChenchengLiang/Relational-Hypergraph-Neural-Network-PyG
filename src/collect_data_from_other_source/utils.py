@@ -27,11 +27,11 @@ def collect_solving_info_from_other_solvers(folder, solver_location="z3", shell_
     # add pruned and simplified files
     for index in file_list:
         # add original file
-        #file_list_dict[index] = file_list_dict[index] + [index + ".zip"]
+        file_list_dict[index] = file_list_dict[index] + [index + ".zip"]
         if len(glob.glob(index + ".pruned*"))!=0:
             file_list_dict[index] = file_list_dict[index] + glob.glob(index + ".pruned*")
-        if os.path.exists(index + ".simplified.zip"):
-            file_list_dict[index] = file_list_dict[index] + [index + ".simplified.zip"]
+        # if os.path.exists(index + ".simplified.zip"):
+        #     file_list_dict[index] = file_list_dict[index] + [index + ".simplified.zip"]
     #print("file_list_dict", file_list_dict)
     timeout_command = "timeout " + str(shell_timeout)
     for index_file in tqdm(file_list_dict, desc="progress"):
@@ -39,6 +39,9 @@ def collect_solving_info_from_other_solvers(folder, solver_location="z3", shell_
         unzip_relative_files(index_file, delete_original_zip_file=True)
         for f in file_list_dict[index_file]:
             f=f.strip(".zip")
+            # add .smt2 to simplified file
+            if os.path.exists(f + ".simplified"):
+                move(f + ".simplified", f + ".simplified.smt2")
             # change file name if it is not end with .smt2
             if (not f.endswith(".smt2")):
                 move(f, f + ".smt2")
@@ -66,6 +69,10 @@ def collect_solving_info_from_other_solvers(folder, solver_location="z3", shell_
             os.remove(shell_file_name)
             if (not f.endswith(".smt2")):
                 move(smt2_file, smt2_file[:-len(".smt2")])
+
+            # change simplified file name back
+            if os.path.exists(f + ".simplified.smt2"):
+                move(f + ".simplified.smt2", f + ".simplified")
 
         # zip file again
         comress_relative_files(index_file, delete_original_file=True)
