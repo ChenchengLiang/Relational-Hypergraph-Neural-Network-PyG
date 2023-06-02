@@ -49,15 +49,17 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
-    #eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-contraint-sum/train_data"
-    #eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/new/train_data"
-    #eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/alvis/train_data"
-    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-two-queues/train_data"
+    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-contraint-sum/train_data"
+    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-old-results/fixed-heuristic/symex-original/new/train_data"
+    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/alvis/train_data"
+    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-two-queues/train_data"
+    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-old-results/fixed-heuristic/symex-prioritize-random/train_data"
+    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax_fixed_heuristic-constant/train_data"
 
-    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/alvis/two-queues/train_data"
-    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/alvis/two-queues/train_data"
+    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-symex_minimal_score/CDHG/train_data"
+    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-symex_minimal_score/CG/train_data"
     test_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
-    full_file_folder = eldarica_symex_folder_CDHG#eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
+    full_file_folder = eldarica_symex_folder_CDHG  # eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
 
     solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
@@ -101,9 +103,10 @@ def main():
         pd.DataFrame(pd.DataFrame(category_dict)).to_excel(writer, sheet_name="category_summary")
         pd.DataFrame(pd.DataFrame(category_dict)).transpose().to_excel(writer, sheet_name="category_summary_transpose")
 
-    #draw common solving time scatter plots
+    # draw common solving time scatter plots
     excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"
     draw_common_unsafe_solving_time(excel_file)
+
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
     categories = get_distinct_category_list(solvability_dict["category"])
@@ -328,7 +331,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 json_file_suffix = "golem-solvability.JSON"
             elif "z3" in solver_variation:
                 json_file_suffix = "z3-solvability.JSON"
-            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in eldarica_abstract_options]:
+            elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in
+                                                                  eldarica_abstract_options]:
                 json_file_suffix = "eld-solvability.JSON"
             elif solver_variation in ["eldarica_symex_CDHG", "eldarica_symex_CG", "eldarica_symex_original"]:
                 json_file_suffix = "simplified.smt2.eld-solvability.JSON"

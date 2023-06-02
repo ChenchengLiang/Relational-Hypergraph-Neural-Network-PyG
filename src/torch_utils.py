@@ -40,9 +40,9 @@ def forward_linear_layers(x,regression_linear_list,regression_linear_ln_list,reg
         x = lin(x)
         if norm ==  True:
             x = lin_norm(x)
+        x = act(x)
         if training == True and i < len(regression_linear_list) - 1:  # don't dropout at last conv layer
             x = drop(x)  # x = F.dropout(x, p=0.8, training=self.training)
-        x = act(x)
 
     x = regression_linear_out(x)
     return x

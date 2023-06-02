@@ -10,22 +10,15 @@ from src.plots import scatter_plot
 from openpyxl import load_workbook
 
 def summarize_excel_files():
-    excel_files = ["symex-random",
-                   "symex-birthTime","symex-new-birthTime","symex-constraintSum","symex-score+constrainSum",
-                   "symex-only-score-100","symex-only-score-1000","symex-only-score-1000-inverse","symex-only-score-10000",
-                   "symex-socre+birthTime","symex-score+new-birthTime","symex-new-birthTime-inverse","symex-score+birthTime+constrainSum",
-                   "symex-rank","symex-rank-inverse","symex-rank+birthTime","symex-rank+new-birthTime",
-                   "symex-rank+new-birthTime-inverse",
-                   "symex-rank+birthTime+constraintSum",
-                   "symex-two-queues","symex-two-queue-score-1000","symex-two-queues-random",
-                   #"symex-two-queue-score-rank"
-                   ]
+    excel_files = ["uppmax_symex_minimal_rank","uppmax-symex_minimal_score"]
+
+
     columns = ["category"]+["original_safe","original_unsafe"]+manual_flatten([[f + "_safe", f + "_unsafe"] for f in excel_files])
     output_dict = {x: [] for x in columns}
 
     #get original safe and unsafe
     solvability_dict = read_solvability_dict(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/symex-new-birthTime.xlsx",
+        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + excel_files[0] + ".xlsx",
         sheet_name="category_summary")
     output_dict["original_safe"] = ["safe"]+solvability_dict["eldarica_symex_original_safe"]
     output_dict["original_unsafe"] = ["unsafe"]+solvability_dict["eldarica_symex_original_unsafe"]
@@ -72,8 +65,8 @@ def summarize_excel_files():
 def draw_common_unsafe_solving_time(excel_file):
     # Read the Excel file into a Pandas DataFrame
     solvability_dict = read_solvability_dict(excel_file)
-    scatter_folder = make_dirct(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots")
+    plot_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots"
+    scatter_folder = make_dirct(plot_folder)
 
     comparison_pairs = [["eldarica_abstract_off", "vb_eldarica_abstract_off_prioritizing_SEH"],
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_prioritizing_rank"],
