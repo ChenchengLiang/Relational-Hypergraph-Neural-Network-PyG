@@ -11,7 +11,7 @@ def main():
 
 def divide_threads(folder):
     file_list=get_file_list(folder,"smt2")
-    divided_folder=make_dirct(folder+"-divided-"+str(len(file_list)))
+    divided_folder=make_dirct(folder+"-divided-"+str(len(file_list)),mute=True)
     for i,file in enumerate(file_list):
         file_name=file[:-len(".zip")]
         thread_folder=make_dirct(opj(divided_folder,"thread_"+str(i)))

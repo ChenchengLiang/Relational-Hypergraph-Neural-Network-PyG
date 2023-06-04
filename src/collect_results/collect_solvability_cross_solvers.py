@@ -54,10 +54,10 @@ def main():
     # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/alvis/train_data"
     # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-two-queues/train_data"
     # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-old-results/fixed-heuristic/symex-prioritize-random/train_data"
-    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax_fixed_heuristic-constant/train_data"
+    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/alvis-fixed_heuristic-constant/train_data"
 
-    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-symex_minimal_score/CDHG/train_data"
-    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-symex_minimal_score/CG/train_data"
+    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/alvis-symex_union_score/CDHG/train_data"
+    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/alvis-symex_union_score/CG/train_data"
     test_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
     full_file_folder = eldarica_symex_folder_CDHG  # eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")

@@ -122,11 +122,14 @@ def manual_flatten(target_list):
     return temp
 
 
-def make_dirct(d):
+def make_dirct(d,mute = False):
     try:
         os.remove(d)
     except:
-        print("no such folder, mkdir")
+        if mute ==True:
+            pass
+        else:
+            print("no such folder, mkdir",d)
     try:
         os.mkdir(d)
         return d

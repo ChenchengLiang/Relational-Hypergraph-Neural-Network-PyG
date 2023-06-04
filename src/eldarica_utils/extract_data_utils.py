@@ -20,6 +20,10 @@ def run_eldarica_with_shell(file, shell_timeout, solver_parameter_list, shell_fo
         unzip_file(f)
         os.remove(f)
 
+    #change simplified file name
+    if os.path.exists(file + ".simplified"):
+        move(file + ".simplified", file + ".simplified.smt2")
+
     file_name = os.path.basename(file)
     shell_file_name = shell_folder + "/" + "run-ulimit" + "-" + file_name + ".sh"
     solver_parameter_list= change_eldarica_parameters(file, solver_parameter_list) if "eldarica" in solver_location else solver_parameter_list
@@ -38,6 +42,9 @@ def run_eldarica_with_shell(file, shell_timeout, solver_parameter_list, shell_fo
 
     # compress files
     if os.path.exists(file):
+        #change simplified file name back
+        if os.path.exists(file + ".simplified.smt2"):
+            move(file + ".simplified.smt2", file + ".simplified")
         file_list = glob.glob(file + "*")
         for f in file_list:
             if "out.gz" not in f:
