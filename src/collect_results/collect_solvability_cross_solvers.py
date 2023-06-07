@@ -49,15 +49,12 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
-    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-contraint-sum/train_data"
-    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-old-results/fixed-heuristic/symex-original/new/train_data"
-    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-original/alvis/train_data"
-    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-prioritize-two-queues/train_data"
-    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-old-results/fixed-heuristic/symex-prioritize-random/train_data"
-    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/alvis-fixed_heuristic-constant/train_data"
 
-    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/alvis-symex_union_score/CDHG/train_data"
-    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/alvis-symex_union_score/CG/train_data"
+    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-old-results/fixed-heuristic/symex-prioritize-random/train_data"
+    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-CEGAR-fixed_heuristic/train_data"
+
+    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-CEGAR-union-score/CDHG/train_data"
+    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-CEGAR-union-score/CG/train_data"
     test_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
     full_file_folder = eldarica_symex_folder_CDHG  # eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
@@ -333,9 +330,9 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 json_file_suffix = "z3-solvability.JSON"
             elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in
                                                                   eldarica_abstract_options]:
-                json_file_suffix = "eld-solvability.JSON"
+                json_file_suffix = "eld-solvability.JSON" #todo: read from solvability file solvingTime-CDHG-0.0
             elif solver_variation in ["eldarica_symex_CDHG", "eldarica_symex_CG", "eldarica_symex_original"]:
-                json_file_suffix = "simplified.smt2.eld-solvability.JSON"
+                json_file_suffix = "eld-solvability.JSON"
             else:
                 json_file_suffix = "solvability.JSON"
 

@@ -67,7 +67,7 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
                                                                        "3-labels_indices_mismatch", separate_mismatch_indices_and_label_cases)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "4-clause_number_match",
                                                                        "4-clause_number_mismatch",
-                                                                       separate_mismatch_label_number_and_clauses_number)
+                                                                       separate_mismatch_label_number_and_clauses_number) # this need solvability file
     # try:
     #     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "5-predicted_label_match_clauses",
     #                                                                        "5-predicted_label_not_match_clauses",
@@ -136,7 +136,7 @@ def separate_cases_by_graph_field(folder, target_folder_name, exception_folder_n
         for cdhg,cg,solv in tqdm(zip(cdhg_graph_dict_list,cg_graph_dict_list,solvability_dict_list),desc=separate_function.__name__):
             file_name_cdhg = cdhg["file_name"][:cdhg["file_name"].find(".hyperEdgeGraph.JSON")]
             if len(cdhg)>3:
-                merged_cdhg={**cdhg,**solv}
+                merged_cdhg={**cdhg, **solv}
                 merged_cg = {**cg, **solv}
                 separate_function(merged_cdhg,merged_cg, file_name_cdhg, target_folder, exception_folder)
                 #separate_function(cdhg, cg, file_name_cdhg, target_folder, exception_folder)

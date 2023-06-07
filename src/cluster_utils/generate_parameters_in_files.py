@@ -47,7 +47,7 @@ def main():
     self_loop = [True]
     gradient_clip = [False]
     inter_layer_norm = [True]
-    embedding_size = [64]
+    embedding_size = [64,128]
     epochs = 500
     patient = 50
     dense_every_num_layers = [2]
