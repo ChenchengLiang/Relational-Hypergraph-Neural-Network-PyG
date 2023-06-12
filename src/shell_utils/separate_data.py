@@ -1,3 +1,4 @@
+import os.path
 import sys
 
 sys.path.append("/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG")
@@ -13,9 +14,15 @@ def main():
     divided_list = divide_list(file_list, n)
 
     for i, l in enumerate(divided_list):
-        current_folder = make_dirct(folder + "-part-" + str(i))
+        current_folder_CDHG = make_dirct(folder + "-part-" + str(i)+"-CDHG")
+        current_folder_CDHG = make_dirct(os.path.join(current_folder_CDHG,"test_data"))
+        current_folder_CDHG = make_dirct(os.path.join(current_folder_CDHG, "raw"))
+        current_folder_CG = make_dirct(folder + "-part-" + str(i) + "-CG")
+        current_folder_CG = make_dirct(os.path.join(current_folder_CG, "test_data"))
+        current_folder_CG = make_dirct(os.path.join(current_folder_CG, "raw"))
         for f in l:
-            copy_relative_files(f[:-len(".zip")], current_folder)
+            copy_relative_files(f[:-len(".zip")], current_folder_CDHG)
+            copy_relative_files(f[:-len(".zip")], current_folder_CG)
 
 
 def divide_list(lst, n):

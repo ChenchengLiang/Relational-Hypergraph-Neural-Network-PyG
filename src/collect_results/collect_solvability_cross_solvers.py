@@ -4,15 +4,15 @@ from src.utils import get_file_list, unzip_file, compress_file, make_dirct, read
     assign_dict_key_empty_list
 import os
 from src.collect_results.utils import read_files, read_json_file, get_sumary_folder, read_smt2_category, \
-    copy_relative_files
+    copy_relative_files, virtual_best_satisfiability_from_list
 import pandas as pd
 from tqdm import tqdm
 from src.CONSTANTS import graph_types, benchmark_timeout, eldarica_abstract_options, threshold_list
 from src.benchmark_statistics.utils import get_fields_by_unsatcore_prioritize_clauses, \
-    virtual_best_satisfiability_from_list, get_min_number_from_list, get_fields_by_unsatcore_threshold, \
+    get_min_number_from_list, get_fields_by_unsatcore_threshold, \
     get_unsatcore_threshold_list, virtual_best_satisfiability_from_list_for_pruning, \
     virtual_best_solving_time_for_pruning, get_distinct_category_list, get_target_row_by_condition
-from src.collect_results.utils import draw_common_unsafe_solving_time
+from src.collect_results.utils import draw_common_solving_time
 
 
 def main():
@@ -50,12 +50,16 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
 
-    # eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/symex-old-results/fixed-heuristic/symex-prioritize-random/train_data"
-    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-CEGAR-fixed_heuristic/train_data"
+    eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-symex-linear-fixed_heuristic-constant/train_data"
+    #eldarica_symex_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-symex-non-linear-train+valid-union-constant-1797/train_data"
 
-    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-CEGAR-union-score/CDHG/train_data"
-    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/uppmax-CEGAR-union-score/CG/train_data"
-    test_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-test/test_data"
+    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-symex-linear-union-rank/CDHG/train_data"
+    eldarica_symex_folder_CG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-symex-linear-union-rank/CG/train_data"
+
+    eldarica_CEGAR_folder_original ="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic/train_data"
+    eldarica_CEGAR_folder_CDHG="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-union-rank-100-SEH/CDHG/train_data"
+    eldarica_CEGAR_folder_CG="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-union-rank-100-SEH/CG/train_data"
+
     full_file_folder = eldarica_symex_folder_CDHG  # eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
     summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
 
@@ -63,6 +67,9 @@ def main():
                                      "eldarica_symex_original": eldarica_symex_folder_original,
                                      "eldarica_symex_CDHG": eldarica_symex_folder_CDHG,
                                      "eldarica_symex_CG": eldarica_symex_folder_CG,
+                                     "eldarica_CEGAR_original":eldarica_CEGAR_folder_original,
+                                     "eldarica_CEGAR_CDHG": eldarica_CEGAR_folder_CDHG,
+                                     "eldarica_CEGAR_CG": eldarica_CEGAR_folder_CG,
                                      "eldarica_abstract_off": eldarica_abstract_off_folder,
                                      "eldarica_abstract_off_prioritizing_SEH": eldarica_abstract_off_folder_prioritizing_SEH_folder,
                                      "eldarica_abstract_off_prioritizing_rank": eldarica_abstract_off_folder_prioritizing_rank_folder,
@@ -102,7 +109,7 @@ def main():
 
     # draw common solving time scatter plots
     excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"
-    draw_common_unsafe_solving_time(excel_file)
+    draw_common_solving_time(excel_file)
 
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
@@ -116,6 +123,9 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     comparison_solver_list.append("eldarica_symex_original")
     comparison_solver_list.append("vb_eldarica_symex_prioritize")
     comparison_solver_list.append("pf_eldarica_symex")
+    comparison_solver_list.append("eldarica_CEGAR_original")
+    comparison_solver_list.append("vb_eldarica_CEGAR_prioritize")
+    comparison_solver_list.append("pf_eldarica_CEGAR")
     for a in eldarica_abstract_options + ["off"]:
         comparison_solver_list.append("eldarica_abstract_" + a)
         for strategy in ["prioritizing_SEH", "prioritizing_rank", "pruning_rank", "pruning_score"]:
@@ -205,8 +215,12 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
                                                                     vb_satisfiability_list_other_solvers,
                                                                     vb_solving_time_list_other_solvers)
 
-            lcr_n = 1 - (vbssn_other_solvers / vbssn)
-            lcr_c = 1 - (vbssc / vbssc_other_solvers)
+            try:
+                lcr_n = 1 - (vbssn_other_solvers / vbssn)
+                lcr_c = 1 - (vbssc / vbssc_other_solvers)
+            except:
+                lcr_n="miss info"
+                lcr_c = "miss info"
             category_dict["[" + str(i) + "]" + " lcr_n " + solver].append(lcr_n)
             category_dict["[" + str(i) + "]" + " lcr_c " + solver].append(lcr_c)
 
@@ -293,11 +307,13 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
             record_fields.append(sv + "_" + m)
             if "prioritizing" in sv or "pruning" in sv:
                 record_fields.append("vb_" + sv + "_" + m)
-        if "eldarica_symex_original" in sv:
+        if "eldarica_symex_original" in sv or "eldarica_CEGAR_original":
             for m in measurements:
                 record_fields.append("vb_eldarica_symex_prioritize" + "_" + m)
+                record_fields.append("vb_eldarica_CEGAR_prioritize" + "_" + m)
             for m in measurements:
                 record_fields.append("pf_eldarica_symex" + "_" + m)
+                record_fields.append("pf_eldarica_CEGAR" + "_" + m)
         if sv in ["z3", "golem"]:
             for m in measurements:
                 record_fields.append(sv + "_pruning_" + m)
@@ -330,8 +346,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
                 json_file_suffix = "z3-solvability.JSON"
             elif solver_variation in ["eldarica_abstract_off"] + ["eldarica_abstract_" + x for x in
                                                                   eldarica_abstract_options]:
-                json_file_suffix = "eld-solvability.JSON" #todo: read from solvability file solvingTime-CDHG-0.0
-            elif solver_variation in ["eldarica_symex_CDHG", "eldarica_symex_CG", "eldarica_symex_original"]:
+                json_file_suffix = "eld-solvability.JSON" #todo: could read from solvability file solvingTime-CDHG-0.0
+            elif solver_variation in ["eldarica_symex_CDHG", "eldarica_symex_CG", "eldarica_symex_original","eldarica_CEGAR_CDHG", "eldarica_CEGAR_CG", "eldarica_CEGAR_original"]:
                 json_file_suffix = "eld-solvability.JSON"
             else:
                 json_file_suffix = "solvability.JSON"
@@ -491,15 +507,16 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
         solvability_dict["pf_" + solver + "_satisfiability"] = vb_satisfiability
         solvability_dict["pf_" + solver + "_solving_time"] = vb_solving_time
 
-    # merge symex CDHG and CG and add vb_symex column
-    vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
-        solvability_dict, ["eldarica_symex_CDHG", "eldarica_symex_CG"])
-    solvability_dict["vb_eldarica_symex_prioritize_satisfiability"] = vb_satisfiability
-    solvability_dict["vb_eldarica_symex_prioritize_solving_time"] = vb_solving_time
-    vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
-        solvability_dict, ["vb_eldarica_symex_prioritize", "eldarica_symex_original"])
-    solvability_dict["pf_eldarica_symex_satisfiability"] = vb_satisfiability
-    solvability_dict["pf_eldarica_symex_solving_time"] = vb_solving_time
+    # merge symex AND CEGAR CDHG and CG and add vb_symex AND vb_CEGARcolumn
+    for engine in ["symex","CEGAR"]:
+        vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+            solvability_dict, ["eldarica_"+engine+"_CDHG", "eldarica_"+engine+"_CG"])
+        solvability_dict["vb_eldarica_"+engine+"_prioritize_satisfiability"] = vb_satisfiability
+        solvability_dict["vb_eldarica_"+engine+"_prioritize_solving_time"] = vb_solving_time
+        vb_satisfiability, vb_solving_time = virtual_best_satisfiability_and_solving_time_for_a_solver_list(
+            solvability_dict, ["vb_eldarica_"+engine+"_prioritize", "eldarica_"+engine+"_original"])
+        solvability_dict["pf_eldarica_"+engine+"_satisfiability"] = vb_satisfiability
+        solvability_dict["pf_eldarica_"+engine+"_solving_time"] = vb_solving_time
 
     for k in solvability_dict:
         print(k, len(solvability_dict[k]))

@@ -9,8 +9,16 @@ import pandas as pd
 from src.plots import scatter_plot
 from openpyxl import load_workbook
 
+
 def summarize_excel_files():
-    excel_files = ["uppmax_symex_minimal_rank","uppmax-symex_minimal_score"]
+    #linear
+    #excel_files = ["uppmax-CEGAR-linear-fixed_heuristic-random","uppmax-CEGAR-linear-union-rank-100-SEH","uppmax-CEGAR-linear-union-rank-100"] #CEGAR
+    excel_files = ["uppmax-symex-linear-fixed_heuristic-random","uppmax-symex-linear-union-score-1000","uppmax-symex-linear-union-score-1000-reverse"] #symex
+    #excel_files = ["uppmax-CEGAR-linear-train+valid-union-label-869"] #CEGAR  train+valid
+    #excel_files = ["uppmax-symex-linear-train+valid-union-label-869"] #symex train+valid
+    #non-linear
+    #excel_files = ["uppmax-CEGAR-non-linear-train+valid-union-label-1797"]# CEGAR train+valid
+    #excel_files = ["uppmax-synex-non-linear-train+valid-union-random-1797","uppmax-symex-non-linear-train+valid-union-label-1797"]  # symex train+valid
 
 
     columns = ["category"]+["original_safe","original_unsafe"]+manual_flatten([[f + "_safe", f + "_unsafe"] for f in excel_files])
@@ -62,7 +70,7 @@ def summarize_excel_files():
     workbook.save(summary_file)
 
 
-def draw_common_unsafe_solving_time(excel_file):
+def draw_common_solving_time(excel_file):
     # Read the Excel file into a Pandas DataFrame
     solvability_dict = read_solvability_dict(excel_file)
     plot_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots"
@@ -74,6 +82,7 @@ def draw_common_unsafe_solving_time(excel_file):
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_score"],
                         ["eldarica_symex_original", "vb_eldarica_symex_prioritize"],
                         # ["eldarica_symex_original", "pf_eldarica_symex"]
+                        ["eldarica_CEGAR_original", "vb_eldarica_CEGAR_prioritize"],
                         ]
 
     axis_name_map = {"eldarica_abstract_off": "Original",
@@ -81,31 +90,55 @@ def draw_common_unsafe_solving_time(excel_file):
                      "vb_eldarica_abstract_off_prioritizing_rank": "Prioritizing score",
                      "vb_eldarica_abstract_off_pruning_rank": "Pruning rank",
                      "vb_eldarica_abstract_off_pruning_score": "Pruning score",
-                     "eldarica_symex_original": "Original", "vb_eldarica_symex_prioritize": "Prioritizing score"}
+                     "eldarica_symex_original": "Original", "vb_eldarica_symex_prioritize": "Prioritizing score",
+                     "eldarica_CEGAR_original": "Original", "vb_eldarica_CEGAR_prioritize": "Prioritizing score"
+                     }
     for pair in comparison_pairs:
         if "symex" in pair[0]:
-            engine = "symbolic execution"
+            engine = "Symex"
         else:
-            engine = "predicate abstraction"
-        original_solving_time_list = []
-        strategy_solving_time_list = []
-        satisfiability_list = []
-        file_name_list = []
+            engine = "CEGAR"
+        #draw common solvig time scatter
+        original_solving_time_list_common = []
+        strategy_solving_time_list_common = []
+        satisfiability_list_common = []
+        file_name_list_common = []
+        # draw all solvig time scatter
+        original_solving_time_list_all = []
+        strategy_solving_time_list_all = []
+        satisfiability_list_all = []
+        file_name_list_all = []
+
         for name, original_s, strategy_s, original_st, strategy_st in zip(solvability_dict["file_name"],
                                                                           solvability_dict[pair[0] + "_satisfiability"],
                                                                           solvability_dict[pair[1] + "_satisfiability"],
                                                                           solvability_dict[pair[0] + "_solving_time"],
                                                                           solvability_dict[pair[1] + "_solving_time"]):
-            if original_s == strategy_s and original_s != "unknown":  # and original_s == "unsafe":
-                file_name_list.append(name)
-                satisfiability_list.append(original_s)
-                original_solving_time_list.append(original_st)
-                strategy_solving_time_list.append(strategy_st)
+            vb_satisfiability=virtual_best_satisfiability_from_list([original_s,strategy_s])
+            # collect all solvable solving time and solvability
+            if vb_satisfiability != "unknown":
+                file_name_list_all.append(name)
+                satisfiability_list_all.append(vb_satisfiability)
+                original_solving_time_list_all.append(original_st)
+                strategy_solving_time_list_all.append(strategy_st)
+                #collect common solvable solving time and solvability
+                if original_s == strategy_s:
+                    file_name_list_common.append(name)
+                    satisfiability_list_common.append(vb_satisfiability)
+                    original_solving_time_list_common.append(original_st)
+                    strategy_solving_time_list_common.append(strategy_st)
 
-        scatter_plot(x_data=original_solving_time_list, y_data=strategy_solving_time_list, z_data=satisfiability_list,
+
+        scatter_plot(x_data=original_solving_time_list_common, y_data=strategy_solving_time_list_common, z_data=satisfiability_list_common,
                      x_axis=axis_name_map[pair[0]], y_axis=axis_name_map[pair[1]], folder=scatter_folder,
-                     data_text=file_name_list,
-                     name="Solving time (second)" + "<br>Solver engine: " + engine, scale="log")
+                     data_text=file_name_list_common,
+                     name="Common solving time (second)" + "<br>Solver engine: " + engine, scale="log")
+        scatter_plot(x_data=original_solving_time_list_all, y_data=strategy_solving_time_list_all,
+                     z_data=satisfiability_list_all,
+                     x_axis=axis_name_map[pair[0]], y_axis=axis_name_map[pair[1]], folder=scatter_folder,
+                     data_text=file_name_list_all,
+                     name="All solving time (second)" + "<br>Solver engine: " + engine, scale="log")
+
 
 
 def read_solvability_dict(excel_file, sheet_name="data"):
@@ -215,3 +248,16 @@ def get_solving_time_dict(object):
             if solving_time_dict[field] == -1:
                 solving_time_dict[field] = 10800000
     return solving_time_dict
+
+
+def virtual_best_satisfiability_from_list(s):
+    if "safe" in s and "unsafe" in s:
+        return "unsound error"
+    elif "safe" in s:
+        return "safe"
+    elif "unsafe" in s:
+        return "unsafe"
+    elif all(element == "miss info" for element in s):
+        return "miss info"
+    else:
+        return "unknown"

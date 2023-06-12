@@ -65,9 +65,12 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
                                                                        "2-no_labels", separate_no_label_cases)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-labels_indices_match",
                                                                        "3-labels_indices_mismatch", separate_mismatch_indices_and_label_cases)
-    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "4-clause_number_match",
-                                                                       "4-clause_number_mismatch",
-                                                                       separate_mismatch_label_number_and_clauses_number) # this need solvability file
+    try:
+        separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "4-clause_number_match",
+                                                                           "4-clause_number_mismatch",
+                                                                           separate_mismatch_label_number_and_clauses_number) # this need solvability file
+    except:
+        print("no solvability file")
     # try:
     #     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "5-predicted_label_match_clauses",
     #                                                                        "5-predicted_label_not_match_clauses",

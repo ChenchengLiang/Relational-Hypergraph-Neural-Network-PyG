@@ -11,10 +11,11 @@ def main():
     cegar_solver="/home/cheli243/Desktop/CodeToGit/eldarica-fork-master/assembly/eld"
     symex_solver="/home/cheli243/Desktop/CodeToGit/eldarica-fork-symex/assembly/eld"
 
-    folder = "/home/cheli243/Desktop/debug/symex/4723"
+    #folder = "/home/cheli243/Desktop/debug/symex/4723"
+    folder = "//home/cheli243/Desktop/debug/unsat-corner-cases/010"
     try:
-        #solver_parameter = "-getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 -hornGraphType:CDHG -prioritizeClausesByUnsatCoreRank -abstract:off"
-        solver_parameter = " -abstract:off -sym:1 -hornGraphType:CDHG"
+        solver_parameter = "-getSolvability -abstract:off"
+        #solver_parameter = " -abstract:off -sym:1 -hornGraphType:CDHG"
     except:
         solver_parameter = " "
     print("solver_parameter", solver_parameter)

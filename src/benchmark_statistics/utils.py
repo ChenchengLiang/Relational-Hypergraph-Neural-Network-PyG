@@ -1,12 +1,10 @@
 from src.utils import assign_dict_key_empty_list
-from src.collect_results.utils import read_files, read_json_file
-from src.collect_results.utils import get_min_max_solving_time
-from statistics import mean, stdev
+from src.collect_results.utils import get_min_max_solving_time, read_files, read_json_file, read_smt2_category, \
+    get_sumary_folder, virtual_best_satisfiability_from_list
+from statistics import mean
 from src.utils import camel_to_snake, make_dirct, read_a_json_field, get_file_list, distinct_list
 from src.plots import scatter_plot, plot_cactus
-import itertools
 import pandas as pd
-from src.collect_results.utils import read_files, read_smt2_category, get_sumary_folder
 import os
 from src.CONSTANTS import max_cegar_iteration, filter_out_min_solving_time, benchmark_timeout, z3_solvability_folder
 
@@ -223,18 +221,6 @@ def get_cactus(summary_folder, folder, second_folder=""):
     plot_cactus(summary_folder, cactus_dict_prioritize_virtual_best_graph,
                 plot_name="unsatcore_prioritize_virtual_best_graph")
 
-
-def virtual_best_satisfiability_from_list(s):
-    if "safe" in s and "unsafe" in s:
-        return "unsound error"
-    elif "safe" in s:
-        return "safe"
-    elif "unsafe" in s:
-        return "unsafe"
-    elif all(element == "miss info" for element in s):
-        return "miss info"
-    else:
-        return "unknown"
 
 def virtual_best_satisfiability_from_list_for_pruning(s):
     if "unsafe" in s:
