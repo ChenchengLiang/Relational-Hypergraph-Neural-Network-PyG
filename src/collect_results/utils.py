@@ -129,6 +129,7 @@ def draw_common_solving_time(excel_file):
                     strategy_solving_time_list_common.append(strategy_st)
 
 
+
         scatter_plot(x_data=original_solving_time_list_common, y_data=strategy_solving_time_list_common, z_data=satisfiability_list_common,
                      x_axis=axis_name_map[pair[0]], y_axis=axis_name_map[pair[1]], folder=scatter_folder,
                      data_text=file_name_list_common,

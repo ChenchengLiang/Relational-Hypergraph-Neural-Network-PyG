@@ -54,6 +54,14 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
             under_diagonal += 1
         else:
             on_diagonal += 1
+    # compute gain and lost
+    gain, lose = 0, 0
+    for x, y in zip(x_data, y_data):
+        if x < y and y >= benchmark_timeout:
+            lose += 1
+        elif x > y and x >= benchmark_timeout:
+            gain += 1
+
 
     # Add a diagonal line
     max_value = benchmark_timeout  # max(x_data + y_data)
@@ -62,7 +70,7 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
 
     fig.update_layout(
         title=name + "<br>Number of common files:" + str(len(x_data)) + "<br>above/under/on diagonal:" + str(
-            above_diagonal) + "/" + str(under_diagonal) + "/" + str(on_diagonal),
+            above_diagonal) + "/" + str(under_diagonal) + "/" + str(on_diagonal) + "<br>gain/lose:" +str(gain) + "/" + str(lose) ,
         title_x=0.5,
         xaxis_title=x_axis,
         yaxis_title=y_axis)
