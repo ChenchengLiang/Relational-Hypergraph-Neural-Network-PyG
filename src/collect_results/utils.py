@@ -80,7 +80,7 @@ def summarize_excel_files():
                         merge_dict[f].append(cell.coordinate)
         for k in merge_dict:
             sheet.merge_cells(merge_dict[k][0] + ":" + merge_dict[k][-1])
-            sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "")
+            sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "").replace("uppmax-","")
 
         # add scatter plot inside
         count = 18

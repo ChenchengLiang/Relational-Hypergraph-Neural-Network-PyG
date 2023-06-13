@@ -50,9 +50,9 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
-    eldarica_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-symex-non-linear-train+valid-union-constant-1797/train_data"
+    eldarica_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-symex-linear-fixed_heuristic-constant/train_data"
 
-    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-symex-non-linear-train+valid-union-random-1797/train_data"
+    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-symex-linear-union-rank/CDHG/train_data"
     eldarica_symex_folder_CG = eldarica_symex_folder_CDHG.replace("CDHG", "CG")
     compare_benchmark_name = os.path.basename(os.path.dirname(
         os.path.dirname(eldarica_symex_folder_CDHG))) if "CDHG" in eldarica_symex_folder_CDHG else os.path.basename(
