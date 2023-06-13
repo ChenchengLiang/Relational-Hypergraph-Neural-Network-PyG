@@ -3,7 +3,7 @@ from src.CONSTANTS import eldarica_abstract_options
 import itertools
 from src.plots import scatter_plot
 from src.utils import make_dirct
-from src.collect_results.utils import draw_common_unsafe_solving_time,read_solvability_dict,summarize_excel_files
+from src.collect_results.utils import draw_solving_time_scatter,read_solvability_dict,summarize_excel_files
 
 def main():
     excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"

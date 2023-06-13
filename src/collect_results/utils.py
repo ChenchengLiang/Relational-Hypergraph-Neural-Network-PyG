@@ -4,101 +4,132 @@ import json
 import glob
 from shutil import copy
 from tqdm import tqdm
-from src.utils import select_key_with_value_condition,manual_flatten
+from src.utils import select_key_with_value_condition, manual_flatten
 import pandas as pd
 from src.plots import scatter_plot
 from openpyxl import load_workbook
+from openpyxl.drawing.image import Image
 
 
 def summarize_excel_files():
-    #linear
-    #excel_files = ["uppmax-CEGAR-linear-fixed_heuristic-random","uppmax-CEGAR-linear-union-rank-100-SEH","uppmax-CEGAR-linear-union-rank-100"] #CEGAR
-    excel_files = ["uppmax-symex-linear-fixed_heuristic-random","uppmax-symex-linear-union-score-1000","uppmax-symex-linear-union-score-1000-reverse"] #symex
-    #excel_files = ["uppmax-CEGAR-linear-train+valid-union-label-869"] #CEGAR  train+valid
-    #excel_files = ["uppmax-symex-linear-train+valid-union-label-869"] #symex train+valid
-    #non-linear
-    #excel_files = ["uppmax-CEGAR-non-linear-train+valid-union-label-1797"]# CEGAR train+valid
-    #excel_files = ["uppmax-synex-non-linear-train+valid-union-random-1797","uppmax-symex-non-linear-train+valid-union-label-1797"]  # symex train+valid
+    excel_files_dict = {"CEGAR-linear-train+valid": ["uppmax-CEGAR-linear-train+valid-union-random-869",
+                                                     "uppmax-CEGAR-linear-train+valid-union-label-869"],
+                        "symex-linear-train+valid": ["uppmax-symex-linear-train+valid-union-random-869",
+                                                     "uppmax-symex-linear-train+valid-union-label-869"],
+                        "CEGAR-linear": ["uppmax-CEGAR-linear-fixed_heuristic-random",
+                                         "uppmax-CEGAR-linear-union-rank-100-SEH", "uppmax-CEGAR-linear-union-rank-100"],
+                        "symex-linear":["uppmax-symex-linear-fixed_heuristic-random","uppmax-symex-linear-union-score-1000",
+                                        "uppmax-symex-linear-union-score-1000-reverse","uppmax-symex-linear-union-rank"],
+                        "CEGAR-non-linear-train+valid":["uppmax-CEGAR-non-linear-train+valid-union-label-1797"],
+                        "symex-non-linear-train+valid":["uppmax-symex-non-linear-train+valid-union-random-1797",
+                         "uppmax-symex-non-linear-train+valid-union-label-1797"]
+                        }
 
+    # non-linear
+    # excel_files = ["uppmax-CEGAR-non-linear-train+valid-union-label-1797"]# CEGAR train+valid
+    # excel_files = ["uppmax-synex-non-linear-train+valid-union-random-1797","uppmax-symex-non-linear-train+valid-union-label-1797"]  # symex train+valid
 
-    columns = ["category"]+["original_safe","original_unsafe"]+manual_flatten([[f + "_safe", f + "_unsafe"] for f in excel_files])
-    output_dict = {x: [] for x in columns}
-
-    #get original safe and unsafe
-    solvability_dict = read_solvability_dict(
-        "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + excel_files[0] + ".xlsx",
-        sheet_name="category_summary")
-    output_dict["original_safe"] = ["safe"]+solvability_dict["eldarica_symex_original_safe"]
-    output_dict["original_unsafe"] = ["unsafe"]+solvability_dict["eldarica_symex_original_unsafe"]
-    output_dict["category"]=[" "]+solvability_dict["category"]
-
-    #get safe and unsafe from other excels
-    for f in excel_files:
-        solvability_dict = read_solvability_dict(
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".xlsx",
-            sheet_name="category_summary")
-        output_dict[f + "_safe"] = ["safe"]+solvability_dict["vb_eldarica_symex_prioritize_safe"]
-        output_dict[f + "_unsafe"] = ["unsafe"]+solvability_dict["vb_eldarica_symex_prioritize_unsafe"]
-
-    summary_file="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/summary.xlsx"
-    #write summary excel
+    summary_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/summary.xlsx"
+    # write summary excel
     with pd.ExcelWriter(summary_file) as writer:
-        pd.DataFrame(pd.DataFrame(output_dict)).to_excel(writer, sheet_name="summary")
+        for k in excel_files_dict:
+            excel_files = excel_files_dict[k]
+            columns = ["category"] + ["original_safe", "original_unsafe"] + manual_flatten(
+                [[f + "_safe", f + "_unsafe"] for f in excel_files])
+            output_dict = {x: [] for x in columns}
+            engine = "symex" if "symex" in excel_files[0] else "CEGAR"
 
-    #merge some cells
-    # Load the Excel file
-    workbook = load_workbook(summary_file)
-    # Select the desired sheet
-    sheet = workbook['summary']
+            # get original safe and unsafe
+            solvability_dict = read_solvability_dict(
+                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" +
+                excel_files[0] + ".xlsx",
+                sheet_name="category_summary")
+            output_dict["original_safe"] = ["safe"] + solvability_dict["eldarica_" + engine + "_original_safe"]
+            output_dict["original_unsafe"] = ["unsafe"] + solvability_dict["eldarica_" + engine + "_original_unsafe"]
+            output_dict["category"] = [" "] + solvability_dict["category"]
 
-    # Merge cells
-    sheet.merge_cells('C1:D1')  # Merge cells in the range C1 to D1
-    sheet["C1"].value="Original"
+            # get safe and unsafe from other excels
+            for f in excel_files:
+                solvability_dict = read_solvability_dict(
+                    "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".xlsx",
+                    sheet_name="category_summary")
+                output_dict[f + "_safe"] = ["safe"] + solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"]
+                output_dict[f + "_unsafe"] = ["unsafe"] + solvability_dict[
+                    "vb_eldarica_" + engine + "_prioritize_unsafe"]
 
-    merge_dict={f:[] for f in excel_files}
-    last_column_letter = sheet.dimensions.split(':')[1].strip('1234567890')
-    for f in excel_files:
-        for row in sheet["E1:"+last_column_letter+"1"]:
-            for cell in row:
-                if f+"_safe" == cell.value or f+"_unsafe" == cell.value:
-                    merge_dict[f].append(cell.coordinate)
-    for k in merge_dict:
-        sheet.merge_cells(merge_dict[k][0]+":"+merge_dict[k][-1])
-        sheet[merge_dict[k][0]].value=k
+            pd.DataFrame(pd.DataFrame(output_dict)).to_excel(writer, sheet_name=k)
 
-    # Save the modified workbook
-    workbook.save(summary_file)
+    # merge some cells
+    for e_k in excel_files_dict:
+        excel_files = excel_files_dict[e_k]
+        # Load the Excel file
+        workbook = load_workbook(summary_file)
+        # Select the desired sheet
+        sheet = workbook[e_k]
+
+        # Merge cells
+        sheet.merge_cells('C1:D1')  # Merge cells in the range C1 to D1
+        sheet["C1"].value = "Original"
+
+        merge_dict = {f: [] for f in excel_files}
+        last_column_letter = sheet.dimensions.split(':')[1].strip('1234567890')
+        for f in excel_files:
+            for row in sheet["E1:" + last_column_letter + "1"]:
+                for cell in row:
+                    if f + "_safe" == cell.value or f + "_unsafe" == cell.value:
+                        merge_dict[f].append(cell.coordinate)
+        for k in merge_dict:
+            sheet.merge_cells(merge_dict[k][0] + ":" + merge_dict[k][-1])
+            sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "")
+
+        # add scatter plot inside
+        count = 18
+        for f in excel_files:
+            img = Image(
+                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".png")
+            sheet["A" + str(count)] = ''
+            sheet["A" + str(count)].comment = None
+            sheet.add_image(img, 'A' + str(count))
+            count += 25
+
+        # Save the modified workbook
+        workbook.save(summary_file)
 
 
-def draw_common_solving_time(excel_file):
+def draw_solving_time_scatter(excel_file, compare_benchmark_name):
     # Read the Excel file into a Pandas DataFrame
     solvability_dict = read_solvability_dict(excel_file)
-    plot_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots"
+    plot_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots"
     scatter_folder = make_dirct(plot_folder)
+
+    if "eldarica_symex_original_satisfiability" in solvability_dict.keys():
+        apptainer_data_pair = ["eldarica_symex_original", "vb_eldarica_symex_prioritize"]
+    elif "eldarica_CEGAR_original_satisfiability" in solvability_dict.keys():
+        apptainer_data_pair = ["eldarica_CEGAR_original", "vb_eldarica_CEGAR_prioritize"]
 
     comparison_pairs = [["eldarica_abstract_off", "vb_eldarica_abstract_off_prioritizing_SEH"],
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_prioritizing_rank"],
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_rank"],
                         ["eldarica_abstract_off", "vb_eldarica_abstract_off_pruning_score"],
-                        ["eldarica_symex_original", "vb_eldarica_symex_prioritize"],
+                        # ["eldarica_symex_original", "vb_eldarica_symex_prioritize"],
                         # ["eldarica_symex_original", "pf_eldarica_symex"]
-                        ["eldarica_CEGAR_original", "vb_eldarica_CEGAR_prioritize"],
-                        ]
+                        # ["eldarica_CEGAR_original", "vb_eldarica_CEGAR_prioritize"],
+                        ] + [apptainer_data_pair]
 
     axis_name_map = {"eldarica_abstract_off": "Original",
                      "vb_eldarica_abstract_off_prioritizing_SEH": "prioritizing score+",
                      "vb_eldarica_abstract_off_prioritizing_rank": "Prioritizing score",
                      "vb_eldarica_abstract_off_pruning_rank": "Pruning rank",
                      "vb_eldarica_abstract_off_pruning_score": "Pruning score",
-                     "eldarica_symex_original": "Original", "vb_eldarica_symex_prioritize": "Prioritizing score",
-                     "eldarica_CEGAR_original": "Original", "vb_eldarica_CEGAR_prioritize": "Prioritizing score"
+                     "eldarica_symex_original": "Original", "vb_eldarica_symex_prioritize": "Prioritizing_score",
+                     "eldarica_CEGAR_original": "Original", "vb_eldarica_CEGAR_prioritize": "Prioritizing_score"
                      }
     for pair in comparison_pairs:
         if "symex" in pair[0]:
             engine = "Symex"
         else:
             engine = "CEGAR"
-        #draw common solvig time scatter
+        # draw common solvig time scatter
         original_solving_time_list_common = []
         strategy_solving_time_list_common = []
         satisfiability_list_common = []
@@ -114,32 +145,30 @@ def draw_common_solving_time(excel_file):
                                                                           solvability_dict[pair[1] + "_satisfiability"],
                                                                           solvability_dict[pair[0] + "_solving_time"],
                                                                           solvability_dict[pair[1] + "_solving_time"]):
-            vb_satisfiability=virtual_best_satisfiability_from_list([original_s,strategy_s])
+            vb_satisfiability = virtual_best_satisfiability_from_list([original_s, strategy_s])
             # collect all solvable solving time and solvability
             if vb_satisfiability != "unknown":
                 file_name_list_all.append(name)
                 satisfiability_list_all.append(vb_satisfiability)
                 original_solving_time_list_all.append(original_st)
                 strategy_solving_time_list_all.append(strategy_st)
-                #collect common solvable solving time and solvability
+                # collect common solvable solving time and solvability
                 if original_s == strategy_s:
                     file_name_list_common.append(name)
                     satisfiability_list_common.append(vb_satisfiability)
                     original_solving_time_list_common.append(original_st)
                     strategy_solving_time_list_common.append(strategy_st)
 
-
-
-        scatter_plot(x_data=original_solving_time_list_common, y_data=strategy_solving_time_list_common, z_data=satisfiability_list_common,
+        scatter_plot(x_data=original_solving_time_list_common, y_data=strategy_solving_time_list_common,
+                     z_data=satisfiability_list_common,
                      x_axis=axis_name_map[pair[0]], y_axis=axis_name_map[pair[1]], folder=scatter_folder,
                      data_text=file_name_list_common,
-                     name="Common solving time (second)" + "<br>Solver engine: " + engine, scale="log")
+                     name="Common-solving-time" + "<br>" + compare_benchmark_name, scale="log")
         scatter_plot(x_data=original_solving_time_list_all, y_data=strategy_solving_time_list_all,
                      z_data=satisfiability_list_all,
                      x_axis=axis_name_map[pair[0]], y_axis=axis_name_map[pair[1]], folder=scatter_folder,
                      data_text=file_name_list_all,
-                     name="All solving time (second)" + "<br>Solver engine: " + engine, scale="log")
-
+                     name="All-solving-time" + "<br>" + compare_benchmark_name, scale="log")
 
 
 def read_solvability_dict(excel_file, sheet_name="data"):
