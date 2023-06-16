@@ -50,79 +50,106 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
-    eldarica_folder_original = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-symex-linear-fixed_heuristic-constant/train_data"
+    comparison_pairs = [
+        [
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic/train_data",
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic-random/train_data"],
+        [
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic/train_data",
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-union-rank-100/CDHG/train_data"],
+        [
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic/train_data",
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-union-rank-100-SEH/CDHG/train_data"],
+        [
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-train+valid-union-869/train_data",
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-train+valid-union-label-869/train_data"],
+        [
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-train+valid-union-869/train_data",
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-train+valid-union-random-869/train_data"],
+        [
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-CEGAR-non-linear-train+valid-union-1797/train_data",
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-CEGAR-non-linear-train+valid-union-label-1797/train_data"],
+        [
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-CEGAR-non-linear-train+valid-union-1797/train_data",
+            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-CEGAR-non-linear-train+valid-union-random-1797/train_data"]
+    ]
 
-    eldarica_symex_folder_CDHG = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-symex-linear-union-rank/CDHG/train_data"
-    eldarica_symex_folder_CG = eldarica_symex_folder_CDHG.replace("CDHG", "CG")
-    compare_benchmark_name = os.path.basename(os.path.dirname(
-        os.path.dirname(eldarica_symex_folder_CDHG))) if "CDHG" in eldarica_symex_folder_CDHG else os.path.basename(
-        os.path.dirname(eldarica_symex_folder_CDHG))
+    for c_pair in comparison_pairs:
+        eldarica_folder_original = c_pair[0]
 
-    eldarica_folder_original_key = "eldarica_" + (
-        "symex" if "symex" in eldarica_folder_original else "CEGAR") + "_original"
-    eldarica_symex_folder_CDHG_key = "eldarica_" + (
-        "symex" if "symex" in eldarica_folder_original else "CEGAR") + "_CDHG"
-    eldarica_symex_folder_CG_key = "eldarica_" + (
-        "symex" if "symex" in eldarica_folder_original else "CEGAR") + "_CG"
+        eldarica_symex_folder_CDHG = c_pair[1]
+        eldarica_symex_folder_CG = eldarica_symex_folder_CDHG.replace("CDHG", "CG")
+        compare_benchmark_name = os.path.basename(os.path.dirname(
+            os.path.dirname(eldarica_symex_folder_CDHG))) if "CDHG" in eldarica_symex_folder_CDHG else os.path.basename(
+            os.path.dirname(eldarica_symex_folder_CDHG))
 
-    full_file_folder = eldarica_symex_folder_CDHG  # eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
-    summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
+        eldarica_folder_original_key = "eldarica_" + (
+            "symex" if "symex" in eldarica_folder_original else "CEGAR") + "_original"
+        eldarica_symex_folder_CDHG_key = "eldarica_" + (
+            "symex" if "symex" in eldarica_folder_original else "CEGAR") + "_CDHG"
+        eldarica_symex_folder_CG_key = "eldarica_" + (
+            "symex" if "symex" in eldarica_folder_original else "CEGAR") + "_CG"
 
-    solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
-                                     # "eldarica_symex_original": eldarica_symex_folder_original,
-                                     # "eldarica_symex_CDHG": eldarica_symex_folder_CDHG,
-                                     # "eldarica_symex_CG": eldarica_symex_folder_CG,
-                                     # "eldarica_CEGAR_original":eldarica_CEGAR_folder_original,
-                                     # "eldarica_CEGAR_CDHG": eldarica_CEGAR_folder_CDHG,
-                                     # "eldarica_CEGAR_CG": eldarica_CEGAR_folder_CG,
-                                     eldarica_folder_original_key: eldarica_folder_original,
-                                     eldarica_symex_folder_CDHG_key: eldarica_symex_folder_CDHG,
-                                     eldarica_symex_folder_CG_key: eldarica_symex_folder_CG,
-                                     "eldarica_abstract_off": eldarica_abstract_off_folder,
-                                     "eldarica_abstract_off_prioritizing_SEH": eldarica_abstract_off_folder_prioritizing_SEH_folder,
-                                     "eldarica_abstract_off_prioritizing_rank": eldarica_abstract_off_folder_prioritizing_rank_folder,
-                                     "eldarica_abstract_off_pruning_rank": eldarica_abstract_off_folder_pruning_rank_folder,
-                                     "eldarica_abstract_off_pruning_score": eldarica_abstract_off_folder_pruning_score_folder,
-                                     "eldarica_abstract_term": eldarica_abstract_term_folder,
-                                     "eldarica_abstract_term_prioritizing_SEH": eldarica_abstract_term_folder_prioritizing_SEH_folder,
-                                     "eldarica_abstract_term_prioritizing_rank": eldarica_abstract_term_folder_prioritizing_rank_folder,
-                                     "eldarica_abstract_term_pruning_rank": eldarica_abstract_term_folder_pruning_rank_folder,
-                                     "eldarica_abstract_term_pruning_score": eldarica_abstract_term_folder_pruning_score_folder,
-                                     "eldarica_abstract_oct": eldarica_abstract_oct_folder,
-                                     "eldarica_abstract_oct_prioritizing_SEH": eldarica_abstract_oct_folder_prioritizing_SEH_folder,
-                                     "eldarica_abstract_oct_prioritizing_rank": eldarica_abstract_oct_folder_prioritizing_rank_folder,
-                                     "eldarica_abstract_oct_pruning_rank": eldarica_abstract_oct_folder_pruning_rank_folder,
-                                     "eldarica_abstract_oct_pruning_score": eldarica_abstract_oct_folder_pruning_score_folder,
-                                     "eldarica_abstract_relEqs": eldarica_abstract_relEqs_folder,
-                                     "eldarica_abstract_relEqs_prioritizing_SEH": eldarica_abstract_relEqs_folder_prioritizing_SEH_folder,
-                                     "eldarica_abstract_relEqs_prioritizing_rank": eldarica_abstract_relEqs_folder_prioritizing_rank_folder,
-                                     "eldarica_abstract_relEqs_pruning_rank": eldarica_abstract_relEqs_folder_pruning_rank_folder,
-                                     "eldarica_abstract_relEqs_pruning_score": eldarica_abstract_relEqs_folder_pruning_score_folder,
-                                     "eldarica_abstract_relIneqs": eldarica_abstract_relIneqs_folder,
-                                     "eldarica_abstract_relIneqs_prioritizing_SEH": eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder,
-                                     "eldarica_abstract_relIneqs_prioritizing_rank": eldarica_abstract_relIneqs_folder_prioritizing_rank_folder,
-                                     "eldarica_abstract_relIneqs_pruning_rank": eldarica_abstract_relIneqs_folder_pruning_rank_folder,
-                                     "eldarica_abstract_relIneqs_pruning_score": eldarica_abstract_relIneqs_folder_pruning_score_folder
-                                     }
+        full_file_folder = eldarica_symex_folder_CDHG  # eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
+        summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
 
-    solvability_dict = read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict)
+        solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
+                                         # "eldarica_symex_original": eldarica_symex_folder_original,
+                                         # "eldarica_symex_CDHG": eldarica_symex_folder_CDHG,
+                                         # "eldarica_symex_CG": eldarica_symex_folder_CG,
+                                         # "eldarica_CEGAR_original":eldarica_CEGAR_folder_original,
+                                         # "eldarica_CEGAR_CDHG": eldarica_CEGAR_folder_CDHG,
+                                         # "eldarica_CEGAR_CG": eldarica_CEGAR_folder_CG,
+                                         eldarica_folder_original_key: eldarica_folder_original,
+                                         eldarica_symex_folder_CDHG_key: eldarica_symex_folder_CDHG,
+                                         eldarica_symex_folder_CG_key: eldarica_symex_folder_CG,
+                                         "eldarica_abstract_off": eldarica_abstract_off_folder,
+                                         "eldarica_abstract_off_prioritizing_SEH": eldarica_abstract_off_folder_prioritizing_SEH_folder,
+                                         "eldarica_abstract_off_prioritizing_rank": eldarica_abstract_off_folder_prioritizing_rank_folder,
+                                         "eldarica_abstract_off_pruning_rank": eldarica_abstract_off_folder_pruning_rank_folder,
+                                         "eldarica_abstract_off_pruning_score": eldarica_abstract_off_folder_pruning_score_folder,
+                                         "eldarica_abstract_term": eldarica_abstract_term_folder,
+                                         "eldarica_abstract_term_prioritizing_SEH": eldarica_abstract_term_folder_prioritizing_SEH_folder,
+                                         "eldarica_abstract_term_prioritizing_rank": eldarica_abstract_term_folder_prioritizing_rank_folder,
+                                         "eldarica_abstract_term_pruning_rank": eldarica_abstract_term_folder_pruning_rank_folder,
+                                         "eldarica_abstract_term_pruning_score": eldarica_abstract_term_folder_pruning_score_folder,
+                                         "eldarica_abstract_oct": eldarica_abstract_oct_folder,
+                                         "eldarica_abstract_oct_prioritizing_SEH": eldarica_abstract_oct_folder_prioritizing_SEH_folder,
+                                         "eldarica_abstract_oct_prioritizing_rank": eldarica_abstract_oct_folder_prioritizing_rank_folder,
+                                         "eldarica_abstract_oct_pruning_rank": eldarica_abstract_oct_folder_pruning_rank_folder,
+                                         "eldarica_abstract_oct_pruning_score": eldarica_abstract_oct_folder_pruning_score_folder,
+                                         "eldarica_abstract_relEqs": eldarica_abstract_relEqs_folder,
+                                         "eldarica_abstract_relEqs_prioritizing_SEH": eldarica_abstract_relEqs_folder_prioritizing_SEH_folder,
+                                         "eldarica_abstract_relEqs_prioritizing_rank": eldarica_abstract_relEqs_folder_prioritizing_rank_folder,
+                                         "eldarica_abstract_relEqs_pruning_rank": eldarica_abstract_relEqs_folder_pruning_rank_folder,
+                                         "eldarica_abstract_relEqs_pruning_score": eldarica_abstract_relEqs_folder_pruning_score_folder,
+                                         "eldarica_abstract_relIneqs": eldarica_abstract_relIneqs_folder,
+                                         "eldarica_abstract_relIneqs_prioritizing_SEH": eldarica_abstract_relIneqs_folder_prioritizing_SEH_folder,
+                                         "eldarica_abstract_relIneqs_prioritizing_rank": eldarica_abstract_relIneqs_folder_prioritizing_rank_folder,
+                                         "eldarica_abstract_relIneqs_pruning_rank": eldarica_abstract_relIneqs_folder_pruning_rank_folder,
+                                         "eldarica_abstract_relIneqs_pruning_score": eldarica_abstract_relIneqs_folder_pruning_score_folder
+                                         }
 
-    category_dict = category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict)
+        solvability_dict = read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_folders_dict)
 
-    # write to excel
-    with pd.ExcelWriter(summary_folder + "/" + "statistics_split_clauses_1.xlsx") as writer:
-        pd.DataFrame(pd.DataFrame(solvability_dict)).to_excel(writer, sheet_name="data")
-        pd.DataFrame(pd.DataFrame(category_dict)).to_excel(writer, sheet_name="category_summary")
-        pd.DataFrame(pd.DataFrame(category_dict)).transpose().to_excel(writer, sheet_name="category_summary_transpose")
+        category_dict = category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict)
 
-    # draw solving time scatter plots
-    excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"
-    draw_solving_time_scatter(excel_file, compare_benchmark_name)
+        # write to excel
+        with pd.ExcelWriter(summary_folder + "/" + "statistics_split_clauses_1.xlsx") as writer:
+            pd.DataFrame(pd.DataFrame(solvability_dict)).to_excel(writer, sheet_name="data")
+            pd.DataFrame(pd.DataFrame(category_dict)).to_excel(writer, sheet_name="category_summary")
+            pd.DataFrame(pd.DataFrame(category_dict)).transpose().to_excel(writer,
+                                                                           sheet_name="category_summary_transpose")
 
-    # rename (collect) results
-    copy(excel_file, os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".xlsx")
-    scatter_plot_path = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots/All-solving-time" + "<br>" + compare_benchmark_name + "-Original-vs-Prioritizing_score.png"
-    copy(scatter_plot_path, os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".png")
+        # draw solving time scatter plots
+        excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"
+        draw_solving_time_scatter(excel_file, compare_benchmark_name)
+
+        # rename (collect) results
+        copy(excel_file, os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".xlsx")
+        scatter_plot_path = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots/All-solving-time" + "<br>" + compare_benchmark_name + "-Original-vs-Prioritizing_score"
+        copy(scatter_plot_path + ".png", os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".png")
+        copy(scatter_plot_path + ".html", os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".html")
 
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):

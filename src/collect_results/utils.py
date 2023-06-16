@@ -9,21 +9,31 @@ import pandas as pd
 from src.plots import scatter_plot
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
-
+import shutil
 
 def summarize_excel_files():
-    excel_files_dict = {"CEGAR-linear-train+valid": ["uppmax-CEGAR-linear-train+valid-union-random-869",
-                                                     "uppmax-CEGAR-linear-train+valid-union-label-869"],
-                        "symex-linear-train+valid": ["uppmax-symex-linear-train+valid-union-random-869",
-                                                     "uppmax-symex-linear-train+valid-union-label-869"],
-                        "CEGAR-linear": ["uppmax-CEGAR-linear-fixed_heuristic-random",
-                                         "uppmax-CEGAR-linear-union-rank-100-SEH", "uppmax-CEGAR-linear-union-rank-100"],
-                        "symex-linear":["uppmax-symex-linear-fixed_heuristic-random","uppmax-symex-linear-union-score-1000",
-                                        "uppmax-symex-linear-union-score-1000-reverse","uppmax-symex-linear-union-rank"],
-                        "CEGAR-non-linear-train+valid":["uppmax-CEGAR-non-linear-train+valid-union-label-1797"],
-                        "symex-non-linear-train+valid":["uppmax-symex-non-linear-train+valid-union-random-1797",
-                         "uppmax-symex-non-linear-train+valid-union-label-1797"]
-                        }
+    excel_files_dict = {
+        "CEGAR-linear": ["uppmax-CEGAR-linear-fixed_heuristic-random",
+                         "uppmax-CEGAR-linear-union-rank-100-SEH", "uppmax-CEGAR-linear-union-rank-100"],
+        # "symex-linear": ["uppmax-symex-linear-fixed_heuristic-random", "uppmax-symex-linear-union-score-1000",
+        #                  "uppmax-symex-linear-union-score-1000-reverse",
+        #                  "uppmax-symex-linear-union-score-1000-unitClauseConstraintSize-birthTime",
+        #                  "uppmax-symex-linear-union-score-100-unitClauseConstraintSize-birthTime",
+        #                  "uppmax-symex-linear-union-two-queue-0.5-score-1000-unitClauseConstraintSize-birthTime",
+        #                  "uppmax-symex-linear-union-rank",
+        #                  "uppmax-symex-linear-union-rank-unitClauseConstraintSize-birthTime",
+        #                  "uppmax-symex-linear-union-two-queue-rank-0.5"],
+        # "symex-non-linear": ["alvis-symex-non-linear-union-fixed-heuristic-random-1000",
+        #                      "alvis-symex-non-linear-union-rank-unitClauseConstraintSize-birthTime","alvis-symex-non-linear-union-score-1000-unitClauseConstraintSize-birthTime"],
+        "CEGAR-non-linear-train+valid": ["uppmax-CEGAR-non-linear-train+valid-union-label-1797",
+                                         "uppmax-CEGAR-non-linear-train+valid-union-random-1797"],
+        "symex-non-linear-train+valid": ["uppmax-symex-non-linear-train+valid-union-random-1797",
+                                         "uppmax-symex-non-linear-train+valid-union-label-1797"],
+        "CEGAR-linear-train+valid": ["uppmax-CEGAR-linear-train+valid-union-random-869",
+                                     "uppmax-CEGAR-linear-train+valid-union-label-869"],
+        "symex-linear-train+valid": ["uppmax-symex-linear-train+valid-union-random-869",
+                                     "uppmax-symex-linear-train+valid-union-label-869"],
+    }
 
     # non-linear
     # excel_files = ["uppmax-CEGAR-non-linear-train+valid-union-label-1797"]# CEGAR train+valid
@@ -80,7 +90,7 @@ def summarize_excel_files():
                         merge_dict[f].append(cell.coordinate)
         for k in merge_dict:
             sheet.merge_cells(merge_dict[k][0] + ":" + merge_dict[k][-1])
-            sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "").replace("uppmax-","")
+            sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "").replace("uppmax-", "")
 
         # add scatter plot inside
         count = 18
@@ -100,6 +110,7 @@ def draw_solving_time_scatter(excel_file, compare_benchmark_name):
     # Read the Excel file into a Pandas DataFrame
     solvability_dict = read_solvability_dict(excel_file)
     plot_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots"
+    shutil.rmtree(plot_folder)
     scatter_folder = make_dirct(plot_folder)
 
     if "eldarica_symex_original_satisfiability" in solvability_dict.keys():

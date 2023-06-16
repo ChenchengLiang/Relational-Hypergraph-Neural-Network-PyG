@@ -3,6 +3,7 @@ import os
 import json
 import subprocess
 import re
+import shutil
 
 
 def write_predicted_label_to_JSON_file(predicted_list, raw_predicted_list, file_name_list, task_type,
@@ -123,13 +124,6 @@ def manual_flatten(target_list):
 
 
 def make_dirct(d,mute = False):
-    try:
-        os.remove(d)
-    except:
-        if mute ==True:
-            pass
-        else:
-            print("no such folder, mkdir",d)
     try:
         os.mkdir(d)
         return d
