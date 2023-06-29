@@ -58,9 +58,9 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
     zip_file_folder, unzip_file_folder = separate_zip_and_unzip_files(folder, source=source)
     separated_folder = separate_cluster_timeout_case(zip_file_folder, file_number=file_numebr,
                                                      target_message=target_message)
-    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "1-has-simplified-clauses",
-                                                                       "1-no_simplified_clauses",
-                                                                       separate_no_simplified_clauses)
+    separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "1-non-trivial-clauses",
+                                                                       "1-trivial_clauses",
+                                                                       separate_trivial_clauses)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "2-has_label",
                                                                        "2-no_labels", separate_no_label_cases)
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "3-labels_indices_match",
@@ -71,12 +71,6 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
                                                                            separate_mismatch_label_number_and_clauses_number) # this need solvability file
     except:
         print("no solvability file")
-    # try:
-    #     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "5-predicted_label_match_clauses",
-    #                                                                        "5-predicted_label_not_match_clauses",
-    #                                                                        separate_mismatch_predicted_number_and_clauses_number)
-    # except:
-    #     print("no 5-predicted-labels")
     separated_folder, exception_folder = separate_cases_by_graph_field(separated_folder, "5-has-positive-labels",
                                                                        "5-no-positive-labels",
                                                                        separate_no_labeled_template_cases)
@@ -86,8 +80,8 @@ def separate_corner_cases_from_cluster_graph_construction(folder, file_numebr, t
     for file in glob.glob(separated_folder+"/*") + glob.glob(exception_folder+"/*"):
         copy(file,ready_for_train_folder)
 
-def separate_no_simplified_clauses(cdhg,cg, file_name, target_folder, exception_folder):
-    if cdhg["nodeNumber"][0] <= 7:
+def separate_trivial_clauses(cdhg,cg, file_name, target_folder, exception_folder):
+    if cdhg["nodeNumber"][0] <= 7 or cdhg["labelNumber"][0]<=1:
         copy_relative_files(file_name, exception_folder)
     else:
         copy_relative_files(file_name, target_folder)
@@ -111,11 +105,6 @@ def separate_mismatch_label_number_and_clauses_number(cdhg,cg, file_name, target
     else:
         copy_relative_files(file_name, target_folder)
 
-def separate_mismatch_predicted_number_and_clauses_number(cdhg,cg, file_name, target_folder, exception_folder):
-    if len(cdhg["predictedLabel"]) != int(cdhg["clauseNumberAfterSimplification"][0]) or len(cg["predictedLabel"]) != int(cg["clauseNumberAfterSimplification"][0]):
-        copy_relative_files(file_name, exception_folder)
-    else:
-        copy_relative_files(file_name, target_folder)
 
 
 def separate_no_labeled_template_cases(cdhg,cg, file_name, target_folder, exception_folder):
@@ -210,15 +199,18 @@ def separate_zip_and_unzip_files(folder, source=""):
 
 
 def collect_cluster_log(folder, zip_file_folder, unzip_file_folder, source=""):
-    cluster_log_list = get_file_list(os.path.join(folder, "log"), "out", "gz")
-    zipped_smt2_file_list = get_file_list(zip_file_folder, "smt2")
-    unzipped_smt2_file_list = get_file_list(unzip_file_folder, "smt2", "")
-    for smt2_file in tqdm(zipped_smt2_file_list, desc="collect log for zipped_smt2_file_list"):
-        smt2_file_name = os.path.basename(smt2_file[:-len(".zip")])
-        scan_cluster_logs(cluster_log_list, smt2_file_name, zip_file_folder, source)
-    for smt2_file in tqdm(unzipped_smt2_file_list, desc="collect log for unzipped_smt2_file_list"):
-        smt2_file_name = os.path.basename(smt2_file)
-        scan_cluster_logs(cluster_log_list, smt2_file_name, unzip_file_folder, source)
+    try:
+        cluster_log_list = get_file_list(os.path.join(folder, "log"), "out", "gz")
+        zipped_smt2_file_list = get_file_list(zip_file_folder, "smt2")
+        unzipped_smt2_file_list = get_file_list(unzip_file_folder, "smt2", "")
+        for smt2_file in tqdm(zipped_smt2_file_list, desc="collect log for zipped_smt2_file_list"):
+            smt2_file_name = os.path.basename(smt2_file[:-len(".zip")])
+            scan_cluster_logs(cluster_log_list, smt2_file_name, zip_file_folder, source)
+        for smt2_file in tqdm(unzipped_smt2_file_list, desc="collect log for unzipped_smt2_file_list"):
+            smt2_file_name = os.path.basename(smt2_file)
+            scan_cluster_logs(cluster_log_list, smt2_file_name, unzip_file_folder, source)
+    except:
+        print("no log file existed")
 
 
 def scan_cluster_logs(cluster_log_list, smt2_file_name, target_folder, source=""):

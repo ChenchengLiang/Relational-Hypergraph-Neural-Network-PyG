@@ -13,7 +13,7 @@ import numpy as np
 from src.utils import count_generator, make_dirct
 import math
 from src.CONSTANTS import benchmark_timeout
-
+import statistics
 plt.style.use("ggplot")
 
 
@@ -47,13 +47,49 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
 
     # compute points above and under the diagonal
     above_diagonal, under_diagonal, on_diagonal = 0, 0, 0
+    diagonal_distance=[]
     for x, y in zip(x_data, y_data):
+        diagonal_distance.append(distance_to_diagnal(x, y))
         if x < y:
             above_diagonal += 1
         elif x > y:
             under_diagonal += 1
         else:
             on_diagonal += 1
+    if len(diagonal_distance) != 0:
+        average_to_diagonal = statistics.mean(diagonal_distance)
+    else:
+        average_to_diagonal = 0
+
+    # compute average solving time gain
+    solving_time_gain_list=[]
+    for x, y in zip(x_data, y_data):
+        solving_time_gain_list.append(x-y)
+    if len(solving_time_gain_list) != 0:
+        average_solving_time_gain = statistics.mean(solving_time_gain_list)
+        total_solving_time_gain = sum(solving_time_gain_list)
+    else:
+        average_solving_time_gain = 0
+        total_solving_time_gain = 0
+
+
+    # compute average
+    if len(x_data) != 0:
+        average_x = statistics.mean(x_data)
+    else:
+        average_x=0
+    if len(y_data) != 0:
+        average_y = statistics.mean(y_data)
+    else:
+        average_y=0
+
+    #compute average improvement percentage
+    if average_x != 0:
+        average_solving_time_gain_percentage = average_solving_time_gain/average_x
+    else:
+        average_solving_time_gain_percentage = 0
+
+
     # compute gain and lost
     gain, lose = 0, 0
     for x, y in zip(x_data, y_data):
@@ -70,7 +106,9 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
 
     fig.update_layout(
         title=name + "<br>Number of common files:" + str(len(x_data)) + "<br>above/under/on diagonal:" + str(
-            above_diagonal) + "/" + str(under_diagonal) + "/" + str(on_diagonal) + "<br>gain/lose:" +str(gain) + "/" + str(lose) ,
+            above_diagonal) + "/" + str(under_diagonal) + "/" + str(on_diagonal) + "<br>gain/lose:" +str(gain) + "/" + str(lose)
+        +"<br>average_x/average_y:" + "{:.1f}".format(average_x)+"/"+"{:.1f}".format(average_y)
+        +"<br>average/percent/total solving time gain:"+"{:.1f}".format(average_solving_time_gain)+"/"+"{:.3f}".format(average_solving_time_gain_percentage)+"/"+"{:.1f}".format(total_solving_time_gain),
         title_x=0.5,
         xaxis_title=x_axis,
         yaxis_title=y_axis)
@@ -86,8 +124,12 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
     save_file_name = os.path.join(folder, plot_file_name)
     # fig.update_yaxes(type="linear")
     fig.write_html(save_file_name + ".html")
-    fig.write_image(save_file_name + ".png")
+    img_width = 1200
+    img_height = img_width*0.6
+    fig.write_image(save_file_name + ".png",width=img_width, height=img_height)
 
+def distance_to_diagnal(x, y):
+    return abs(x - y) / math.sqrt(2)
 
 def train_valid_plot(train_loss_floats, valid_loss_floats, folder, field="loss"):
     fig = go.Figure()

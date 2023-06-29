@@ -50,29 +50,85 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
+    holdout_linear_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/"
+    holdout_non_linear_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/"
+
     comparison_pairs = [
-        [
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic/train_data",
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic-random/train_data"],
-        [
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic/train_data",
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-union-rank-100/CDHG/train_data"],
-        [
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-fixed_heuristic/train_data",
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-union-rank-100-SEH/CDHG/train_data"],
-        [
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-train+valid-union-869/train_data",
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-train+valid-union-label-869/train_data"],
-        [
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-train+valid-union-869/train_data",
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/uppmax-CEGAR-linear-train+valid-union-random-869/train_data"],
-        [
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-CEGAR-non-linear-train+valid-union-1797/train_data",
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-CEGAR-non-linear-train+valid-union-label-1797/train_data"],
-        [
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-CEGAR-non-linear-train+valid-union-1797/train_data",
-            "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/uppmax-CEGAR-non-linear-train+valid-union-random-1797/train_data"]
+        # [
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-fixed-heuristic-constant/train_data",
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-fixed-heuristic-random/train_data"],
+        # [
+        #     holdout_linear_folder + "uppmax-symex-linear-fixed-heuristic-constant/train_data",
+        #     holdout_linear_folder + "uppmax-symex-linear-fixed-heuristic-random/train_data"],
+
+
+        # [
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-union-constant-869/train_data",
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-union-label-869/train_data"],
+        # [
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-union-constant-869/train_data",
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-union-random-869/train_data"],
+        # [
+        #     holdout_linear_folder + "uppmax-symex-linear-train+valid-union-constant-869/train_data",
+        #     holdout_linear_folder + "uppmax-symex-linear-train+valid-union-label-869/train_data"],
+        # [
+        #     holdout_linear_folder + "uppmax-symex-linear-train+valid-union-constant-869/train_data",
+        #     holdout_linear_folder + "uppmax-symex-linear-train+valid-union-random-869/train_data"],
+        # [
+        #     holdout_linear_folder + "uppmax-symex-linear-train+valid-minimal-constant-861/train_data",
+        #     holdout_linear_folder + "uppmax-symex-linear-train+valid-minimal-random-861/train_data"],
+        # [
+        #     holdout_linear_folder + "uppmax-symex-linear-train+valid-minimal-constant-861/train_data",
+        #     holdout_linear_folder + "uppmax-symex-linear-train+valid-minimal-label-861/train_data"],
+        # [
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-minimal-constant-861/train_data",
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-minimal-random-861/train_data"],
+        # [
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-minimal-constant-861/train_data",
+        #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-minimal-label-861/train_data"],
+        # [
+        #     holdout_non_linear_folder + "uppmax-CEGAR-non-linear-train+valid-union-constant-1797/train_data",
+        #     holdout_non_linear_folder + "uppmax-CEGAR-non-linear-train+valid-union-label-1797/train_data"],
+        # [
+        #     holdout_non_linear_folder + "uppmax-CEGAR-non-linear-train+valid-union-constant-1797/train_data",
+        #     holdout_non_linear_folder + "uppmax-CEGAR-non-linear-train+valid-union-random-1797/train_data"],
+        # [
+        #     holdout_non_linear_folder + "uppmax-symex-non-linear-train+valid-union-constant-1797/train_data",
+        #     holdout_non_linear_folder + "uppmax-symex-non-linear-train+valid-union-label-1797/train_data"],
+        # [
+        #     holdout_non_linear_folder + "uppmax-symex-non-linear-train+valid-union-constant-1797/train_data",
+        #     holdout_non_linear_folder + "uppmax-symex-non-linear-train+valid-union-random-1797/train_data"],
+
+        # [
+        #     holdout_non_linear_folder + "uppmax-CEGAR-non-linear-fixed-heuristic-constant/train_data",
+        #     holdout_non_linear_folder + "uppmax-CEGAR-non-linear-fixed-heuristic-random/train_data"],
+        # [
+        #     holdout_non_linear_folder + "uppmax-symex-non-linear-fixed-heuristic-constant/train_data",
+        #     holdout_non_linear_folder + "uppmax-symex-non-linear-fixed-heuristic-random/train_data"],
+
     ]
+    #liner
+    # for engine in ["CEGAR", "symex"]:
+    #     for CEOption in ["union","union-mixed-model","minimal"]: #common
+    #         for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
+    #             comparison_pairs.append([holdout_linear_folder + "uppmax-"+engine+"-linear-fixed-heuristic-constant/train_data",
+    #                 holdout_linear_folder + "uppmax-"+engine+"-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+
+    #non-linear
+    # for engine in ["CEGAR", "symex"]:
+    #     for CEOption in ["union","union-mixed-model"]: #common
+    #         for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
+    #             comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
+    #                 holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+
+    for bench in ["linear","non-linear"]:
+        for CEOption in ["union-"+bench+"-model", "union-mixed-model"]:  # common
+            for po in ["twoQueue02", "twoQueue05", "twoQueue08"]:
+                folder= holdout_linear_folder if bench=="linear" else holdout_non_linear_folder
+                comparison_pairs.append(
+                    [folder + "uppmax-symex-"+bench+"-fixed-heuristic-constant/train_data",
+                     folder + "uppmax-symex-"+bench+"-" + CEOption + "-" + po + "/CDHG/train_data"])
+
 
     for c_pair in comparison_pairs:
         eldarica_folder_original = c_pair[0]
@@ -90,7 +146,7 @@ def main():
         eldarica_symex_folder_CG_key = "eldarica_" + (
             "symex" if "symex" in eldarica_folder_original else "CEGAR") + "_CG"
 
-        full_file_folder = eldarica_symex_folder_CDHG  # eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
+        full_file_folder = eldarica_folder_original  # eldarica_symex_folder_original #golem_folder #eldarica_symex_folder_CDHG  # test_folder
         summary_folder = get_sumary_folder(os.path.dirname(os.path.dirname(golem_folder)) + "/data")
 
         solver_variation_folders_dict = {"golem": golem_folder, "z3": z3_folder,
@@ -268,8 +324,8 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
             category_dict["[" + str(i) + "]" + " lcr_c " + solver].append(lcr_c)
 
     # print category_dict column number
-    for k in category_dict:
-        print(k, len(category_dict[k]))
+    # for k in category_dict:
+    #     print(k, len(category_dict[k]))
 
     return category_dict
 
@@ -569,8 +625,8 @@ def read_solvability_cross_solvers_to_dict(full_file_folder, solver_variation_fo
     solvability_dict["pf_eldarica_" + engine + "_satisfiability"] = vb_satisfiability
     solvability_dict["pf_eldarica_" + engine + "_solving_time"] = vb_solving_time
 
-    for k in solvability_dict:
-        print(k, len(solvability_dict[k]))
+    # for k in solvability_dict:
+    #     print(k, len(solvability_dict[k]))
 
     print("-" * 10)
 

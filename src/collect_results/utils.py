@@ -10,29 +10,72 @@ from src.plots import scatter_plot
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 import shutil
+import math
+
 
 def summarize_excel_files():
     excel_files_dict = {
-        "CEGAR-linear": ["uppmax-CEGAR-linear-fixed_heuristic-random",
-                         "uppmax-CEGAR-linear-union-rank-100-SEH", "uppmax-CEGAR-linear-union-rank-100"],
-        # "symex-linear": ["uppmax-symex-linear-fixed_heuristic-random", "uppmax-symex-linear-union-score-1000",
-        #                  "uppmax-symex-linear-union-score-1000-reverse",
-        #                  "uppmax-symex-linear-union-score-1000-unitClauseConstraintSize-birthTime",
-        #                  "uppmax-symex-linear-union-score-100-unitClauseConstraintSize-birthTime",
-        #                  "uppmax-symex-linear-union-two-queue-0.5-score-1000-unitClauseConstraintSize-birthTime",
-        #                  "uppmax-symex-linear-union-rank",
-        #                  "uppmax-symex-linear-union-rank-unitClauseConstraintSize-birthTime",
-        #                  "uppmax-symex-linear-union-two-queue-rank-0.5"],
-        # "symex-non-linear": ["alvis-symex-non-linear-union-fixed-heuristic-random-1000",
-        #                      "alvis-symex-non-linear-union-rank-unitClauseConstraintSize-birthTime","alvis-symex-non-linear-union-score-1000-unitClauseConstraintSize-birthTime"],
-        "CEGAR-non-linear-train+valid": ["uppmax-CEGAR-non-linear-train+valid-union-label-1797",
-                                         "uppmax-CEGAR-non-linear-train+valid-union-random-1797"],
-        "symex-non-linear-train+valid": ["uppmax-symex-non-linear-train+valid-union-random-1797",
-                                         "uppmax-symex-non-linear-train+valid-union-label-1797"],
-        "CEGAR-linear-train+valid": ["uppmax-CEGAR-linear-train+valid-union-random-869",
-                                     "uppmax-CEGAR-linear-train+valid-union-label-869"],
-        "symex-linear-train+valid": ["uppmax-symex-linear-train+valid-union-random-869",
-                                     "uppmax-symex-linear-train+valid-union-label-869"],
+        "CEGAR-linear-minimal": ["uppmax-CEGAR-linear-fixed-heuristic-random",
+                                 "uppmax-CEGAR-linear-minimal-SEHPlus", "uppmax-CEGAR-linear-minimal-SEHMinus",
+                                 "uppmax-CEGAR-linear-minimal-REHPlus", "uppmax-CEGAR-linear-minimal-REHMinus"],
+        "symex-linear-minimal": ["uppmax-symex-linear-fixed-heuristic-random",
+                                 "uppmax-symex-linear-minimal-SEHPlus", "uppmax-symex-linear-minimal-SEHMinus",
+                                 "uppmax-symex-linear-minimal-REHPlus", "uppmax-symex-linear-minimal-REHMinus"],
+        "CEGAR-linear-union": ["uppmax-CEGAR-linear-fixed-heuristic-random",
+                               "uppmax-CEGAR-linear-union-SEHPlus", "uppmax-CEGAR-linear-union-SEHMinus",
+                               "uppmax-CEGAR-linear-union-REHPlus", "uppmax-CEGAR-linear-union-REHMinus",
+                               "uppmax-CEGAR-linear-union-mixed-model-SEHPlus",
+                               "uppmax-CEGAR-linear-union-mixed-model-SEHMinus",
+                               "uppmax-CEGAR-linear-union-mixed-model-REHPlus",
+                               "uppmax-CEGAR-linear-union-mixed-model-REHMinus"
+                               ],
+        "symex-linear-union": ["uppmax-symex-linear-fixed-heuristic-random",
+                               "uppmax-symex-linear-union-SEHPlus", "uppmax-symex-linear-union-SEHMinus",
+                               "uppmax-symex-linear-union-REHPlus", "uppmax-symex-linear-union-REHMinus",
+                               "uppmax-symex-linear-union-linear-model-twoQueue02",
+                               "uppmax-symex-linear-union-linear-model-twoQueue05",
+                               "uppmax-symex-linear-union-linear-model-twoQueue08",
+                               "uppmax-symex-linear-union-mixed-model-SEHPlus",
+                               "uppmax-symex-linear-union-mixed-model-SEHMinus",
+                               "uppmax-symex-linear-union-mixed-model-REHPlus",
+                               "uppmax-symex-linear-union-mixed-model-REHMinus",
+                               "uppmax-symex-linear-union-mixed-model-REHMinus",
+                               "uppmax-symex-linear-union-mixed-model-twoQueue02",
+                               "uppmax-symex-linear-union-mixed-model-twoQueue05",
+                               "uppmax-symex-linear-union-mixed-model-twoQueue08"
+                               ],
+        "CEGAR-non-linear-union": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
+                                   "uppmax-CEGAR-non-linear-union-SEHPlus", "uppmax-CEGAR-non-linear-union-SEHMinus",
+                                   "uppmax-CEGAR-non-linear-union-REHPlus", "uppmax-CEGAR-non-linear-union-REHMinus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-SEHPlus", "uppmax-CEGAR-non-linear-union-mixed-model-SEHMinus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-REHPlus", "uppmax-CEGAR-non-linear-union-mixed-model-REHMinus",
+                                   ],
+        "symex-non-linear-union": ["uppmax-symex-non-linear-fixed-heuristic-random",
+                                   "uppmax-symex-non-linear-union-SEHPlus", "uppmax-symex-non-linear-union-SEHMinus",
+                                   "uppmax-symex-non-linear-union-REHPlus", "uppmax-symex-non-linear-union-REHMinus",
+                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue02",
+                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue05",
+                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue08",
+                                   "uppmax-symex-non-linear-union-mixed-model-SEHPlus",
+                                   "uppmax-symex-non-linear-union-mixed-model-SEHMinus",
+                                   "uppmax-symex-non-linear-union-mixed-model-REHPlus",
+                                   "uppmax-symex-non-linear-union-mixed-model-REHMinus",
+                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue02",
+                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue05",
+                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue08"
+                                   ],
+        "CEGAR-linear-train+valid-union": ["uppmax-CEGAR-linear-train+valid-union-random-869",
+                                           "uppmax-CEGAR-linear-train+valid-union-label-869"],
+        "symex-linear-train+valid-union": ["uppmax-symex-linear-train+valid-union-random-869",
+                                           "uppmax-symex-linear-train+valid-union-label-869"],
+        "CEGAR-linear-train+valid-minimal": ["uppmax-CEGAR-linear-train+valid-minimal-random-861",
+                                             "uppmax-CEGAR-linear-train+valid-minimal-label-861"],
+        "symex-linear-train+valid-minimal": ["uppmax-symex-linear-train+valid-minimal-random-861",
+                                             "uppmax-symex-linear-train+valid-minimal-label-861"],
+        "CEGAR-non-linear-train+valid-union": ["uppmax-CEGAR-non-linear-train+valid-union-label-1797",
+                                               "uppmax-CEGAR-non-linear-train+valid-union-random-1797"],
+        "symex-non-linear-train+valid-union": ["uppmax-symex-non-linear-train+valid-union-random-1797",
+                                               "uppmax-symex-non-linear-train+valid-union-label-1797"],
     }
 
     # non-linear
@@ -100,7 +143,7 @@ def summarize_excel_files():
             sheet["A" + str(count)] = ''
             sheet["A" + str(count)].comment = None
             sheet.add_image(img, 'A' + str(count))
-            count += 25
+            count += 35
 
         # Save the modified workbook
         workbook.save(summary_file)
@@ -157,6 +200,10 @@ def draw_solving_time_scatter(excel_file, compare_benchmark_name):
                                                                           solvability_dict[pair[0] + "_solving_time"],
                                                                           solvability_dict[pair[1] + "_solving_time"]):
             vb_satisfiability = virtual_best_satisfiability_from_list([original_s, strategy_s])
+            # file_name_list_all.append(name)
+            # satisfiability_list_all.append(vb_satisfiability)
+            # original_solving_time_list_all.append(original_st)
+            # strategy_solving_time_list_all.append(strategy_st)
             # collect all solvable solving time and solvability
             if vb_satisfiability != "unknown":
                 file_name_list_all.append(name)

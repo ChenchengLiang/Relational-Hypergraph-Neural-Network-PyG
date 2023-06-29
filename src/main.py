@@ -5,8 +5,8 @@ from cluster_utils.utils import get_task_by_folder_name
 
 
 def main():
-    benchmarks = ["/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/one-example-demo-unsatcore",#CDHG
-                  #"/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/one-example-demo",#CG
+    benchmarks = ["/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/5449",#CDHG
+                  "/home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/benchmarks/5449",#CG
                   ]
 
     # load data
@@ -35,7 +35,7 @@ def _train(benchmarks):
     num_linear_layers = [2]  # 2 works
     data_loader_shuffle = [False]
     use_intermediate_gnn_results = [False]
-    message_normalization = [False]
+    message_normalization = [True]
     add_backward_edges = [False]
     add_global_edges = [True]
     self_loop = [True]

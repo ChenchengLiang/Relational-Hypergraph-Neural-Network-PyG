@@ -33,7 +33,7 @@ def main():
     # parameters_pipeline.append(" -getSolvability -abstract:off ")
 
     # unsatcore: get labeled data # 3 hours
-    #parameters_pipeline.append(" -mineCounterExample:minimal -abstract:off ")
+    #parameters_pipeline.append(" -mineCounterExample:common -abstract:off ")
 
     # unsatcore: construct graphs # 6 hours
     parameters_pipeline.append(" -getHornGraph:CDHG -hornGraphLabelType:unsatCore -abstract:off")
@@ -50,7 +50,7 @@ def main():
     # parameters_pipeline.append(
     #     " -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:CDHG -abstract:off ")
     # for g in ["CDHG", "CG"]:
-    #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClausesByUnsatCoreRank -abstract:off " )
+    #     parameters_pipeline.append(" -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 " + " -hornGraphType:" + g +" -prioritizeClauses:constant -abstract:off " )
 
     # description: output pruned CHCs in files 12*2*shell_timeout
     # shell_timeout = int(60 * 20)
