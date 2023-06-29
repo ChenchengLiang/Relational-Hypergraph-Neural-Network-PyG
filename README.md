@@ -39,15 +39,6 @@ by visiting http://127.0.0.1:5000. This server is used to receive and visualize 
 
 ## Reproduce instructions:
 
-[Exploring Representation of Horn Clauses using GNNs (Extended Technical Report)](https://arxiv.org/abs/2206.06986)
-@misc{liang2022exploring,
-      title={Exploring Representation of Horn Clauses using GNNs (Extended Technical Report)}, 
-      author={Chencheng Liang and Philipp Rümmer and Marc Brockschmidt},
-      year={2022},
-      eprint={2206.06986},
-      archivePrefix={arXiv},
-      primaryClass={cs.AI}
-}
 ### Task 5 reproduce instruction:
 
 
@@ -117,3 +108,18 @@ In "one-example-demo-unsatcore-CDHG/test_data/predicted", you can see the predic
 
 Try to replace the relatieve paths to absolute paths 
 if there are some problems caused by path (e.g., didn't read data in list).
+
+
+## Citation
+[Exploring Representation of Horn Clauses using GNNs (Extended Technical Report)](https://arxiv.org/abs/2206.06986)
+
+```
+@misc{liang2022exploring,
+      title={Exploring Representation of Horn Clauses using GNNs (Extended Technical Report)}, 
+      author={Chencheng Liang and Philipp Rümmer and Marc Brockschmidt},
+      year={2022},
+      eprint={2206.06986},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI}
+}
+```
