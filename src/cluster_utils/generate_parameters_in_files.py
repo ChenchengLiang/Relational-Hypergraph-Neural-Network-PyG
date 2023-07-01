@@ -40,11 +40,11 @@ def main():
     ]
     num_linear_layers = [2]  # 2 works
     data_loader_shuffle = [False]
-    use_intermediate_gnn_results = [False]
+    use_intermediate_gnn_results = [True,False]
     message_normalization = [False]
     add_backward_edges = [False]
     add_global_edges = [True]
-    self_loop = [True]
+    self_loop = [True,False]
     gradient_clip = [False]
     inter_layer_norm = [True]
     embedding_size = [64,128]
@@ -56,8 +56,8 @@ def main():
     reload_data = False
     regression_layer_norm = False
     fix_random_seed = [True]
-    use_class_weight = [True]
-    learning_rate = [0.0001]
+    use_class_weight = [True,False]
+    learning_rate = [0.001]
     activation = ["relu"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",
                        #"ASTLeftEdge", "ASTRightEdge",

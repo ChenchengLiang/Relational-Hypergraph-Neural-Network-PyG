@@ -115,19 +115,25 @@ def main():
     #                 holdout_linear_folder + "uppmax-"+engine+"-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
 
     #non-linear
-    # for engine in ["CEGAR", "symex"]:
-    #     for CEOption in ["union","union-mixed-model"]: #common
-    #         for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
-    #             comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
-    #                 holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+    for engine in ["CEGAR", "symex"]:
+        for CEOption in ["union","union-mixed-model","minimal-non-linear-model"]: #common
+            if engine=="CEGAR":
+                for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
+                    comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
+                        holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+            if engine=="symex":
+                for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus","twoQueue02", "twoQueue05", "twoQueue08"]:
+                    comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
+                        holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
 
-    for bench in ["linear","non-linear"]:
-        for CEOption in ["union-"+bench+"-model", "union-mixed-model"]:  # common
-            for po in ["twoQueue02", "twoQueue05", "twoQueue08"]:
-                folder= holdout_linear_folder if bench=="linear" else holdout_non_linear_folder
-                comparison_pairs.append(
-                    [folder + "uppmax-symex-"+bench+"-fixed-heuristic-constant/train_data",
-                     folder + "uppmax-symex-"+bench+"-" + CEOption + "-" + po + "/CDHG/train_data"])
+
+    # for bench in ["linear","non-linear"]:
+    #     for CEOption in ["union-"+bench+"-model", "union-mixed-model"]:  # common
+    #         for po in ["twoQueue02", "twoQueue05", "twoQueue08"]:
+    #             folder= holdout_linear_folder if bench=="linear" else holdout_non_linear_folder
+    #             comparison_pairs.append(
+    #                 [folder + "uppmax-symex-"+bench+"-fixed-heuristic-constant/train_data",
+    #                  folder + "uppmax-symex-"+bench+"-" + CEOption + "-" + po + "/CDHG/train_data"])
 
 
     for c_pair in comparison_pairs:
