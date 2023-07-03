@@ -131,6 +131,8 @@ def make_dirct(d,mute = False):
         print(str(d), "folder existed")
         return d
 
+def float_to_percentage(x):
+    return "{:.2%}".format(x)
 
 def distinct_list(original_list):
     distinct_list = []

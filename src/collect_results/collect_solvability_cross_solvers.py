@@ -54,12 +54,18 @@ def main():
     holdout_non_linear_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/"
 
     comparison_pairs = [
-        # [
-        #     holdout_linear_folder + "uppmax-CEGAR-linear-fixed-heuristic-constant/train_data",
-        #     holdout_linear_folder + "uppmax-CEGAR-linear-fixed-heuristic-random/train_data"],
-        # [
-        #     holdout_linear_folder + "uppmax-symex-linear-fixed-heuristic-constant/train_data",
-        #     holdout_linear_folder + "uppmax-symex-linear-fixed-heuristic-random/train_data"],
+        [
+            holdout_linear_folder + "uppmax-CEGAR-linear-fixed-heuristic-constant/train_data",
+            holdout_linear_folder + "uppmax-CEGAR-linear-fixed-heuristic-random/train_data"],
+        [
+            holdout_linear_folder + "uppmax-symex-linear-fixed-heuristic-constant/train_data",
+            holdout_linear_folder + "uppmax-symex-linear-fixed-heuristic-random/train_data"],
+        [
+            holdout_non_linear_folder + "uppmax-CEGAR-non-linear-fixed-heuristic-constant/train_data",
+            holdout_non_linear_folder + "uppmax-CEGAR-non-linear-fixed-heuristic-random/train_data"],
+        [
+            holdout_non_linear_folder + "uppmax-symex-non-linear-fixed-heuristic-constant/train_data",
+            holdout_non_linear_folder + "uppmax-symex-non-linear-fixed-heuristic-random/train_data"],
 
 
         # [
@@ -99,41 +105,32 @@ def main():
         #     holdout_non_linear_folder + "uppmax-symex-non-linear-train+valid-union-constant-1797/train_data",
         #     holdout_non_linear_folder + "uppmax-symex-non-linear-train+valid-union-random-1797/train_data"],
 
-        # [
-        #     holdout_non_linear_folder + "uppmax-CEGAR-non-linear-fixed-heuristic-constant/train_data",
-        #     holdout_non_linear_folder + "uppmax-CEGAR-non-linear-fixed-heuristic-random/train_data"],
-        # [
-        #     holdout_non_linear_folder + "uppmax-symex-non-linear-fixed-heuristic-constant/train_data",
-        #     holdout_non_linear_folder + "uppmax-symex-non-linear-fixed-heuristic-random/train_data"],
-
     ]
-    #liner
+    #linear
     # for engine in ["CEGAR", "symex"]:
-    #     for CEOption in ["union","union-mixed-model","minimal"]: #common
-    #         for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
-    #             comparison_pairs.append([holdout_linear_folder + "uppmax-"+engine+"-linear-fixed-heuristic-constant/train_data",
-    #                 holdout_linear_folder + "uppmax-"+engine+"-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+    #     for CEOption in ["union","union-mixed-model","minimal-linear-model"]: #common
+    #         if engine == "CEGAR":
+    #             for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
+    #                 comparison_pairs.append([holdout_linear_folder + "uppmax-"+engine+"-linear-fixed-heuristic-constant/train_data",
+    #                     holdout_linear_folder + "uppmax-"+engine+"-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+    #         if engine=="symex":
+    #             for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus","twoQueue02", "twoQueue05", "twoQueue08"]:
+    #                 comparison_pairs.append(
+    #                     [holdout_linear_folder + "uppmax-" + engine + "-linear-fixed-heuristic-constant/train_data",
+    #                      holdout_linear_folder + "uppmax-" + engine + "-linear-" + CEOption + "-" + po + "/CDHG/train_data"])
 
     #non-linear
-    for engine in ["CEGAR", "symex"]:
-        for CEOption in ["union","union-mixed-model","minimal-non-linear-model"]: #common
-            if engine=="CEGAR":
-                for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
-                    comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
-                        holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
-            if engine=="symex":
-                for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus","twoQueue02", "twoQueue05", "twoQueue08"]:
-                    comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
-                        holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+    # for engine in ["CEGAR", "symex"]:
+    #     for CEOption in ["union","union-mixed-model","minimal-non-linear-model"]: #common
+    #         if engine=="CEGAR":
+    #             for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
+    #                 comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
+    #                     holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+    #         if engine=="symex":
+    #             for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus","twoQueue02", "twoQueue05", "twoQueue08"]:
+    #                 comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
+    #                     holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
 
-
-    # for bench in ["linear","non-linear"]:
-    #     for CEOption in ["union-"+bench+"-model", "union-mixed-model"]:  # common
-    #         for po in ["twoQueue02", "twoQueue05", "twoQueue08"]:
-    #             folder= holdout_linear_folder if bench=="linear" else holdout_non_linear_folder
-    #             comparison_pairs.append(
-    #                 [folder + "uppmax-symex-"+bench+"-fixed-heuristic-constant/train_data",
-    #                  folder + "uppmax-symex-"+bench+"-" + CEOption + "-" + po + "/CDHG/train_data"])
 
 
     for c_pair in comparison_pairs:
@@ -259,7 +256,7 @@ def category_summary_for_solvability_dict(solvability_dict, solver_variation_fol
     for c in categories:
         count = 0
         for ca, sa in zip(solvability_dict["category"],
-                          solvability_dict["eldarica_abstract_off_prioritizing_SEH_satisfiability"]):
+                          solvability_dict["vb_eldarica_satisfiability"]):
             if c in ca and sa != "miss info":
                 count += 1
         category_dict["number_predicted"].append(count)

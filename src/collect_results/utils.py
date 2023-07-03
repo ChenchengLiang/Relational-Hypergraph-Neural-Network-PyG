@@ -1,26 +1,21 @@
-from src.utils import unzip_file, make_dirct, convert_bytes
+from src.utils import unzip_file, make_dirct, convert_bytes,select_key_with_value_condition, manual_flatten,float_to_percentage
+from src.CONSTANTS import benchmark_timeout
 import os
 import json
 import glob
 from shutil import copy
 from tqdm import tqdm
-from src.utils import select_key_with_value_condition, manual_flatten
 import pandas as pd
 from src.plots import scatter_plot
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 import shutil
+
 import math
 
 
 def summarize_excel_files():
     excel_files_dict = {
-        "CEGAR-linear-minimal": ["uppmax-CEGAR-linear-fixed-heuristic-random",
-                                 "uppmax-CEGAR-linear-minimal-SEHPlus", "uppmax-CEGAR-linear-minimal-SEHMinus",
-                                 "uppmax-CEGAR-linear-minimal-REHPlus", "uppmax-CEGAR-linear-minimal-REHMinus"],
-        "symex-linear-minimal": ["uppmax-symex-linear-fixed-heuristic-random",
-                                 "uppmax-symex-linear-minimal-SEHPlus", "uppmax-symex-linear-minimal-SEHMinus",
-                                 "uppmax-symex-linear-minimal-REHPlus", "uppmax-symex-linear-minimal-REHMinus"],
         "CEGAR-linear-union": ["uppmax-CEGAR-linear-fixed-heuristic-random",
                                "uppmax-CEGAR-linear-union-SEHPlus", "uppmax-CEGAR-linear-union-SEHMinus",
                                "uppmax-CEGAR-linear-union-REHPlus", "uppmax-CEGAR-linear-union-REHMinus",
@@ -47,8 +42,10 @@ def summarize_excel_files():
         "CEGAR-non-linear-union": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
                                    "uppmax-CEGAR-non-linear-union-SEHPlus", "uppmax-CEGAR-non-linear-union-SEHMinus",
                                    "uppmax-CEGAR-non-linear-union-REHPlus", "uppmax-CEGAR-non-linear-union-REHMinus",
-                                   "uppmax-CEGAR-non-linear-union-mixed-model-SEHPlus", "uppmax-CEGAR-non-linear-union-mixed-model-SEHMinus",
-                                   "uppmax-CEGAR-non-linear-union-mixed-model-REHPlus", "uppmax-CEGAR-non-linear-union-mixed-model-REHMinus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-SEHPlus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-SEHMinus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-REHPlus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-REHMinus",
                                    ],
         "symex-non-linear-union": ["uppmax-symex-non-linear-fixed-heuristic-random",
                                    "uppmax-symex-non-linear-union-SEHPlus", "uppmax-symex-non-linear-union-SEHMinus",
@@ -64,40 +61,64 @@ def summarize_excel_files():
                                    "uppmax-symex-non-linear-union-mixed-model-twoQueue05",
                                    "uppmax-symex-non-linear-union-mixed-model-twoQueue08"
                                    ],
+        "CEGAR-linear-minimal": ["uppmax-CEGAR-linear-fixed-heuristic-random",
+                                 "uppmax-CEGAR-linear-minimal-linear-model-SEHPlus", "uppmax-CEGAR-linear-minimal-linear-model-SEHMinus",
+                                 "uppmax-CEGAR-linear-minimal-linear-model-REHPlus", "uppmax-CEGAR-linear-minimal-linear-model-REHMinus",
+                                 # "uppmax-CEGAR-linear-minimal-mixed-model-SEHPlus",
+                                 # "uppmax-CEGAR-linear-minimal-mixed-model-SEHMinus",
+                                 # "uppmax-CEGAR-linear-minimal-mixed-model-REHPlus",
+                                 # "uppmax-CEGAR-linear-minimal-mixed-model-REHMinus",
+                                 ],
+        "symex-linear-minimal": ["uppmax-symex-linear-fixed-heuristic-random",
+                                 "uppmax-symex-linear-minimal-linear-model-SEHPlus", "uppmax-symex-linear-minimal-linear-model-SEHMinus",
+                                 "uppmax-symex-linear-minimal-linear-model-REHPlus", "uppmax-symex-linear-minimal-linear-model-REHMinus",
+                                 # "uppmax-symex-linear-minimal-mixed-model-SEHPlus",
+                                 # "uppmax-symex-linear-minimal-mixed-model-SEHMinus",
+                                 # "uppmax-symex-linear-minimal-mixed-model-REHPlus",
+                                 # "uppmax-symex-linear-minimal-mixed-model-REHMinus",
+                                 # "uppmax-symex-linear-minimal-mixed-model-twoQueue02",
+                                 # "uppmax-symex-linear-minimal-mixed-model-twoQueue05",
+                                 # "uppmax-symex-linear-minimal-mixed-model-twoQueue08"
+                                 ],
         "CEGAR-non-linear-minimal": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
-                                   "uppmax-CEGAR-non-linear-minimal-non-linear-model-SEHPlus", "uppmax-CEGAR-non-linear-minimal-non-linear-model-SEHMinus",
-                                   "uppmax-CEGAR-non-linear-minimal-non-linear-model-REHPlus", "uppmax-CEGAR-non-linear-minimal-non-linear-model-REHMinus",
-                                   # "uppmax-CEGAR-non-linear-union-mixed-model-SEHPlus",
-                                   # "uppmax-CEGAR-non-linear-union-mixed-model-SEHMinus",
-                                   # "uppmax-CEGAR-non-linear-union-mixed-model-REHPlus",
-                                   # "uppmax-CEGAR-non-linear-union-mixed-model-REHMinus",
-                                   ],
+                                     "uppmax-CEGAR-non-linear-minimal-non-linear-model-SEHPlus",
+                                     "uppmax-CEGAR-non-linear-minimal-non-linear-model-SEHMinus",
+                                     "uppmax-CEGAR-non-linear-minimal-non-linear-model-REHPlus",
+                                     "uppmax-CEGAR-non-linear-minimal-non-linear-model-REHMinus",
+                                     # "uppmax-CEGAR-non-linear-minimal-mixed-model-SEHPlus",
+                                     # "uppmax-CEGAR-non-linear-minimal-mixed-model-SEHMinus",
+                                     # "uppmax-CEGAR-non-linear-minimal-mixed-model-REHPlus",
+                                     # "uppmax-CEGAR-non-linear-minimal-mixed-model-REHMinus",
+                                     ],
         "symex-non-linear-minimal": ["uppmax-symex-non-linear-fixed-heuristic-random",
-                                   "uppmax-symex-non-linear-minimal-non-linear-model-SEHPlus", "uppmax-symex-non-linear-minimal-non-linear-model-SEHMinus",
-                                   "uppmax-symex-non-linear-minimal-non-linear-model-REHPlus", "uppmax-symex-non-linear-minimal-non-linear-model-REHMinus",
-                                   "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue02",
-                                   "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue05",
-                                   "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue08",
-                                   # "uppmax-symex-non-linear-union-mixed-model-SEHPlus",
-                                   # "uppmax-symex-non-linear-union-mixed-model-SEHMinus",
-                                   # "uppmax-symex-non-linear-union-mixed-model-REHPlus",
-                                   # "uppmax-symex-non-linear-union-mixed-model-REHMinus",
-                                   # "uppmax-symex-non-linear-union-mixed-model-twoQueue02",
-                                   # "uppmax-symex-non-linear-union-mixed-model-twoQueue05",
-                                   # "uppmax-symex-non-linear-union-mixed-model-twoQueue08"
-                                   ],
-        "CEGAR-linear-train+valid-union": ["uppmax-CEGAR-linear-train+valid-union-random-869",
-                                           "uppmax-CEGAR-linear-train+valid-union-label-869"],
-        "symex-linear-train+valid-union": ["uppmax-symex-linear-train+valid-union-random-869",
-                                           "uppmax-symex-linear-train+valid-union-label-869"],
-        "CEGAR-linear-train+valid-minimal": ["uppmax-CEGAR-linear-train+valid-minimal-random-861",
-                                             "uppmax-CEGAR-linear-train+valid-minimal-label-861"],
-        "symex-linear-train+valid-minimal": ["uppmax-symex-linear-train+valid-minimal-random-861",
-                                             "uppmax-symex-linear-train+valid-minimal-label-861"],
-        "CEGAR-non-linear-train+valid-union": ["uppmax-CEGAR-non-linear-train+valid-union-label-1797",
-                                               "uppmax-CEGAR-non-linear-train+valid-union-random-1797"],
-        "symex-non-linear-train+valid-union": ["uppmax-symex-non-linear-train+valid-union-random-1797",
-                                               "uppmax-symex-non-linear-train+valid-union-label-1797"],
+                                     "uppmax-symex-non-linear-minimal-non-linear-model-SEHPlus",
+                                     "uppmax-symex-non-linear-minimal-non-linear-model-SEHMinus",
+                                     "uppmax-symex-non-linear-minimal-non-linear-model-REHPlus",
+                                     "uppmax-symex-non-linear-minimal-non-linear-model-REHMinus",
+                                     "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue02",
+                                     "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue05",
+                                     "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue08",
+                                     # "uppmax-symex-non-linear-minimal-mixed-model-SEHPlus",
+                                     # "uppmax-symex-non-linear-minimal-mixed-model-SEHMinus",
+                                     # "uppmax-symex-non-linear-minimal-mixed-model-REHPlus",
+                                     # "uppmax-symex-non-linear-minimal-mixed-model-REHMinus",
+                                     # "uppmax-symex-non-linear-minimal-mixed-model-twoQueue02",
+                                     # "uppmax-symex-non-linear-minimal-mixed-model-twoQueue05",
+                                     # "uppmax-symex-non-linear-minimal-mixed-model-twoQueue08"
+                                     ],
+
+        # "CEGAR-linear-train+valid-union": ["uppmax-CEGAR-linear-train+valid-union-random-869",
+        #                                    "uppmax-CEGAR-linear-train+valid-union-label-869"],
+        # "symex-linear-train+valid-union": ["uppmax-symex-linear-train+valid-union-random-869",
+        #                                    "uppmax-symex-linear-train+valid-union-label-869"],
+        # "CEGAR-linear-train+valid-minimal": ["uppmax-CEGAR-linear-train+valid-minimal-random-861",
+        #                                      "uppmax-CEGAR-linear-train+valid-minimal-label-861"],
+        # "symex-linear-train+valid-minimal": ["uppmax-symex-linear-train+valid-minimal-random-861",
+        #                                      "uppmax-symex-linear-train+valid-minimal-label-861"],
+        # "CEGAR-non-linear-train+valid-union": ["uppmax-CEGAR-non-linear-train+valid-union-label-1797",
+        #                                        "uppmax-CEGAR-non-linear-train+valid-union-random-1797"],
+        # "symex-non-linear-train+valid-union": ["uppmax-symex-non-linear-train+valid-union-random-1797",
+        #                                        "uppmax-symex-non-linear-train+valid-union-label-1797"],
     }
 
     # non-linear
@@ -109,8 +130,8 @@ def summarize_excel_files():
     with pd.ExcelWriter(summary_file) as writer:
         for k in excel_files_dict:
             excel_files = excel_files_dict[k]
-            columns = ["category"] + ["original_safe", "original_unsafe"] + manual_flatten(
-                [[f + "_safe", f + "_unsafe"] for f in excel_files])
+            columns = ["category"] + ["total","original_solved","original_safe", "original_unsafe", "original_avg_t","original_avg_t_s"] + manual_flatten(
+                [[f + "_solved",f + "_safe", f + "_unsafe", f + "_avg_t",f + "_avg_t_s"] for f in excel_files])
             output_dict = {x: [] for x in columns}
             engine = "symex" if "symex" in excel_files[0] else "CEGAR"
 
@@ -119,8 +140,19 @@ def summarize_excel_files():
                 "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" +
                 excel_files[0] + ".xlsx",
                 sheet_name="category_summary")
+
+            output_dict["total"] = ["total"] + solvability_dict["number_predicted"]
+
+            output_dict["original_solved"] = ["solved"] + [a + b for a, b in
+                                                         zip(solvability_dict["eldarica_" + engine + "_original_safe"],
+                                                             solvability_dict[
+                                                                 "eldarica_" + engine + "_original_unsafe"])]
             output_dict["original_safe"] = ["safe"] + solvability_dict["eldarica_" + engine + "_original_safe"]
             output_dict["original_unsafe"] = ["unsafe"] + solvability_dict["eldarica_" + engine + "_original_unsafe"]
+            solving_time_list=solvability_dict["eldarica_" + engine + "_original_solving_time"]
+            averge_solving_time_list,averge_solving_time_solved_list=compute_average_solving_time(output_dict["total"],output_dict["original_solved"] ,solving_time_list)
+            output_dict["original_avg_t"] = ["avg_t"] + averge_solving_time_list
+            output_dict["original_avg_t_s"] = ["avg_t_s"] + averge_solving_time_solved_list
             output_dict["category"] = [" "] + solvability_dict["category"]
 
             # get safe and unsafe from other excels
@@ -128,9 +160,16 @@ def summarize_excel_files():
                 solvability_dict = read_solvability_dict(
                     "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".xlsx",
                     sheet_name="category_summary")
+                output_dict[f + "_solved"] = ["solved"] + [a + b for a, b in zip(
+                    solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"],
+                    solvability_dict["vb_eldarica_" + engine + "_prioritize_unsafe"])]
                 output_dict[f + "_safe"] = ["safe"] + solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"]
                 output_dict[f + "_unsafe"] = ["unsafe"] + solvability_dict[
                     "vb_eldarica_" + engine + "_prioritize_unsafe"]
+                solving_time_list=solvability_dict["vb_eldarica_" + engine + "_prioritize_solving_time"]
+                averge_solving_time_list,averge_solving_time_solved_list = compute_average_solving_time(output_dict["total"],output_dict[f + "_solved"] , solving_time_list)
+                output_dict[f + "_avg_t"] = ["avg_t"] + averge_solving_time_list
+                output_dict[f + "_avg_t_s"] = ["avg_t_s"] + averge_solving_time_solved_list
 
             pd.DataFrame(pd.DataFrame(output_dict)).to_excel(writer, sheet_name=k)
 
@@ -143,15 +182,15 @@ def summarize_excel_files():
         sheet = workbook[e_k]
 
         # Merge cells
-        sheet.merge_cells('C1:D1')  # Merge cells in the range C1 to D1
-        sheet["C1"].value = "Original"
+        sheet.merge_cells('D1:H1')  # Merge cells in the range C1 to E1
+        sheet["D1"].value = "Original"
 
         merge_dict = {f: [] for f in excel_files}
         last_column_letter = sheet.dimensions.split(':')[1].strip('1234567890')
         for f in excel_files:
             for row in sheet["E1:" + last_column_letter + "1"]:
                 for cell in row:
-                    if f + "_safe" == cell.value or f + "_unsafe" == cell.value:
+                    if f + "_solved" == cell.value or f + "_safe" == cell.value or f + "_unsafe" == cell.value or f + "_avg_t" == cell.value or f + "_avg_t_s" == cell.value:
                         merge_dict[f].append(cell.coordinate)
         for k in merge_dict:
             sheet.merge_cells(merge_dict[k][0] + ":" + merge_dict[k][-1])
@@ -166,11 +205,46 @@ def summarize_excel_files():
             sheet["A" + str(count)].comment = None
             sheet.add_image(img, 'A' + str(count))
             count += 35
+            
+        #compute improve percentage for absolute solving time
+        row =13 if "non-linear" in e_k else 15
+        oirginal_st_column_number=7
+        oirginal_st_value=sheet[get_column_letter(oirginal_st_column_number)+str(row)].value
+        sheet["B"+str(row+2)].value="improve percentage"
+        current_st_column_number=oirginal_st_column_number+5
+        while sheet[get_column_letter(current_st_column_number)+str(row)].value is not None:
+            target_st_value=sheet[get_column_letter(current_st_column_number)+str(row)].value
+            improve_percentage=(oirginal_st_value-target_st_value)/oirginal_st_value
+            sheet[get_column_letter(current_st_column_number)+str(row+2)].value=float_to_percentage(improve_percentage)
+            current_st_column_number = current_st_column_number + 5
 
         # Save the modified workbook
         workbook.save(summary_file)
 
+def get_column_letter(col_num):
+    letter = ''
+    while col_num:
+        col_num, remainder = divmod(col_num - 1, 26)
+        letter = chr(65 + remainder) + letter
+    return letter
 
+def compute_average_solving_time(list_total, list_solved, list_time):
+    averge_solving_time_list=[]
+    averge_solving_time_solved_list = []
+    for x, y in zip(list_total[1:], list_time):
+        if isinstance(x, str):
+            averge_solving_time_list.append(x)
+        else:
+            averge_solving_time_list.append(y / x)
+    for t,s,time in zip(list_total[1:],list_solved[1:], list_time):
+        if isinstance(t, str):
+            averge_solving_time_solved_list.append(t)
+        elif s==0:
+            averge_solving_time_solved_list.append(0)
+        else:
+            numerator = (time - (t - s) * benchmark_timeout)
+            averge_solving_time_solved_list.append(numerator/ s)
+    return averge_solving_time_list,averge_solving_time_solved_list
 def draw_solving_time_scatter(excel_file, compare_benchmark_name):
     # Read the Excel file into a Pandas DataFrame
     solvability_dict = read_solvability_dict(excel_file)
