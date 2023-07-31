@@ -50,8 +50,8 @@ def main():
     eldarica_abstract_relIneqs_folder_pruning_rank_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/solvability-linear-eldarica-abstract-relIneqs-pruning-threshold-rank/train_data"
     eldarica_abstract_relIneqs_folder_pruning_score_folder = ""
 
-    holdout_linear_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/"
-    holdout_non_linear_folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/"
+    holdout_linear_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/linear/"
+    holdout_non_linear_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/holdout/non-linear/"
 
     comparison_pairs = [
         [
@@ -66,7 +66,6 @@ def main():
         [
             holdout_non_linear_folder + "uppmax-symex-non-linear-fixed-heuristic-constant/train_data",
             holdout_non_linear_folder + "uppmax-symex-non-linear-fixed-heuristic-random/train_data"],
-
 
         # [
         #     holdout_linear_folder + "uppmax-CEGAR-linear-train+valid-union-constant-869/train_data",
@@ -106,32 +105,34 @@ def main():
         #     holdout_non_linear_folder + "uppmax-symex-non-linear-train+valid-union-random-1797/train_data"],
 
     ]
-    #linear
-    # for engine in ["CEGAR", "symex"]:
-    #     for CEOption in ["union","union-mixed-model","minimal-linear-model"]: #common
-    #         if engine == "CEGAR":
-    #             for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
-    #                 comparison_pairs.append([holdout_linear_folder + "uppmax-"+engine+"-linear-fixed-heuristic-constant/train_data",
-    #                     holdout_linear_folder + "uppmax-"+engine+"-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
-    #         if engine=="symex":
-    #             for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus","twoQueue02", "twoQueue05", "twoQueue08"]:
-    #                 comparison_pairs.append(
-    #                     [holdout_linear_folder + "uppmax-" + engine + "-linear-fixed-heuristic-constant/train_data",
-    #                      holdout_linear_folder + "uppmax-" + engine + "-linear-" + CEOption + "-" + po + "/CDHG/train_data"])
 
-    #non-linear
-    # for engine in ["CEGAR", "symex"]:
-    #     for CEOption in ["union","union-mixed-model","minimal-non-linear-model"]: #common
-    #         if engine=="CEGAR":
-    #             for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
-    #                 comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
-    #                     holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
-    #         if engine=="symex":
-    #             for po in ["SEHPlus", "SEHMinus", "REHPlus", "REHMinus","twoQueue02", "twoQueue05", "twoQueue08"]:
-    #                 comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
-    #                     holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+    # linear
+    for engine in ["CEGAR","symex"]:
+        for CEOption in ["common-linear-model","common-mixed-model"]:  # common, "union","union-mixed-model","minimal-linear-model","minimal-mixed-model",
+            if engine == "CEGAR":
+                for po in ["rank", "score", "SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
+                    comparison_pairs.append(
+                        [holdout_linear_folder + "uppmax-" + engine + "-linear-fixed-heuristic-constant/train_data",
+                         holdout_linear_folder + "uppmax-" + engine + "-linear-" + CEOption + "-" + po + "/CDHG/train_data"])
+            if engine == "symex":
+                for po in ["rank", "score", "SEHPlus", "SEHMinus", "REHPlus", "REHMinus", "twoQueue02", "twoQueue05","twoQueue08",
+                           "schedule10", "schedule100", "schedule1000"]:
+                    comparison_pairs.append(
+                        [holdout_linear_folder + "uppmax-" + engine + "-linear-fixed-heuristic-constant/train_data",
+                         holdout_linear_folder + "uppmax-" + engine + "-linear-" + CEOption + "-" + po + "/CDHG/train_data"])
 
-
+    # non-linear
+    for engine in ["CEGAR", "symex"]:
+        for CEOption in ["common-non-linear-model","common-mixed-model"]: #common, "union","union-mixed-model","minimal-non-linear-model""minimal-mixed-model",
+            if engine=="CEGAR":
+                for po in ["rank","score","SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
+                    comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
+                        holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
+            if engine=="symex":
+                for po in ["rank","score","SEHPlus", "SEHMinus", "REHPlus", "REHMinus","twoQueue02", "twoQueue05", "twoQueue08",
+                           "schedule10","schedule100","schedule1000"]:
+                    comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
+                        holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-"+CEOption+"-"+po+"/CDHG/train_data"])
 
     for c_pair in comparison_pairs:
         eldarica_folder_original = c_pair[0]
@@ -213,7 +214,8 @@ def main():
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
     categories = get_distinct_category_list(solvability_dict["category"])
-    measurements = ["safe", "unsafe", "unknown", "miss info", "solving_time"]
+    measurements = ["safe", "unsafe", "unknown", "miss info", "solving_time", "common_solving_count",
+                    "common_original_solving_time", "common_solving_time"]
     comparison_solver_list = ["vb"]
     for solver in ["golem", "z3"]:
         comparison_solver_list.append(solver)
@@ -383,16 +385,52 @@ def compute_vbss(c, solvability_dict, vb_satisfiability_list, vb_solving_time_li
 def count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_dict, solver):
     count = 0
     solving_time = 0
-    for ca, sa, st in zip(solvability_dict["category"], solvability_dict[solver + "_satisfiability"],
-                          solvability_dict[solver + "_solving_time"]):
+    common_solving_time = 0
+    common_original_solving_time=0
+    common_solving_count = 0
+    original_solver = "vb"
+    if "golem" in solver:
+        original_solver = "golem"
+    if "z3" in solver:
+        original_solver = "z3"
+    if "CEGAR" in solver:
+        original_solver = "eldarica_CEGAR_original"
+    if "abstract_term" in solver:
+        original_solver = "eldarica_abstract_term"
+    if "abstract_oct" in solver:
+        original_solver = "eldarica_abstract_oct"
+    if "abstract_relEqs" in solver:
+        original_solver = "eldarica_abstract_relEqs"
+    if "abstract_relIneqs" in solver:
+        original_solver = "eldarica_abstract_relIneqs"
+    if "abstract_off" in solver:
+        original_solver = "eldarica_abstract_off"
+
+    for ca, sa, st, original_st in zip(solvability_dict["category"], solvability_dict[solver + "_satisfiability"],
+                                       solvability_dict[solver + "_solving_time"],
+                                       solvability_dict[original_solver + "_solving_time"]):
         if c in ca and m == sa:
             count += 1
         if c in ca:
-            solving_time += read_solving_time_from_differernt_formats(st)
-            # solving_time += st
+            st = read_solving_time_from_differernt_formats(st)
+            solving_time += st
+            # common solving time
+            original_st = read_solving_time_from_differernt_formats(original_st)
+            if st < benchmark_timeout and original_st < benchmark_timeout:
+                common_solving_time += st
+                common_original_solving_time += original_st
+                common_solving_count += 1
+
+    # eldarica_symex_original_solving_time  vb_eldarica_symex_prioritize_solving_time
 
     if "solving_time" == m:
         category_dict[solver + "_" + m].append(solving_time)
+    elif "common_solving_time" == m:
+        category_dict[solver + "_" + m].append(common_solving_time)
+    elif "common_original_solving_time" == m:
+        category_dict[solver + "_" + m].append(common_original_solving_time)
+    elif "common_solving_count" == m:
+        category_dict[solver + "_" + m].append(common_solving_count)
     else:
         category_dict[solver + "_" + m].append(count)
 

@@ -30,7 +30,7 @@ def main():
     # tasks = ["argument_binary_classification","template_binary_classification","template_multi_classification","unsat_core_binary_classification"]
     task = get_task_by_folder_name(folder_1)
     # todo add inner layer control to graph conv operator
-    num_gnn_layers = [8,16]  # 8 works best
+    num_gnn_layers = [2,8,16]  # 8 works best
     dropout_rate = [  # all 0 works
         {"gnn_dropout_rate": 0.0, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
         #{"gnn_dropout_rate": 0.5, "mlp_dropout_rate": 0.0, "gnn_inner_layer_dropout_rate": 0.0},
@@ -56,7 +56,7 @@ def main():
     reload_data = False
     regression_layer_norm = False
     fix_random_seed = [True]
-    use_class_weight = [True,False]
+    use_class_weight = [False]
     learning_rate = [0.001]
     activation = ["relu"]  # ["relu","leak_relu", "tanh"]
     cdhg_edge_types = ["relationSymbolArgumentEdge", "guardEdge",

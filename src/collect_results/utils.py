@@ -16,95 +16,187 @@ import math
 
 def summarize_excel_files():
     excel_files_dict = {
-        "CEGAR-linear-union": ["uppmax-CEGAR-linear-fixed-heuristic-random",
-                               "uppmax-CEGAR-linear-union-SEHPlus", "uppmax-CEGAR-linear-union-SEHMinus",
-                               "uppmax-CEGAR-linear-union-REHPlus", "uppmax-CEGAR-linear-union-REHMinus",
-                               "uppmax-CEGAR-linear-union-mixed-model-SEHPlus",
-                               "uppmax-CEGAR-linear-union-mixed-model-SEHMinus",
-                               "uppmax-CEGAR-linear-union-mixed-model-REHPlus",
-                               "uppmax-CEGAR-linear-union-mixed-model-REHMinus"
-                               ],
-        "symex-linear-union": ["uppmax-symex-linear-fixed-heuristic-random",
-                               "uppmax-symex-linear-union-SEHPlus", "uppmax-symex-linear-union-SEHMinus",
-                               "uppmax-symex-linear-union-REHPlus", "uppmax-symex-linear-union-REHMinus",
-                               "uppmax-symex-linear-union-linear-model-twoQueue02",
-                               "uppmax-symex-linear-union-linear-model-twoQueue05",
-                               "uppmax-symex-linear-union-linear-model-twoQueue08",
-                               "uppmax-symex-linear-union-mixed-model-SEHPlus",
-                               "uppmax-symex-linear-union-mixed-model-SEHMinus",
-                               "uppmax-symex-linear-union-mixed-model-REHPlus",
-                               "uppmax-symex-linear-union-mixed-model-REHMinus",
-                               "uppmax-symex-linear-union-mixed-model-REHMinus",
-                               "uppmax-symex-linear-union-mixed-model-twoQueue02",
-                               "uppmax-symex-linear-union-mixed-model-twoQueue05",
-                               "uppmax-symex-linear-union-mixed-model-twoQueue08"
-                               ],
-        "CEGAR-non-linear-union": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
-                                   "uppmax-CEGAR-non-linear-union-SEHPlus", "uppmax-CEGAR-non-linear-union-SEHMinus",
-                                   "uppmax-CEGAR-non-linear-union-REHPlus", "uppmax-CEGAR-non-linear-union-REHMinus",
-                                   "uppmax-CEGAR-non-linear-union-mixed-model-SEHPlus",
-                                   "uppmax-CEGAR-non-linear-union-mixed-model-SEHMinus",
-                                   "uppmax-CEGAR-non-linear-union-mixed-model-REHPlus",
-                                   "uppmax-CEGAR-non-linear-union-mixed-model-REHMinus",
-                                   ],
-        "symex-non-linear-union": ["uppmax-symex-non-linear-fixed-heuristic-random",
-                                   "uppmax-symex-non-linear-union-SEHPlus", "uppmax-symex-non-linear-union-SEHMinus",
-                                   "uppmax-symex-non-linear-union-REHPlus", "uppmax-symex-non-linear-union-REHMinus",
-                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue02",
-                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue05",
-                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue08",
-                                   "uppmax-symex-non-linear-union-mixed-model-SEHPlus",
-                                   "uppmax-symex-non-linear-union-mixed-model-SEHMinus",
-                                   "uppmax-symex-non-linear-union-mixed-model-REHPlus",
-                                   "uppmax-symex-non-linear-union-mixed-model-REHMinus",
-                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue02",
-                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue05",
-                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue08"
-                                   ],
-        "CEGAR-linear-minimal": ["uppmax-CEGAR-linear-fixed-heuristic-random",
-                                 "uppmax-CEGAR-linear-minimal-linear-model-SEHPlus", "uppmax-CEGAR-linear-minimal-linear-model-SEHMinus",
-                                 "uppmax-CEGAR-linear-minimal-linear-model-REHPlus", "uppmax-CEGAR-linear-minimal-linear-model-REHMinus",
-                                 # "uppmax-CEGAR-linear-minimal-mixed-model-SEHPlus",
-                                 # "uppmax-CEGAR-linear-minimal-mixed-model-SEHMinus",
-                                 # "uppmax-CEGAR-linear-minimal-mixed-model-REHPlus",
-                                 # "uppmax-CEGAR-linear-minimal-mixed-model-REHMinus",
+        # "CEGAR-linear-union": ["uppmax-CEGAR-linear-fixed-heuristic-random",
+        #                        "uppmax-CEGAR-linear-union-SEHPlus", "uppmax-CEGAR-linear-union-SEHMinus",
+        #                        "uppmax-CEGAR-linear-union-REHPlus", "uppmax-CEGAR-linear-union-REHMinus",
+        #                        "uppmax-CEGAR-linear-union-mixed-model-SEHPlus",
+        #                        "uppmax-CEGAR-linear-union-mixed-model-SEHMinus",
+        #                        "uppmax-CEGAR-linear-union-mixed-model-REHPlus",
+        #                        "uppmax-CEGAR-linear-union-mixed-model-REHMinus"
+        #                        ],
+        # "symex-linear-union": ["uppmax-symex-linear-fixed-heuristic-random",
+        #                        "uppmax-symex-linear-union-SEHPlus", "uppmax-symex-linear-union-SEHMinus",
+        #                        "uppmax-symex-linear-union-REHPlus", "uppmax-symex-linear-union-REHMinus",
+        #                        "uppmax-symex-linear-union-linear-model-twoQueue02",
+        #                        "uppmax-symex-linear-union-linear-model-twoQueue05",
+        #                        "uppmax-symex-linear-union-linear-model-twoQueue08",
+        #                        "uppmax-symex-linear-union-mixed-model-SEHPlus",
+        #                        "uppmax-symex-linear-union-mixed-model-SEHMinus",
+        #                        "uppmax-symex-linear-union-mixed-model-REHPlus",
+        #                        "uppmax-symex-linear-union-mixed-model-REHMinus",
+        #                        "uppmax-symex-linear-union-mixed-model-REHMinus",
+        #                        "uppmax-symex-linear-union-mixed-model-twoQueue02",
+        #                        "uppmax-symex-linear-union-mixed-model-twoQueue05",
+        #                        "uppmax-symex-linear-union-mixed-model-twoQueue08"
+        #                        ],
+        # "CEGAR-non-linear-union": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
+        #                            "uppmax-CEGAR-non-linear-union-SEHPlus", "uppmax-CEGAR-non-linear-union-SEHMinus",
+        #                            "uppmax-CEGAR-non-linear-union-REHPlus", "uppmax-CEGAR-non-linear-union-REHMinus",
+        #                            "uppmax-CEGAR-non-linear-union-mixed-model-SEHPlus",
+        #                            "uppmax-CEGAR-non-linear-union-mixed-model-SEHMinus",
+        #                            "uppmax-CEGAR-non-linear-union-mixed-model-REHPlus",
+        #                            "uppmax-CEGAR-non-linear-union-mixed-model-REHMinus",
+        #                            ],
+        # "symex-non-linear-union": ["uppmax-symex-non-linear-fixed-heuristic-random",
+        #                            "uppmax-symex-non-linear-union-SEHPlus", "uppmax-symex-non-linear-union-SEHMinus",
+        #                            "uppmax-symex-non-linear-union-REHPlus", "uppmax-symex-non-linear-union-REHMinus",
+        #                            "uppmax-symex-non-linear-union-non-linear-model-twoQueue02",
+        #                            "uppmax-symex-non-linear-union-non-linear-model-twoQueue05",
+        #                            "uppmax-symex-non-linear-union-non-linear-model-twoQueue08",
+        #                            "uppmax-symex-non-linear-union-mixed-model-SEHPlus",
+        #                            "uppmax-symex-non-linear-union-mixed-model-SEHMinus",
+        #                            "uppmax-symex-non-linear-union-mixed-model-REHPlus",
+        #                            "uppmax-symex-non-linear-union-mixed-model-REHMinus",
+        #                            "uppmax-symex-non-linear-union-mixed-model-twoQueue02",
+        #                            "uppmax-symex-non-linear-union-mixed-model-twoQueue05",
+        #                            "uppmax-symex-non-linear-union-mixed-model-twoQueue08"
+        #                            ],
+        # "CEGAR-linear-minimal": ["uppmax-CEGAR-linear-fixed-heuristic-random",
+        #                          "uppmax-CEGAR-linear-minimal-linear-model-SEHPlus", "uppmax-CEGAR-linear-minimal-linear-model-SEHMinus",
+        #                          "uppmax-CEGAR-linear-minimal-linear-model-REHPlus", "uppmax-CEGAR-linear-minimal-linear-model-REHMinus",
+        #                          "uppmax-CEGAR-linear-minimal-mixed-model-rank",
+        #                          "uppmax-CEGAR-linear-minimal-mixed-model-score",
+        #                          "uppmax-CEGAR-linear-minimal-mixed-model-SEHPlus",
+        #                          "uppmax-CEGAR-linear-minimal-mixed-model-SEHMinus",
+        #                          "uppmax-CEGAR-linear-minimal-mixed-model-REHPlus",
+        #                          "uppmax-CEGAR-linear-minimal-mixed-model-REHMinus",
+        #                          ],
+        # "symex-linear-minimal": ["uppmax-symex-linear-fixed-heuristic-random",
+        #                          "uppmax-symex-linear-minimal-linear-model-SEHPlus", "uppmax-symex-linear-minimal-linear-model-SEHMinus",
+        #                          "uppmax-symex-linear-minimal-linear-model-REHPlus", "uppmax-symex-linear-minimal-linear-model-REHMinus",
+        #                          "uppmax-symex-linear-minimal-mixed-model-rank",
+        #                          "uppmax-symex-linear-minimal-mixed-model-score",
+        #                          "uppmax-symex-linear-minimal-mixed-model-SEHPlus",
+        #                          "uppmax-symex-linear-minimal-mixed-model-SEHMinus",
+        #                          "uppmax-symex-linear-minimal-mixed-model-REHPlus",
+        #                          "uppmax-symex-linear-minimal-mixed-model-REHMinus",
+        #                          "uppmax-symex-linear-minimal-mixed-model-twoQueue02",
+        #                          "uppmax-symex-linear-minimal-mixed-model-twoQueue05",
+        #                          "uppmax-symex-linear-minimal-mixed-model-twoQueue08",
+        #                          "uppmax-symex-linear-minimal-mixed-model-schedule10",
+        #                          "uppmax-symex-linear-minimal-mixed-model-schedule100",
+        #                          "uppmax-symex-linear-minimal-mixed-model-schedule1000"
+        #                          ],
+        # "CEGAR-non-linear-minimal": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
+        #                              "uppmax-CEGAR-non-linear-minimal-non-linear-model-SEHPlus",
+        #                              "uppmax-CEGAR-non-linear-minimal-non-linear-model-SEHMinus",
+        #                              "uppmax-CEGAR-non-linear-minimal-non-linear-model-REHPlus",
+        #                              "uppmax-CEGAR-non-linear-minimal-non-linear-model-REHMinus",
+        #                              "uppmax-CEGAR-non-linear-minimal-mixed-model-rank",
+        #                              "uppmax-CEGAR-non-linear-minimal-mixed-model-score",
+        #                              "uppmax-CEGAR-non-linear-minimal-mixed-model-SEHPlus",
+        #                              "uppmax-CEGAR-non-linear-minimal-mixed-model-SEHMinus",
+        #                              "uppmax-CEGAR-non-linear-minimal-mixed-model-REHPlus",
+        #                              "uppmax-CEGAR-non-linear-minimal-mixed-model-REHMinus",
+        #                              ],
+        # "symex-non-linear-minimal": ["uppmax-symex-non-linear-fixed-heuristic-random",
+        #                              "uppmax-symex-non-linear-minimal-non-linear-model-SEHPlus",
+        #                              "uppmax-symex-non-linear-minimal-non-linear-model-SEHMinus",
+        #                              "uppmax-symex-non-linear-minimal-non-linear-model-REHPlus",
+        #                              "uppmax-symex-non-linear-minimal-non-linear-model-REHMinus",
+        #                              "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue02",
+        #                              "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue05",
+        #                              "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue08",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-rank",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-score",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-SEHPlus",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-SEHMinus",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-REHPlus",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-REHMinus",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-twoQueue02",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-twoQueue05",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-twoQueue08",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-schedule10",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-schedule100",
+        #                              "uppmax-symex-non-linear-minimal-mixed-model-schedule1000"
+        #                              ],
+        #
+        "CEGAR-linear-common": ["uppmax-CEGAR-linear-fixed-heuristic-random",
+                                # "uppmax-CEGAR-linear-common-linear-model-rank",
+                                # "uppmax-CEGAR-linear-common-linear-model-score",
+                                #  "uppmax-CEGAR-linear-common-linear-model-SEHPlus",
+                                #  "uppmax-CEGAR-linear-common-linear-model-SEHMinus",
+                                #  "uppmax-CEGAR-linear-common-linear-model-REHPlus",
+                                #  "uppmax-CEGAR-linear-common-linear-model-REHMinus",
+                                 "uppmax-CEGAR-linear-common-mixed-model-rank",
+                                 "uppmax-CEGAR-linear-common-mixed-model-score",
+                                 "uppmax-CEGAR-linear-common-mixed-model-SEHPlus",
+                                 "uppmax-CEGAR-linear-common-mixed-model-SEHMinus",
+                                 "uppmax-CEGAR-linear-common-mixed-model-REHPlus",
+                                 "uppmax-CEGAR-linear-common-mixed-model-REHMinus",
                                  ],
-        "symex-linear-minimal": ["uppmax-symex-linear-fixed-heuristic-random",
-                                 "uppmax-symex-linear-minimal-linear-model-SEHPlus", "uppmax-symex-linear-minimal-linear-model-SEHMinus",
-                                 "uppmax-symex-linear-minimal-linear-model-REHPlus", "uppmax-symex-linear-minimal-linear-model-REHMinus",
-                                 # "uppmax-symex-linear-minimal-mixed-model-SEHPlus",
-                                 # "uppmax-symex-linear-minimal-mixed-model-SEHMinus",
-                                 # "uppmax-symex-linear-minimal-mixed-model-REHPlus",
-                                 # "uppmax-symex-linear-minimal-mixed-model-REHMinus",
-                                 # "uppmax-symex-linear-minimal-mixed-model-twoQueue02",
-                                 # "uppmax-symex-linear-minimal-mixed-model-twoQueue05",
-                                 # "uppmax-symex-linear-minimal-mixed-model-twoQueue08"
+        "symex-linear-common": ["uppmax-symex-linear-fixed-heuristic-random",
+        #                         "uppmax-symex-linear-common-linear-model-rank",
+        #                         "uppmax-symex-linear-common-linear-model-score",
+        #                          "uppmax-symex-linear-common-linear-model-SEHPlus",
+        #                          "uppmax-symex-linear-common-linear-model-SEHMinus",
+        #                          "uppmax-symex-linear-common-linear-model-REHPlus",
+        #                          "uppmax-symex-linear-common-linear-model-REHMinus",
+        #                         "uppmax-symex-linear-common-linear-model-schedule10",
+        #                         "uppmax-symex-linear-common-linear-model-schedule100",
+        #                         "uppmax-symex-linear-common-linear-model-schedule1000",
+                                 "uppmax-symex-linear-common-mixed-model-rank",
+                                 "uppmax-symex-linear-common-mixed-model-score",
+                                 "uppmax-symex-linear-common-mixed-model-SEHPlus",
+                                 "uppmax-symex-linear-common-mixed-model-SEHMinus",
+                                 "uppmax-symex-linear-common-mixed-model-REHPlus",
+                                 "uppmax-symex-linear-common-mixed-model-REHMinus",
+                                 "uppmax-symex-linear-common-mixed-model-twoQueue02",
+                                 "uppmax-symex-linear-common-mixed-model-twoQueue05",
+                                 "uppmax-symex-linear-common-mixed-model-twoQueue08",
+                                "uppmax-symex-linear-common-mixed-model-schedule10",
+                                "uppmax-symex-linear-common-mixed-model-schedule100",
+                                "uppmax-symex-linear-common-mixed-model-schedule1000"
                                  ],
-        "CEGAR-non-linear-minimal": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
-                                     "uppmax-CEGAR-non-linear-minimal-non-linear-model-SEHPlus",
-                                     "uppmax-CEGAR-non-linear-minimal-non-linear-model-SEHMinus",
-                                     "uppmax-CEGAR-non-linear-minimal-non-linear-model-REHPlus",
-                                     "uppmax-CEGAR-non-linear-minimal-non-linear-model-REHMinus",
-                                     # "uppmax-CEGAR-non-linear-minimal-mixed-model-SEHPlus",
-                                     # "uppmax-CEGAR-non-linear-minimal-mixed-model-SEHMinus",
-                                     # "uppmax-CEGAR-non-linear-minimal-mixed-model-REHPlus",
-                                     # "uppmax-CEGAR-non-linear-minimal-mixed-model-REHMinus",
+        "CEGAR-non-linear-common": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
+                                    # "uppmax-CEGAR-non-linear-common-non-linear-model-rank",
+                                    # "uppmax-CEGAR-non-linear-common-non-linear-model-score",
+                                    #  "uppmax-CEGAR-non-linear-common-non-linear-model-SEHPlus",
+                                    #  "uppmax-CEGAR-non-linear-common-non-linear-model-SEHMinus",
+                                    #  "uppmax-CEGAR-non-linear-common-non-linear-model-REHPlus",
+                                    #  "uppmax-CEGAR-non-linear-common-non-linear-model-REHMinus",
+                                     "uppmax-CEGAR-non-linear-common-mixed-model-rank",
+                                     "uppmax-CEGAR-non-linear-common-mixed-model-score",
+                                     "uppmax-CEGAR-non-linear-common-mixed-model-SEHPlus",
+                                     "uppmax-CEGAR-non-linear-common-mixed-model-SEHMinus",
+                                     "uppmax-CEGAR-non-linear-common-mixed-model-REHPlus",
+                                     "uppmax-CEGAR-non-linear-common-mixed-model-REHMinus",
                                      ],
-        "symex-non-linear-minimal": ["uppmax-symex-non-linear-fixed-heuristic-random",
-                                     "uppmax-symex-non-linear-minimal-non-linear-model-SEHPlus",
-                                     "uppmax-symex-non-linear-minimal-non-linear-model-SEHMinus",
-                                     "uppmax-symex-non-linear-minimal-non-linear-model-REHPlus",
-                                     "uppmax-symex-non-linear-minimal-non-linear-model-REHMinus",
-                                     "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue02",
-                                     "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue05",
-                                     "uppmax-symex-non-linear-minimal-non-linear-model-twoQueue08",
-                                     # "uppmax-symex-non-linear-minimal-mixed-model-SEHPlus",
-                                     # "uppmax-symex-non-linear-minimal-mixed-model-SEHMinus",
-                                     # "uppmax-symex-non-linear-minimal-mixed-model-REHPlus",
-                                     # "uppmax-symex-non-linear-minimal-mixed-model-REHMinus",
-                                     # "uppmax-symex-non-linear-minimal-mixed-model-twoQueue02",
-                                     # "uppmax-symex-non-linear-minimal-mixed-model-twoQueue05",
-                                     # "uppmax-symex-non-linear-minimal-mixed-model-twoQueue08"
+        "symex-non-linear-common": ["uppmax-symex-non-linear-fixed-heuristic-random",
+                                    # "uppmax-symex-non-linear-common-non-linear-model-rank",
+                                    # "uppmax-symex-non-linear-common-non-linear-model-score",
+                                    #  "uppmax-symex-non-linear-common-non-linear-model-SEHPlus",
+                                    #  "uppmax-symex-non-linear-common-non-linear-model-SEHMinus",
+                                    #  "uppmax-symex-non-linear-common-non-linear-model-REHPlus",
+                                    #  "uppmax-symex-non-linear-common-non-linear-model-REHMinus",
+                                    #  "uppmax-symex-non-linear-common-non-linear-model-twoQueue02",
+                                    #  "uppmax-symex-non-linear-common-non-linear-model-twoQueue05",
+                                    #  "uppmax-symex-non-linear-common-non-linear-model-twoQueue08",
+                                    # "uppmax-symex-non-linear-common-non-linear-model-schedule10",
+                                    # "uppmax-symex-non-linear-common-non-linear-model-schedule100",
+                                    # "uppmax-symex-non-linear-common-non-linear-model-schedule1000",
+                                     "uppmax-symex-non-linear-common-mixed-model-rank",
+                                     "uppmax-symex-non-linear-common-mixed-model-score",
+                                     "uppmax-symex-non-linear-common-mixed-model-SEHPlus",
+                                     "uppmax-symex-non-linear-common-mixed-model-SEHMinus",
+                                     "uppmax-symex-non-linear-common-mixed-model-REHPlus",
+                                     "uppmax-symex-non-linear-common-mixed-model-REHMinus",
+                                     "uppmax-symex-non-linear-common-mixed-model-twoQueue02",
+                                     "uppmax-symex-non-linear-common-mixed-model-twoQueue05",
+                                     "uppmax-symex-non-linear-common-mixed-model-twoQueue08",
+                                     "uppmax-symex-non-linear-common-mixed-model-schedule10",
+                                     "uppmax-symex-non-linear-common-mixed-model-schedule100",
+                                     "uppmax-symex-non-linear-common-mixed-model-schedule1000"
                                      ],
 
         # "CEGAR-linear-train+valid-union": ["uppmax-CEGAR-linear-train+valid-union-random-869",
@@ -130,8 +222,8 @@ def summarize_excel_files():
     with pd.ExcelWriter(summary_file) as writer:
         for k in excel_files_dict:
             excel_files = excel_files_dict[k]
-            columns = ["category"] + ["total","original_solved","original_safe", "original_unsafe", "original_avg_t","original_avg_t_s"] + manual_flatten(
-                [[f + "_solved",f + "_safe", f + "_unsafe", f + "_avg_t",f + "_avg_t_s"] for f in excel_files])
+            columns = ["category"] + ["total","original_solved","original_safe", "original_unsafe", "original_avg_t","original_avg_t_s","original_avg_t_cs","original_avg_t_ocs"] + manual_flatten(
+                [[f + "_solved",f + "_safe", f + "_unsafe", f + "_avg_t",f + "_avg_t_s",f + "_avg_t_cs",f+"_avg_t_ocs"] for f in excel_files])
             output_dict = {x: [] for x in columns}
             engine = "symex" if "symex" in excel_files[0] else "CEGAR"
 
@@ -140,6 +232,7 @@ def summarize_excel_files():
                 "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" +
                 excel_files[0] + ".xlsx",
                 sheet_name="category_summary")
+
 
             output_dict["total"] = ["total"] + solvability_dict["number_predicted"]
 
@@ -150,10 +243,16 @@ def summarize_excel_files():
             output_dict["original_safe"] = ["safe"] + solvability_dict["eldarica_" + engine + "_original_safe"]
             output_dict["original_unsafe"] = ["unsafe"] + solvability_dict["eldarica_" + engine + "_original_unsafe"]
             solving_time_list=solvability_dict["eldarica_" + engine + "_original_solving_time"]
-            averge_solving_time_list,averge_solving_time_solved_list=compute_average_solving_time(output_dict["total"],output_dict["original_solved"] ,solving_time_list)
-            output_dict["original_avg_t"] = ["avg_t"] + averge_solving_time_list
-            output_dict["original_avg_t_s"] = ["avg_t_s"] + averge_solving_time_solved_list
+            common_solving_time_list = solvability_dict["eldarica_" + engine + "_original_common_solving_time"]
+            common_original_solving_time_list = solvability_dict["eldarica_" + engine + "_original_common_original_solving_time"]
+            common_solving_count_list = solvability_dict["eldarica_" + engine + "_original_common_solving_count"]
+            averge_solving_time_list,averge_solving_time_solved_list,averge_solving_common_solving_time_list,averge_solving_common_original_solving_time_list=compute_average_solving_time(output_dict["total"],output_dict["original_solved"] ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list)
+            output_dict["original_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in averge_solving_time_list]
+            output_dict["original_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in averge_solving_time_solved_list]
+            output_dict["original_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in averge_solving_common_solving_time_list]
+            output_dict["original_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in averge_solving_common_original_solving_time_list]
             output_dict["category"] = [" "] + solvability_dict["category"]
+
 
             # get safe and unsafe from other excels
             for f in excel_files:
@@ -167,11 +266,23 @@ def summarize_excel_files():
                 output_dict[f + "_unsafe"] = ["unsafe"] + solvability_dict[
                     "vb_eldarica_" + engine + "_prioritize_unsafe"]
                 solving_time_list=solvability_dict["vb_eldarica_" + engine + "_prioritize_solving_time"]
-                averge_solving_time_list,averge_solving_time_solved_list = compute_average_solving_time(output_dict["total"],output_dict[f + "_solved"] , solving_time_list)
-                output_dict[f + "_avg_t"] = ["avg_t"] + averge_solving_time_list
-                output_dict[f + "_avg_t_s"] = ["avg_t_s"] + averge_solving_time_solved_list
+                common_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_solving_time"]
+                common_original_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_original_solving_time"]
+                common_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_solving_count"]
+                averge_solving_time_list,averge_solving_time_solved_list,averge_solving_common_solving_time_list,averge_solving_common_original_solving_time_list = compute_average_solving_time(output_dict["total"],output_dict[f + "_solved"]
+                                                                                                                                                ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list)
+                output_dict[f + "_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in averge_solving_time_list]
+                output_dict[f + "_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in averge_solving_time_solved_list]
+                output_dict[f + "_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in averge_solving_common_solving_time_list]
+                output_dict[f + "_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in averge_solving_common_original_solving_time_list]
 
+
+            # for x in output_dict:
+            #     print(x,len(output_dict[x]))
             pd.DataFrame(pd.DataFrame(output_dict)).to_excel(writer, sheet_name=k)
+
+            #get common solved time
+
 
     # merge some cells
     for e_k in excel_files_dict:
@@ -182,7 +293,7 @@ def summarize_excel_files():
         sheet = workbook[e_k]
 
         # Merge cells
-        sheet.merge_cells('D1:H1')  # Merge cells in the range C1 to E1
+        sheet.merge_cells('D1:J1')  # Merge cells in the range C1 to E1
         sheet["D1"].value = "Original"
 
         merge_dict = {f: [] for f in excel_files}
@@ -190,7 +301,8 @@ def summarize_excel_files():
         for f in excel_files:
             for row in sheet["E1:" + last_column_letter + "1"]:
                 for cell in row:
-                    if f + "_solved" == cell.value or f + "_safe" == cell.value or f + "_unsafe" == cell.value or f + "_avg_t" == cell.value or f + "_avg_t_s" == cell.value:
+                    if (f + "_solved" == cell.value or f + "_safe" == cell.value or f + "_unsafe" == cell.value or f + "_avg_t" == cell.value or
+                            f + "_avg_t_s" == cell.value or f + "_avg_t_cs" == cell.value or f + "_avg_t_ocs" == cell.value):
                         merge_dict[f].append(cell.coordinate)
         for k in merge_dict:
             sheet.merge_cells(merge_dict[k][0] + ":" + merge_dict[k][-1])
@@ -205,21 +317,39 @@ def summarize_excel_files():
             sheet["A" + str(count)].comment = None
             sheet.add_image(img, 'A' + str(count))
             count += 35
-            
+
         #compute improve percentage for absolute solving time
         row =13 if "non-linear" in e_k else 15
-        oirginal_st_column_number=7
-        oirginal_st_value=sheet[get_column_letter(oirginal_st_column_number)+str(row)].value
-        sheet["B"+str(row+2)].value="improve percentage"
-        current_st_column_number=oirginal_st_column_number+5
-        while sheet[get_column_letter(current_st_column_number)+str(row)].value is not None:
-            target_st_value=sheet[get_column_letter(current_st_column_number)+str(row)].value
-            improve_percentage=(oirginal_st_value-target_st_value)/oirginal_st_value
-            sheet[get_column_letter(current_st_column_number)+str(row+2)].value=float_to_percentage(improve_percentage)
-            current_st_column_number = current_st_column_number + 5
+        column_number = 7
+        sheet["B" + str(row + 2)].value = "improve percentage"
+
+        oirginal_st_column_number=7 #avg_t
+        compute_improve_percentage(sheet, oirginal_st_column_number, row, column_number)
+        oirginal_st_column_number=8 #avg_t_s
+        compute_improve_percentage(sheet, oirginal_st_column_number, row, column_number)
+        oirginal_st_column_number=9 #avg_t_cs
+        compute_imprived_percentage_for_common_solving_time(sheet, oirginal_st_column_number, row, column_number)
 
         # Save the modified workbook
         workbook.save(summary_file)
+
+def compute_imprived_percentage_for_common_solving_time(sheet,oirginal_st_column_number,row,column_number):
+    current_st_column_number=oirginal_st_column_number
+    while sheet[get_column_letter(current_st_column_number) + str(row)].value is not None:
+        target_st_value = float(sheet[get_column_letter(current_st_column_number) + str(row)].value) # avg_t_cs
+        oirginal_st_value = float(sheet[get_column_letter(current_st_column_number + 1) + str(row)].value)  # avg_t_ocs
+        improve_percentage = (oirginal_st_value - target_st_value) / oirginal_st_value
+        sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(improve_percentage)
+        current_st_column_number = current_st_column_number + column_number
+def compute_improve_percentage(sheet,oirginal_st_column_number,row,column_number):
+    oirginal_st_value = float(sheet[get_column_letter(oirginal_st_column_number) + str(row)].value)
+    current_st_column_number = oirginal_st_column_number + column_number
+    while sheet[get_column_letter(current_st_column_number) + str(row)].value is not None:
+        target_st_value = float(sheet[get_column_letter(current_st_column_number) + str(row)].value)
+        improve_percentage = (oirginal_st_value - target_st_value) / oirginal_st_value
+        sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(
+            improve_percentage)
+        current_st_column_number = current_st_column_number + column_number
 
 def get_column_letter(col_num):
     letter = ''
@@ -228,14 +358,18 @@ def get_column_letter(col_num):
         letter = chr(65 + remainder) + letter
     return letter
 
-def compute_average_solving_time(list_total, list_solved, list_time):
+def compute_average_solving_time(list_total, list_solved, list_time,list_common_time,common_solving_count,list_common_original_time):
     averge_solving_time_list=[]
     averge_solving_time_solved_list = []
+    averge_solving_common_solving_time_list = []
+    averge_solving_common_original_solving_time_list=[]
+    #compute average solving time
     for x, y in zip(list_total[1:], list_time):
         if isinstance(x, str):
             averge_solving_time_list.append(x)
         else:
             averge_solving_time_list.append(y / x)
+    #compute average solving time for solved
     for t,s,time in zip(list_total[1:],list_solved[1:], list_time):
         if isinstance(t, str):
             averge_solving_time_solved_list.append(t)
@@ -244,7 +378,25 @@ def compute_average_solving_time(list_total, list_solved, list_time):
         else:
             numerator = (time - (t - s) * benchmark_timeout)
             averge_solving_time_solved_list.append(numerator/ s)
-    return averge_solving_time_list,averge_solving_time_solved_list
+    #compute average solving time for common solved
+    for x, y,z in zip(list_total[1:], list_common_time,common_solving_count):
+        if isinstance(x, str):
+            averge_solving_common_solving_time_list.append(x)
+        elif z == 0:
+            averge_solving_common_solving_time_list.append(0)
+        else:
+            averge_solving_common_solving_time_list.append(y / z)
+    # compute average solving time for original common solved
+    for x, y, z in zip(list_total[1:], list_common_original_time, common_solving_count):
+        if isinstance(x, str):
+            averge_solving_common_original_solving_time_list.append(x)
+        elif z == 0:
+            averge_solving_common_original_solving_time_list.append(0)
+        else:
+            averge_solving_common_original_solving_time_list.append(y / z)
+
+
+    return averge_solving_time_list,averge_solving_time_solved_list,averge_solving_common_solving_time_list,averge_solving_common_original_solving_time_list
 def draw_solving_time_scatter(excel_file, compare_benchmark_name):
     # Read the Excel file into a Pandas DataFrame
     solvability_dict = read_solvability_dict(excel_file)
