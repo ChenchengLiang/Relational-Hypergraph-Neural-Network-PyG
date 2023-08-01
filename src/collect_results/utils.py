@@ -317,7 +317,7 @@ def summarize_excel_files():
         sheet = workbook[e_k]
 
         # Merge cells
-        sheet.merge_cells('D1:L1')  # Merge cells in the range C1 to E1
+        sheet.merge_cells('D1:L1')  # Merge cells in the range
         sheet["D1"].value = "Original"
 
         merge_dict = {f: [] for f in excel_files}
@@ -342,21 +342,27 @@ def summarize_excel_files():
             sheet.add_image(img, 'A' + str(count))
             count += 35 #row number
 
-        #compute improve percentage for absolute solving time
+        #compute improve percentage for solving time
         row =13 if "non-linear" in e_k else 15
         column_number = 9
         sheet["B" + str(row + 2)].value = "improve percentage"
 
+        oirginal_column_number = 4  # solved
+        compute_improved_percentage(sheet, oirginal_column_number, row, column_number)
+        oirginal_column_number = 5  # safe
+        compute_improved_percentage(sheet, oirginal_column_number, row, column_number)
+        oirginal_column_number = 6  # unsafe
+        compute_improved_percentage(sheet, oirginal_column_number, row, column_number)
         oirginal_st_column_number=7 #avg_t
-        compute_improved_percentage(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, row, column_number)
         oirginal_st_column_number=8 #avg_t_s
-        compute_improved_percentage(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, row, column_number)
         oirginal_st_column_number=9 #avg_t_cs
         compute_improved_percentage_for_common_solving_time(sheet, oirginal_st_column_number, row, column_number)
         oirginal_st_column_number = 11  # avg_t_safe
-        compute_improved_percentage(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, row, column_number)
         oirginal_st_column_number = 12  # avg_t_unsafe
-        compute_improved_percentage(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, row, column_number)
 
         # Save the modified workbook
         workbook.save(summary_file)
@@ -369,12 +375,21 @@ def compute_improved_percentage_for_common_solving_time(sheet,oirginal_st_column
         improve_percentage = (oirginal_st_value - target_st_value) / oirginal_st_value
         sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(improve_percentage)
         current_st_column_number = current_st_column_number + column_number
-def compute_improved_percentage(sheet,oirginal_st_column_number,row,column_number):
+def compute_improved_percentage_solving_time(sheet,oirginal_st_column_number,row,column_number):
     oirginal_st_value = float(sheet[get_column_letter(oirginal_st_column_number) + str(row)].value)
     current_st_column_number = oirginal_st_column_number + column_number
     while sheet[get_column_letter(current_st_column_number) + str(row)].value is not None:
         target_st_value = float(sheet[get_column_letter(current_st_column_number) + str(row)].value)
         improve_percentage = (oirginal_st_value - target_st_value) / oirginal_st_value
+        sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(
+            improve_percentage)
+        current_st_column_number = current_st_column_number + column_number
+def compute_improved_percentage(sheet,oirginal_column_number,row,column_number):
+    oirginal_st_value = float(sheet[get_column_letter(oirginal_column_number) + str(row)].value)
+    current_st_column_number = oirginal_column_number + column_number
+    while sheet[get_column_letter(current_st_column_number) + str(row)].value is not None:
+        target_st_value = float(sheet[get_column_letter(current_st_column_number) + str(row)].value)
+        improve_percentage = (target_st_value-oirginal_st_value) / oirginal_st_value
         sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(
             improve_percentage)
         current_st_column_number = current_st_column_number + column_number
