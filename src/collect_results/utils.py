@@ -235,8 +235,8 @@ def summarize_excel_files():
     with pd.ExcelWriter(summary_file) as writer:
         for k in excel_files_dict:
             excel_files = excel_files_dict[k]
-            columns = ["category"] + ["total","original_solved","original_safe", "original_unsafe", "original_avg_t","original_avg_t_s","original_avg_t_cs","original_avg_t_ocs"] + manual_flatten(
-                [[f + "_solved",f + "_safe", f + "_unsafe", f + "_avg_t",f + "_avg_t_s",f + "_avg_t_cs",f+"_avg_t_ocs"] for f in excel_files])
+            columns = ["category"] + ["total","original_solved","original_safe", "original_unsafe", "original_avg_t","original_avg_t_s","original_avg_t_cs","original_avg_t_ocs","original_avg_t_safe","original_avg_t_unsafe"] + manual_flatten(
+                [[f + "_solved",f + "_safe", f + "_unsafe", f + "_avg_t",f + "_avg_t_s",f + "_avg_t_cs",f+"_avg_t_ocs",f+"_avg_t_safe",f+"_avg_t_unsafe"] for f in excel_files])
             output_dict = {x: [] for x in columns}
             engine = "symex" if "symex" in excel_files[0] else "CEGAR"
 
@@ -245,7 +245,6 @@ def summarize_excel_files():
                 "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" +
                 excel_files[0] + ".xlsx",
                 sheet_name="category_summary")
-
 
             output_dict["total"] = ["total"] + solvability_dict["number_predicted"]
 
@@ -259,11 +258,18 @@ def summarize_excel_files():
             common_solving_time_list = solvability_dict["eldarica_" + engine + "_original_common_solving_time"]
             common_original_solving_time_list = solvability_dict["eldarica_" + engine + "_original_common_original_solving_time"]
             common_solving_count_list = solvability_dict["eldarica_" + engine + "_original_common_solving_count"]
-            averge_solving_time_list,averge_solving_time_solved_list,averge_solving_common_solving_time_list,averge_solving_common_original_solving_time_list=compute_average_solving_time(output_dict["total"],output_dict["original_solved"] ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list)
-            output_dict["original_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in averge_solving_time_list]
-            output_dict["original_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in averge_solving_time_solved_list]
-            output_dict["original_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in averge_solving_common_solving_time_list]
-            output_dict["original_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in averge_solving_common_original_solving_time_list]
+            sat_solving_time_list=solvability_dict["eldarica_" + engine + "_original_sat_solving_time"]
+            sat_solving_count_list=solvability_dict["eldarica_" + engine + "_original_safe"]
+            unsat_solving_time_list=solvability_dict["eldarica_" + engine + "_original_unsat_solving_time"]
+            unsat_solving_count_list=solvability_dict["eldarica_" + engine + "_original_unsafe"]
+            average_solving_time_list,average_solving_time_solved_list,average_solving_common_solving_time_list,average_solving_common_original_solving_time_list,average_safe_solving_time_list,average_unsafe_solving_time_list = compute_average_solving_time(
+                output_dict["total"],output_dict["original_solved"] ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list,sat_solving_time_list,sat_solving_count_list,unsat_solving_time_list,unsat_solving_count_list)
+            output_dict["original_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_list]
+            output_dict["original_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_solved_list]
+            output_dict["original_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_solving_time_list]
+            output_dict["original_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_original_solving_time_list]
+            output_dict["original_avg_t_safe"] = ["avg_t_safe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_safe_solving_time_list]
+            output_dict["original_avg_t_unsafe"] = ["avg_t_unsafe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_unsafe_solving_time_list]
             output_dict["category"] = [" "] + solvability_dict["category"]
 
 
@@ -282,13 +288,18 @@ def summarize_excel_files():
                 common_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_solving_time"]
                 common_original_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_original_solving_time"]
                 common_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_solving_count"]
-                averge_solving_time_list,averge_solving_time_solved_list,averge_solving_common_solving_time_list,averge_solving_common_original_solving_time_list = compute_average_solving_time(output_dict["total"],output_dict[f + "_solved"]
-                                                                                                                                                ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list)
-                output_dict[f + "_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in averge_solving_time_list]
-                output_dict[f + "_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in averge_solving_time_solved_list]
-                output_dict[f + "_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in averge_solving_common_solving_time_list]
-                output_dict[f + "_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in averge_solving_common_original_solving_time_list]
-
+                sat_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_sat_solving_time"]
+                sat_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"]
+                unsat_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_unsat_solving_time"]
+                unsat_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_unsafe"]
+                average_solving_time_list,average_solving_time_solved_list,average_solving_common_solving_time_list,average_solving_common_original_solving_time_list,average_safe_solving_time_list,average_unsafe_solving_time_list = compute_average_solving_time(output_dict["total"],output_dict[f + "_solved"]
+                ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list,sat_solving_time_list,sat_solving_count_list,unsat_solving_time_list,unsat_solving_count_list)
+                output_dict[f + "_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_list]
+                output_dict[f + "_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_solved_list]
+                output_dict[f + "_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_solving_time_list]
+                output_dict[f + "_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_original_solving_time_list]
+                output_dict[f + "_avg_t_safe"] = ["avg_t_safe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_safe_solving_time_list]
+                output_dict[f + "_avg_t_unsafe"] = ["avg_t_unsafe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_unsafe_solving_time_list]
 
             # for x in output_dict:
             #     print(x,len(output_dict[x]))
@@ -306,7 +317,7 @@ def summarize_excel_files():
         sheet = workbook[e_k]
 
         # Merge cells
-        sheet.merge_cells('D1:J1')  # Merge cells in the range C1 to E1
+        sheet.merge_cells('D1:L1')  # Merge cells in the range C1 to E1
         sheet["D1"].value = "Original"
 
         merge_dict = {f: [] for f in excel_files}
@@ -315,38 +326,42 @@ def summarize_excel_files():
             for row in sheet["E1:" + last_column_letter + "1"]:
                 for cell in row:
                     if (f + "_solved" == cell.value or f + "_safe" == cell.value or f + "_unsafe" == cell.value or f + "_avg_t" == cell.value or
-                            f + "_avg_t_s" == cell.value or f + "_avg_t_cs" == cell.value or f + "_avg_t_ocs" == cell.value):
+                            f + "_avg_t_s" == cell.value or f + "_avg_t_cs" == cell.value or f + "_avg_t_ocs" == cell.value or f + "_avg_t_safe" == cell.value or f + "_avg_t_unsafe" == cell.value):
                         merge_dict[f].append(cell.coordinate)
         for k in merge_dict:
             sheet.merge_cells(merge_dict[k][0] + ":" + merge_dict[k][-1])
             sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "").replace("uppmax-", "")
 
         # add scatter plot inside
-        count = 18
+        count = 18 #row number
         for f in excel_files:
             img = Image(
                 "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".png")
             sheet["A" + str(count)] = ''
             sheet["A" + str(count)].comment = None
             sheet.add_image(img, 'A' + str(count))
-            count += 35
+            count += 35 #row number
 
         #compute improve percentage for absolute solving time
         row =13 if "non-linear" in e_k else 15
-        column_number = 7
+        column_number = 9
         sheet["B" + str(row + 2)].value = "improve percentage"
 
         oirginal_st_column_number=7 #avg_t
-        compute_improve_percentage(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage(sheet, oirginal_st_column_number, row, column_number)
         oirginal_st_column_number=8 #avg_t_s
-        compute_improve_percentage(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage(sheet, oirginal_st_column_number, row, column_number)
         oirginal_st_column_number=9 #avg_t_cs
-        compute_imprived_percentage_for_common_solving_time(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_for_common_solving_time(sheet, oirginal_st_column_number, row, column_number)
+        oirginal_st_column_number = 11  # avg_t_safe
+        compute_improved_percentage(sheet, oirginal_st_column_number, row, column_number)
+        oirginal_st_column_number = 12  # avg_t_unsafe
+        compute_improved_percentage(sheet, oirginal_st_column_number, row, column_number)
 
         # Save the modified workbook
         workbook.save(summary_file)
 
-def compute_imprived_percentage_for_common_solving_time(sheet,oirginal_st_column_number,row,column_number):
+def compute_improved_percentage_for_common_solving_time(sheet,oirginal_st_column_number,row,column_number):
     current_st_column_number=oirginal_st_column_number
     while sheet[get_column_letter(current_st_column_number) + str(row)].value is not None:
         target_st_value = float(sheet[get_column_letter(current_st_column_number) + str(row)].value) # avg_t_cs
@@ -354,7 +369,7 @@ def compute_imprived_percentage_for_common_solving_time(sheet,oirginal_st_column
         improve_percentage = (oirginal_st_value - target_st_value) / oirginal_st_value
         sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(improve_percentage)
         current_st_column_number = current_st_column_number + column_number
-def compute_improve_percentage(sheet,oirginal_st_column_number,row,column_number):
+def compute_improved_percentage(sheet,oirginal_st_column_number,row,column_number):
     oirginal_st_value = float(sheet[get_column_letter(oirginal_st_column_number) + str(row)].value)
     current_st_column_number = oirginal_st_column_number + column_number
     while sheet[get_column_letter(current_st_column_number) + str(row)].value is not None:
@@ -371,45 +386,65 @@ def get_column_letter(col_num):
         letter = chr(65 + remainder) + letter
     return letter
 
-def compute_average_solving_time(list_total, list_solved, list_time,list_common_time,common_solving_count,list_common_original_time):
-    averge_solving_time_list=[]
-    averge_solving_time_solved_list = []
-    averge_solving_common_solving_time_list = []
-    averge_solving_common_original_solving_time_list=[]
+def compute_average_solving_time(list_total, list_solved, list_time,list_common_time,common_solving_count,list_common_original_time,sat_solving_time_list,sat_solving_count_list,unsat_solving_time_list,unsat_solving_count_list):
+    average_solving_time_list=[]
+    average_solving_time_solved_list = []
+    average_common_solving_time_list = []
+    average_common_original_solving_time_list=[]
+    average_safe_solving_time_list=[]
+    average_unsafe_solving_time_list=[]
     #compute average solving time
     for x, y in zip(list_total[1:], list_time):
         if isinstance(x, str):
-            averge_solving_time_list.append(x)
+            average_solving_time_list.append(x)
+        elif x == 0:
+            average_solving_time_list.append(0)
         else:
-            averge_solving_time_list.append(y / x)
+            average_solving_time_list.append(y / x)
+    #compute average solving time for safe
+    for x, y, z in zip(list_total[1:], sat_solving_time_list, sat_solving_count_list):
+        if isinstance(x, str):
+            average_safe_solving_time_list.append(x)
+        elif z == 0:
+            average_safe_solving_time_list.append(0)
+        else:
+            average_safe_solving_time_list.append(y / z)
+    #compute average solving time for unsafe
+    for x, y, z in zip(list_total[1:], unsat_solving_time_list, unsat_solving_count_list):
+        if isinstance(x, str):
+            average_unsafe_solving_time_list.append(x)
+        elif z == 0:
+            average_unsafe_solving_time_list.append(0)
+        else:
+            average_unsafe_solving_time_list.append(y / z)
     #compute average solving time for solved
     for t,s,time in zip(list_total[1:],list_solved[1:], list_time):
         if isinstance(t, str):
-            averge_solving_time_solved_list.append(t)
+            average_solving_time_solved_list.append(t)
         elif s==0:
-            averge_solving_time_solved_list.append(0)
+            average_solving_time_solved_list.append(0)
         else:
             numerator = (time - (t - s) * benchmark_timeout)
-            averge_solving_time_solved_list.append(numerator/ s)
+            average_solving_time_solved_list.append(numerator/ s)
     #compute average solving time for common solved
-    for x, y,z in zip(list_total[1:], list_common_time,common_solving_count):
+    for x, y, z in zip(list_total[1:], list_common_time,common_solving_count):
         if isinstance(x, str):
-            averge_solving_common_solving_time_list.append(x)
+            average_common_solving_time_list.append(x)
         elif z == 0:
-            averge_solving_common_solving_time_list.append(0)
+            average_common_solving_time_list.append(0)
         else:
-            averge_solving_common_solving_time_list.append(y / z)
+            average_common_solving_time_list.append(y / z)
     # compute average solving time for original common solved
     for x, y, z in zip(list_total[1:], list_common_original_time, common_solving_count):
         if isinstance(x, str):
-            averge_solving_common_original_solving_time_list.append(x)
+            average_common_original_solving_time_list.append(x)
         elif z == 0:
-            averge_solving_common_original_solving_time_list.append(0)
+            average_common_original_solving_time_list.append(0)
         else:
-            averge_solving_common_original_solving_time_list.append(y / z)
+            average_common_original_solving_time_list.append(y / z)
 
 
-    return averge_solving_time_list,averge_solving_time_solved_list,averge_solving_common_solving_time_list,averge_solving_common_original_solving_time_list
+    return average_solving_time_list,average_solving_time_solved_list,average_common_solving_time_list,average_common_original_solving_time_list,average_safe_solving_time_list,average_unsafe_solving_time_list
 def draw_solving_time_scatter(excel_file, compare_benchmark_name):
     # Read the Excel file into a Pandas DataFrame
     solvability_dict = read_solvability_dict(excel_file)

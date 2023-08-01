@@ -108,7 +108,7 @@ def main():
 
     # linear
     for engine in ["CEGAR","symex"]:
-        for CEOption in ["minimal-linear-model","minimal-mixed-model"]:  # common, "union","union-mixed-model",,"common-linear-model","common-mixed-model"
+        for CEOption in ["minimal-linear-model","minimal-mixed-model","common-linear-model","common-mixed-model"]:  #"union-linear-model","union-mixed-model"
             if engine == "CEGAR":
                 for po in ["rank", "score", "SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
                     comparison_pairs.append(
@@ -123,7 +123,7 @@ def main():
 
     # non-linear
     for engine in ["CEGAR", "symex"]:
-        for CEOption in ["minimal-non-linear-model","minimal-mixed-model"]: #common, "union","union-mixed-model","common-non-linear-model","common-mixed-model"
+        for CEOption in ["minimal-non-linear-model","minimal-mixed-model","common-non-linear-model","common-mixed-model"]: #"union-non-linear-model","union-mixed-model"
             if engine=="CEGAR":
                 for po in ["rank","score","SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
                     comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
@@ -215,7 +215,7 @@ def main():
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):
     categories = get_distinct_category_list(solvability_dict["category"])
     measurements = ["safe", "unsafe", "unknown", "miss info", "solving_time", "common_solving_count",
-                    "common_original_solving_time", "common_solving_time"]
+                    "common_original_solving_time", "common_solving_time","sat_solving_time", "unsat_solving_time"]
     comparison_solver_list = ["vb"]
     for solver in ["golem", "z3"]:
         comparison_solver_list.append(solver)
@@ -388,6 +388,8 @@ def count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_d
     common_solving_time = 0
     common_original_solving_time=0
     common_solving_count = 0
+    sat_solving_time=0
+    unsat_solving_time=0
     original_solver = "vb"
     if "golem" in solver:
         original_solver = "golem"
@@ -395,6 +397,8 @@ def count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_d
         original_solver = "z3"
     if "CEGAR" in solver:
         original_solver = "eldarica_CEGAR_original"
+    if "symex" in solver:
+        original_solver = "eldarica_symex_original"
     if "abstract_term" in solver:
         original_solver = "eldarica_abstract_term"
     if "abstract_oct" in solver:
@@ -420,6 +424,12 @@ def count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_d
                 common_solving_time += st
                 common_original_solving_time += original_st
                 common_solving_count += 1
+            # sat solving time
+            if sa =="safe":
+                sat_solving_time += st
+            if sa =="unsafe":
+                unsat_solving_time += st
+
 
     # eldarica_symex_original_solving_time  vb_eldarica_symex_prioritize_solving_time
 
@@ -431,6 +441,10 @@ def count_satisfiability_and_sum_solving_time(c, m, solvability_dict, category_d
         category_dict[solver + "_" + m].append(common_original_solving_time)
     elif "common_solving_count" == m:
         category_dict[solver + "_" + m].append(common_solving_count)
+    elif "sat_solving_time" == m:
+        category_dict[solver + "_" + m].append(sat_solving_time)
+    elif "unsat_solving_time" == m:
+        category_dict[solver + "_" + m].append(unsat_solving_time)
     else:
         category_dict[solver + "_" + m].append(count)
 
