@@ -132,7 +132,7 @@ def make_dirct(d,mute = False):
         return d
 
 def float_to_percentage(x):
-    return "{:.2%}".format(x)
+    return "{:.1%}".format(x)
 
 def distinct_list(original_list):
     distinct_list = []

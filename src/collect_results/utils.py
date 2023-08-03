@@ -9,58 +9,97 @@ import pandas as pd
 from src.plots import scatter_plot
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
+from openpyxl.styles import PatternFill
 import shutil
-
+green_fill = PatternFill(start_color="FF00FF00",
+                           end_color="FF00FF00",
+                           fill_type="solid")
 import math
 
 
 def summarize_excel_files():
     excel_files_dict = {
-        # "CEGAR-linear-union": ["uppmax-CEGAR-linear-fixed-heuristic-random",
-        #                        "uppmax-CEGAR-linear-union-SEHPlus", "uppmax-CEGAR-linear-union-SEHMinus",
-        #                        "uppmax-CEGAR-linear-union-REHPlus", "uppmax-CEGAR-linear-union-REHMinus",
-        #                        "uppmax-CEGAR-linear-union-mixed-model-SEHPlus",
-        #                        "uppmax-CEGAR-linear-union-mixed-model-SEHMinus",
-        #                        "uppmax-CEGAR-linear-union-mixed-model-REHPlus",
-        #                        "uppmax-CEGAR-linear-union-mixed-model-REHMinus"
-        #                        ],
-        # "symex-linear-union": ["uppmax-symex-linear-fixed-heuristic-random",
-        #                        "uppmax-symex-linear-union-SEHPlus", "uppmax-symex-linear-union-SEHMinus",
-        #                        "uppmax-symex-linear-union-REHPlus", "uppmax-symex-linear-union-REHMinus",
-        #                        "uppmax-symex-linear-union-linear-model-twoQueue02",
-        #                        "uppmax-symex-linear-union-linear-model-twoQueue05",
-        #                        "uppmax-symex-linear-union-linear-model-twoQueue08",
-        #                        "uppmax-symex-linear-union-mixed-model-SEHPlus",
-        #                        "uppmax-symex-linear-union-mixed-model-SEHMinus",
-        #                        "uppmax-symex-linear-union-mixed-model-REHPlus",
-        #                        "uppmax-symex-linear-union-mixed-model-REHMinus",
-        #                        "uppmax-symex-linear-union-mixed-model-REHMinus",
-        #                        "uppmax-symex-linear-union-mixed-model-twoQueue02",
-        #                        "uppmax-symex-linear-union-mixed-model-twoQueue05",
-        #                        "uppmax-symex-linear-union-mixed-model-twoQueue08"
-        #                        ],
-        # "CEGAR-non-linear-union": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
-        #                            "uppmax-CEGAR-non-linear-union-SEHPlus", "uppmax-CEGAR-non-linear-union-SEHMinus",
-        #                            "uppmax-CEGAR-non-linear-union-REHPlus", "uppmax-CEGAR-non-linear-union-REHMinus",
-        #                            "uppmax-CEGAR-non-linear-union-mixed-model-SEHPlus",
-        #                            "uppmax-CEGAR-non-linear-union-mixed-model-SEHMinus",
-        #                            "uppmax-CEGAR-non-linear-union-mixed-model-REHPlus",
-        #                            "uppmax-CEGAR-non-linear-union-mixed-model-REHMinus",
-        #                            ],
-        # "symex-non-linear-union": ["uppmax-symex-non-linear-fixed-heuristic-random",
-        #                            "uppmax-symex-non-linear-union-SEHPlus", "uppmax-symex-non-linear-union-SEHMinus",
-        #                            "uppmax-symex-non-linear-union-REHPlus", "uppmax-symex-non-linear-union-REHMinus",
-        #                            "uppmax-symex-non-linear-union-non-linear-model-twoQueue02",
-        #                            "uppmax-symex-non-linear-union-non-linear-model-twoQueue05",
-        #                            "uppmax-symex-non-linear-union-non-linear-model-twoQueue08",
-        #                            "uppmax-symex-non-linear-union-mixed-model-SEHPlus",
-        #                            "uppmax-symex-non-linear-union-mixed-model-SEHMinus",
-        #                            "uppmax-symex-non-linear-union-mixed-model-REHPlus",
-        #                            "uppmax-symex-non-linear-union-mixed-model-REHMinus",
-        #                            "uppmax-symex-non-linear-union-mixed-model-twoQueue02",
-        #                            "uppmax-symex-non-linear-union-mixed-model-twoQueue05",
-        #                            "uppmax-symex-non-linear-union-mixed-model-twoQueue08"
-        #                            ],
+        "CEGAR-linear-union": ["uppmax-CEGAR-linear-fixed-heuristic-random",
+                                 "uppmax-CEGAR-linear-union-linear-model-rank",
+                                 "uppmax-CEGAR-linear-union-linear-model-score",
+                                 "uppmax-CEGAR-linear-union-linear-model-SEHPlus",
+                                 "uppmax-CEGAR-linear-union-linear-model-SEHMinus",
+                                 "uppmax-CEGAR-linear-union-linear-model-REHPlus",
+                                 "uppmax-CEGAR-linear-union-linear-model-REHMinus",
+                                 "uppmax-CEGAR-linear-union-mixed-model-rank",
+                                 "uppmax-CEGAR-linear-union-mixed-model-score",
+                                 "uppmax-CEGAR-linear-union-mixed-model-SEHPlus",
+                                 "uppmax-CEGAR-linear-union-mixed-model-SEHMinus",
+                                 "uppmax-CEGAR-linear-union-mixed-model-REHPlus",
+                                 "uppmax-CEGAR-linear-union-mixed-model-REHMinus",
+                                 ],
+        "symex-linear-union": ["uppmax-symex-linear-fixed-heuristic-random",
+                                 "uppmax-symex-linear-union-linear-model-rank",
+                                 "uppmax-symex-linear-union-linear-model-score",
+                                 "uppmax-symex-linear-union-linear-model-SEHPlus",
+                                 "uppmax-symex-linear-union-linear-model-SEHMinus",
+                                 "uppmax-symex-linear-union-linear-model-REHPlus",
+                                 "uppmax-symex-linear-union-linear-model-REHMinus",
+                                 "uppmax-symex-linear-union-linear-model-twoQueue02",
+                                 "uppmax-symex-linear-union-linear-model-twoQueue05",
+                                 "uppmax-symex-linear-union-linear-model-twoQueue08",
+                                 "uppmax-symex-linear-union-linear-model-schedule10",
+                                 "uppmax-symex-linear-union-linear-model-schedule100",
+                                 "uppmax-symex-linear-union-linear-model-schedule1000",
+                                 "uppmax-symex-linear-union-mixed-model-rank",
+                                 "uppmax-symex-linear-union-mixed-model-score",
+                                 "uppmax-symex-linear-union-mixed-model-SEHPlus",
+                                 "uppmax-symex-linear-union-mixed-model-SEHMinus",
+                                 "uppmax-symex-linear-union-mixed-model-REHPlus",
+                                 "uppmax-symex-linear-union-mixed-model-REHMinus",
+                                 "uppmax-symex-linear-union-mixed-model-twoQueue02",
+                                 "uppmax-symex-linear-union-mixed-model-twoQueue05",
+                                 "uppmax-symex-linear-union-mixed-model-twoQueue08",
+                                 "uppmax-symex-linear-union-mixed-model-schedule10",
+                                 "uppmax-symex-linear-union-mixed-model-schedule100",
+                                 "uppmax-symex-linear-union-mixed-model-schedule1000"
+                                 ],
+        "CEGAR-non-linear-union": ["uppmax-CEGAR-non-linear-fixed-heuristic-random",
+                                   "uppmax-CEGAR-non-linear-union-non-linear-model-rank",
+                                   "uppmax-CEGAR-non-linear-union-non-linear-model-score",
+                                   "uppmax-CEGAR-non-linear-union-non-linear-model-SEHPlus",
+                                   "uppmax-CEGAR-non-linear-union-non-linear-model-SEHMinus",
+                                   "uppmax-CEGAR-non-linear-union-non-linear-model-REHPlus",
+                                   "uppmax-CEGAR-non-linear-union-non-linear-model-REHMinus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-rank",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-score",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-SEHPlus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-SEHMinus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-REHPlus",
+                                   "uppmax-CEGAR-non-linear-union-mixed-model-REHMinus",
+                                   ],
+        "symex-non-linear-union": ["uppmax-symex-non-linear-fixed-heuristic-random",
+                                   "uppmax-symex-non-linear-union-non-linear-model-rank",
+                                   "uppmax-symex-non-linear-union-non-linear-model-score",
+                                   "uppmax-symex-non-linear-union-non-linear-model-SEHPlus",
+                                   "uppmax-symex-non-linear-union-non-linear-model-SEHMinus",
+                                   "uppmax-symex-non-linear-union-non-linear-model-REHPlus",
+                                   "uppmax-symex-non-linear-union-non-linear-model-REHMinus",
+                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue02",
+                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue05",
+                                   "uppmax-symex-non-linear-union-non-linear-model-twoQueue08",
+                                   "uppmax-symex-non-linear-union-non-linear-model-schedule10",
+                                   "uppmax-symex-non-linear-union-non-linear-model-schedule100",
+                                   "uppmax-symex-non-linear-union-non-linear-model-schedule1000",
+                                   "uppmax-symex-non-linear-union-mixed-model-rank",
+                                   "uppmax-symex-non-linear-union-mixed-model-score",
+                                   "uppmax-symex-non-linear-union-mixed-model-SEHPlus",
+                                   "uppmax-symex-non-linear-union-mixed-model-SEHMinus",
+                                   "uppmax-symex-non-linear-union-mixed-model-REHPlus",
+                                   "uppmax-symex-non-linear-union-mixed-model-REHMinus",
+                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue02",
+                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue05",
+                                   "uppmax-symex-non-linear-union-mixed-model-twoQueue08",
+                                   "uppmax-symex-non-linear-union-mixed-model-schedule10",
+                                   "uppmax-symex-non-linear-union-mixed-model-schedule100",
+                                   "uppmax-symex-non-linear-union-mixed-model-schedule1000"
+                                   ],
+
         "CEGAR-linear-minimal": ["uppmax-CEGAR-linear-fixed-heuristic-random",
                                  "uppmax-CEGAR-linear-minimal-linear-model-rank",
                                  "uppmax-CEGAR-linear-minimal-linear-model-score",
@@ -231,8 +270,11 @@ def summarize_excel_files():
     # excel_files = ["uppmax-synex-non-linear-train+valid-union-random-1797","uppmax-symex-non-linear-train+valid-union-label-1797"]  # symex train+valid
 
     summary_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/summary.xlsx"
+
     # write summary excel
     with pd.ExcelWriter(summary_file) as writer:
+        pd.DataFrame(pd.DataFrame({})).to_excel(writer, sheet_name="summary")
+
         for k in excel_files_dict:
             excel_files = excel_files_dict[k]
             columns = ["category"] + ["total","original_solved","original_safe", "original_unsafe", "original_avg_t","original_avg_t_s","original_avg_t_cs","original_avg_t_ocs","original_avg_t_safe","original_avg_t_unsafe"] + manual_flatten(
@@ -333,7 +375,7 @@ def summarize_excel_files():
             sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "").replace("uppmax-", "")
 
         # add scatter plot inside
-        count = 18 #row number
+        count = 20 #row number
         for f in excel_files:
             img = Image(
                 "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".png")
@@ -343,29 +385,148 @@ def summarize_excel_files():
             count += 35 #row number
 
         #compute improve percentage for solving time
-        row =13 if "non-linear" in e_k else 15
+        total_row = 13 if "non-linear" in e_k else 15
         column_number = 9
-        sheet["B" + str(row + 2)].value = "improve percentage"
+        sheet["B" + str(total_row + 2)].value = "improve percentage"
 
         oirginal_column_number = 4  # solved
-        compute_improved_percentage(sheet, oirginal_column_number, row, column_number)
+        compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
         oirginal_column_number = 5  # safe
-        compute_improved_percentage(sheet, oirginal_column_number, row, column_number)
+        compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
         oirginal_column_number = 6  # unsafe
-        compute_improved_percentage(sheet, oirginal_column_number, row, column_number)
+        compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
         oirginal_st_column_number=7 #avg_t
-        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
         oirginal_st_column_number=8 #avg_t_s
-        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
         oirginal_st_column_number=9 #avg_t_cs
-        compute_improved_percentage_for_common_solving_time(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_for_common_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
         oirginal_st_column_number = 11  # avg_t_safe
-        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
         oirginal_st_column_number = 12  # avg_t_unsafe
-        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, row, column_number)
+        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
+
+        summary_max_for_each_sheet(sheet, total_row, column_number)
 
         # Save the modified workbook
         workbook.save(summary_file)
+
+    #write final summary
+    workbook = load_workbook(summary_file)
+    measurement_row_map = {"solved": 23,"safe":24,"unsafe":25,"avt_t":26,"avg_t_s":27,"avg_t_cs":28,"avg_t_safe":29,"avg_t_unsafe":30}
+    ce_types=["union", "minimal", "common"]
+    engine_data_list=[]
+    for e in ["CEGAR","symex"]:
+        for d in ["linear","non-linear"]:
+            engine_data_list.append(e + "-" + d)
+
+    for engine_data_index,engine_data in enumerate(engine_data_list):
+        for i,measurement in enumerate(measurement_row_map):
+            write_one_block_summary_best_strategy(workbook, ce_types, measurement_row_map, measurement,i,engine_data,engine_data_index)
+
+    write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_number)
+
+    workbook.save(summary_file)
+
+def write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_number):
+    numerical_row=total_row+2
+    improved_percentage_row=total_row+4
+    strategy_list=["random","rank","score","SEHPlus"]
+    strategies={ss:i*9+4 for i,ss in enumerate(strategy_list)}
+    strategies = {k:strategies[k]+9 for k in strategies}
+    print(strategies)
+
+    for s in strategies:
+        current_column_number = strategies[s]
+        max_percentage_value=-1
+        max_CE=""
+        solved_list = []
+        for ce in ce_types:
+            sheet = workbook["CEGAR-linear-" + ce]
+            improved_percentage_value = percentage_to_float(sheet[get_column_letter(current_column_number) + str(improved_percentage_row)].value)
+            solved_list.append(improved_percentage_value)
+            if improved_percentage_value > max_percentage_value:
+                max_percentage_value = improved_percentage_value
+                max_CE=ce
+        print(solved_list)
+        print(s,max_CE,max_percentage_value)
+
+
+
+
+    # write to summary sheet
+    sheet = workbook["summary"]
+    sheet["D33"].value= "best data set"
+
+def write_one_block_summary_best_strategy(workbook,ce_types,measurement_row_map,measurement,measurement_index,engine_data,column_index):
+    ce_number=3
+    column_number=3
+    strategy_list = []
+    percentage_list = []
+    for ce_type in ce_types:
+        sheet = workbook[engine_data+ "-" + ce_type]
+        strategy = sheet["R" + str(measurement_row_map[measurement])].value
+        percentage = sheet["S" + str(measurement_row_map[measurement])].value
+        strategy_list.append(strategy)
+        percentage_list.append(percentage)
+
+    #write to summary sheet
+    sheet = workbook["summary"]
+    #merge rows
+    sheet["A"+str(measurement_index*column_number+2)].value = measurement
+    sheet.merge_cells('A'+str(measurement_index*column_number+2)+':A'+str(measurement_index*column_number+4))
+    #merge columns
+    sheet[get_column_letter(column_index*ce_number+2)+"1"].value = engine_data
+    sheet.merge_cells(str(get_column_letter(column_index*ce_number+2))+'1:'+str(get_column_letter(column_index*ce_number+4))+'1')
+    for i, (s, p, ce) in enumerate(zip(strategy_list, percentage_list, ce_types)):
+        sheet[str(get_column_letter(column_index*column_number+2)) + str(i+measurement_index*column_number + 2)].value = ce
+        if "random" in s:
+            s="random"
+        sheet[str(get_column_letter(column_index*column_number+3)) + str(i+measurement_index*column_number + 2)].value = s
+        sheet[str(get_column_letter(column_index*column_number+4)) + str(i+measurement_index*column_number + 2)].value = p
+        if p == max(percentage_list):
+            sheet[str(get_column_letter(column_index * column_number + 4)) + str(i + measurement_index * column_number + 2)].fill=green_fill
+
+def summary_max_for_each_sheet(sheet,total_row,column_number):
+    # color max value for improve percentage
+    # Define the fill color (RGB)
+
+    row_number_map = {"strategy": 1}
+    column_number_map = {"solved": 13, "safe": 14, "unsafe": 15,"avg_t":16,"avg_t_s":17,"avg_t_cs":18,"avg_t_safe":20,"avg_t_unsafe":21}#
+
+    summary_row = 22
+    max_column=17
+    sheet[get_column_letter(max_column) + str(summary_row)] = "max"
+    sheet[get_column_letter(max_column+1) + str(summary_row)] = "strategy"
+    sheet[get_column_letter(max_column + 2) + str(summary_row)] = "improved percentage"
+    for column_name in column_number_map:
+        summary_one_column_max(sheet, total_row, column_number, column_number_map, row_number_map, max_column,summary_row,column_name)
+        summary_row+=1
+
+
+
+def summary_one_column_max(sheet,total_row,column_number,column_number_map,row_number_map,max_column,summary_row,column_name):
+    comparison_column=column_number_map[column_name]
+    improved_percentage_row = total_row + 2
+    current_column_number = comparison_column
+    max_percentage = -1
+    max_percentage_cell = [None, None,None]
+    while sheet[get_column_letter(current_column_number) + str(improved_percentage_row)].value is not None:
+        current_cell_value = percentage_to_float(sheet[get_column_letter(current_column_number) + str(improved_percentage_row)].value)
+        if current_cell_value > max_percentage:
+            max_percentage = current_cell_value
+            max_percentage_cell[0] = str(improved_percentage_row)
+            max_percentage_cell[1] = get_column_letter(current_column_number)
+            max_percentage_cell[2] = get_column_letter(current_column_number- (current_column_number- 4) % column_number) #compute corresponding strategy column
+
+        current_column_number += column_number
+    sheet[max_percentage_cell[1] + max_percentage_cell[0]].fill = green_fill
+    max_strategy = sheet[max_percentage_cell[2] + str(row_number_map["strategy"])].value
+    max_value=sheet[max_percentage_cell[1] + max_percentage_cell[0]].value
+    sheet[get_column_letter(max_column) + str(summary_row + 1)].value = column_name
+    sheet[get_column_letter(max_column+1) + str(summary_row + 1)].value = max_strategy
+    sheet[get_column_letter(max_column + 2) + str(summary_row + 1)].value = max_value
+
 
 def compute_improved_percentage_for_common_solving_time(sheet,oirginal_st_column_number,row,column_number):
     current_st_column_number=oirginal_st_column_number
@@ -374,6 +535,9 @@ def compute_improved_percentage_for_common_solving_time(sheet,oirginal_st_column
         oirginal_st_value = float(sheet[get_column_letter(current_st_column_number + 1) + str(row)].value)  # avg_t_ocs
         improve_percentage = (oirginal_st_value - target_st_value) / oirginal_st_value
         sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(improve_percentage)
+        # output a row combine numerical data and improved percentage for latex
+        sheet[get_column_letter(current_st_column_number) + str(row + 4)].value = (sheet[get_column_letter(current_st_column_number) + str(row)].value +"\n"+ "(" +float_to_percentage(
+                                                                                       improve_percentage)) + ")"
         current_st_column_number = current_st_column_number + column_number
 def compute_improved_percentage_solving_time(sheet,oirginal_st_column_number,row,column_number):
     oirginal_st_value = float(sheet[get_column_letter(oirginal_st_column_number) + str(row)].value)
@@ -381,8 +545,10 @@ def compute_improved_percentage_solving_time(sheet,oirginal_st_column_number,row
     while sheet[get_column_letter(current_st_column_number) + str(row)].value is not None:
         target_st_value = float(sheet[get_column_letter(current_st_column_number) + str(row)].value)
         improve_percentage = (oirginal_st_value - target_st_value) / oirginal_st_value
-        sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(
-            improve_percentage)
+        sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(improve_percentage)
+        # output a row combine numerical data and improved percentage for latex
+        sheet[get_column_letter(current_st_column_number) + str(row + 4)].value = (sheet[get_column_letter(current_st_column_number) + str(row)].value + "\n"+ "("+
+                                                                                   float_to_percentage(improve_percentage)) + ")"
         current_st_column_number = current_st_column_number + column_number
 def compute_improved_percentage(sheet,oirginal_column_number,row,column_number):
     oirginal_st_value = float(sheet[get_column_letter(oirginal_column_number) + str(row)].value)
@@ -392,6 +558,10 @@ def compute_improved_percentage(sheet,oirginal_column_number,row,column_number):
         improve_percentage = (target_st_value-oirginal_st_value) / oirginal_st_value
         sheet[get_column_letter(current_st_column_number) + str(row + 2)].value = float_to_percentage(
             improve_percentage)
+
+        #output a row combine numerical data and improved percentage for latex
+        sheet[get_column_letter(current_st_column_number) + str(row + 4)].value = str(sheet[get_column_letter(current_st_column_number) + str(row)].value)+"\n"+"("+float_to_percentage(improve_percentage)+")"
+
         current_st_column_number = current_st_column_number + column_number
 
 def get_column_letter(col_num):
@@ -648,6 +818,8 @@ def get_solving_time_dict(object):
                 solving_time_dict[field] = 10800000
     return solving_time_dict
 
+def percentage_to_float(percentage):
+    return float(percentage.strip('%')) / 100
 
 def virtual_best_satisfiability_from_list(s):
     if "safe" in s and "unsafe" in s:
