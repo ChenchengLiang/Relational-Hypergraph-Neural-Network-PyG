@@ -540,6 +540,7 @@ def summary_max_for_each_sheet(sheet,total_row,column_number):
     sheet[get_column_letter(max_column) + str(summary_row)] = "max"
     sheet[get_column_letter(max_column+1) + str(summary_row)] = "strategy"
     sheet[get_column_letter(max_column + 2) + str(summary_row)] = "improved percentage"
+    sheet[get_column_letter(max_column + 3) + str(summary_row)] = "value"
     for column_name in column_number_map:
         summary_one_column_max(sheet, total_row, column_number, column_number_map, row_number_map, max_column,summary_row,column_name)
         summary_row+=1
@@ -551,11 +552,14 @@ def summary_one_column_max(sheet,total_row,column_number,column_number_map,row_n
     improved_percentage_row = total_row + 2
     current_column_number = comparison_column
     max_percentage = -1
+    max_value=-1
     max_percentage_cell = [None, None,None]
     while sheet[get_column_letter(current_column_number) + str(improved_percentage_row)].value is not None:
-        current_cell_value = percentage_to_float(sheet[get_column_letter(current_column_number) + str(improved_percentage_row)].value)
-        if current_cell_value > max_percentage:
-            max_percentage = current_cell_value
+        current_cell_percentage = percentage_to_float(sheet[get_column_letter(current_column_number) + str(improved_percentage_row)].value)
+        current_cell_value = sheet[get_column_letter(current_column_number) + str(improved_percentage_row-2)].value
+        if current_cell_percentage > max_percentage:
+            max_percentage = current_cell_percentage
+            max_value=current_cell_value
             max_percentage_cell[0] = str(improved_percentage_row)
             max_percentage_cell[1] = get_column_letter(current_column_number)
             max_percentage_cell[2] = get_column_letter(current_column_number- (current_column_number- 4) % column_number) #compute corresponding strategy column
@@ -563,10 +567,11 @@ def summary_one_column_max(sheet,total_row,column_number,column_number_map,row_n
         current_column_number += column_number
     sheet[max_percentage_cell[1] + max_percentage_cell[0]].fill = green_fill
     max_strategy = sheet[max_percentage_cell[2] + str(row_number_map["strategy"])].value
-    max_value=sheet[max_percentage_cell[1] + max_percentage_cell[0]].value
+    max_percentage_value=sheet[max_percentage_cell[1] + max_percentage_cell[0]].value
     sheet[get_column_letter(max_column) + str(summary_row + 1)].value = column_name
     sheet[get_column_letter(max_column+1) + str(summary_row + 1)].value = max_strategy
-    sheet[get_column_letter(max_column + 2) + str(summary_row + 1)].value = max_value
+    sheet[get_column_letter(max_column + 2) + str(summary_row + 1)].value = max_percentage_value
+    sheet[get_column_letter(max_column + 3) + str(summary_row + 1)].value = max_value
 
 
 def compute_improved_percentage_for_common_solving_time(sheet,oirginal_st_column_number,row,column_number):
