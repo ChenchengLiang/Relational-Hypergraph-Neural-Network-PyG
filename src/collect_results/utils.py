@@ -1,4 +1,4 @@
-from src.utils import unzip_file, make_dirct, convert_bytes,select_key_with_value_condition, manual_flatten,float_to_percentage
+from src.utils import unzip_file, make_dirct, convert_bytes,select_key_with_value_condition, manual_flatten,float_to_percentage,assign_dict_key_empty_list
 from src.CONSTANTS import benchmark_timeout
 import os
 import json
@@ -347,8 +347,6 @@ def summarize_excel_files():
             #     print(x,len(output_dict[x]))
             pd.DataFrame(pd.DataFrame(output_dict)).to_excel(writer, sheet_name=k)
 
-            #get common solved time
-
 
     # merge some cells
     for e_k in excel_files_dict:
@@ -411,8 +409,10 @@ def summarize_excel_files():
         # Save the modified workbook
         workbook.save(summary_file)
 
-    #write final summary
+    #write final summary, best strategy
     workbook = load_workbook(summary_file)
+    sheet = workbook["summary"]
+    sheet.delete_rows(1, sheet.max_row) #clear the sheet
     measurement_row_map = {"solved": 23,"safe":24,"unsafe":25,"avt_t":26,"avg_t_s":27,"avg_t_cs":28,"avg_t_safe":29,"avg_t_unsafe":30}
     ce_types=["union", "minimal", "common"]
     engine_data_list=[]
@@ -424,39 +424,80 @@ def summarize_excel_files():
         for i,measurement in enumerate(measurement_row_map):
             write_one_block_summary_best_strategy(workbook, ce_types, measurement_row_map, measurement,i,engine_data,engine_data_index)
 
-    write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_number)
+    # write final summary, best data set
+    column_number = 9
+    starting_row = 32
+    measurement_column_map = {"solved": 0, "safe": 1, "unsafe": 2, "avt_t": 3, "avg_t_s": 4, "avg_t_cs": 5,
+                           "avg_t_safe": 7, "avg_t_unsafe": 8}
+    strategy_list_symex=["twoQueue02","twoQueue05","twoQueue08","schedule10","schedule100","schedule1000"]
+    strategy_list=["random","rank","score","SEHPlus","SEHMinus","REHPlus","REHMinus"]+strategy_list_symex
+
+    #write measurement column
+    for index,measurement in enumerate(measurement_column_map):
+        sheet = workbook["summary"]
+        s_row = starting_row + len(strategy_list) * index
+        e_row = starting_row + len(strategy_list) * (index+1) - 1
+        sheet["A"+ str(s_row)].value = measurement
+        sheet.merge_cells("A"+ str(s_row) + ':'+"A"+ str(e_row))
+    #write content
+    for engine_data_index, engine_data in enumerate(engine_data_list):
+        total_row = 13 if "non-linear" in engine_data else 15
+        for measurement in measurement_column_map:
+            index = measurement_column_map[measurement]
+            write_one_block_summary_best_data_set(workbook, ce_types, total_row, column_number, starting_row,
+                                                  strategy_list, measurement, index, engine_data,
+                                                  engine_data_index,strategy_list_symex)
+
+
 
     workbook.save(summary_file)
 
-def write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_number):
-    numerical_row=total_row+2
-    improved_percentage_row=total_row+4
-    strategy_list=["random","rank","score","SEHPlus"]
-    strategies={ss:i*9+4 for i,ss in enumerate(strategy_list)}
-    strategies = {k:strategies[k]+9 for k in strategies}
-    print(strategies)
-
+def write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_number,starting_row,strategy_list,measurement,index,engine_data,engine_data_index,strategy_list_symex):
+    strategy_dict={}
+    strategy_list=assign_dict_key_empty_list(strategy_dict,strategy_list)
+    improved_percentage_row=total_row+2
+    strategies={ss:i*column_number+4+index for i,ss in enumerate(strategy_dict)}
+    strategies = {k:strategies[k]+column_number for k in strategies}
+    max_percentage_value_list=[]
+    #write numerical values
     for s in strategies:
         current_column_number = strategies[s]
         max_percentage_value=-1
         max_CE=""
-        solved_list = []
-        for ce in ce_types:
-            sheet = workbook["CEGAR-linear-" + ce]
-            improved_percentage_value = percentage_to_float(sheet[get_column_letter(current_column_number) + str(improved_percentage_row)].value)
-            solved_list.append(improved_percentage_value)
-            if improved_percentage_value > max_percentage_value:
-                max_percentage_value = improved_percentage_value
-                max_CE=ce
-        print(solved_list)
-        print(s,max_CE,max_percentage_value)
-
+        if "CEGAR" in engine_data and s in strategy_list_symex:
+            max_percentage_value = -1
+            max_CE = ""
+        else:
+            for ce in ce_types:
+                sheet = workbook[engine_data+"-" + ce]
+                improved_percentage_value = percentage_to_float(sheet[get_column_letter(current_column_number) + str(improved_percentage_row)].value)
+                if improved_percentage_value > max_percentage_value:
+                    max_percentage_value = improved_percentage_value
+                    max_CE=ce
+        strategy_dict[s].append([max_CE,float_to_percentage(max_percentage_value)])
+        max_percentage_value_list.append(max_percentage_value)
 
 
 
     # write to summary sheet
     sheet = workbook["summary"]
-    sheet["D33"].value= "best data set"
+    if measurement in ["avg_t_safe","avg_t_unsafe"]:
+        index-=1
+    s_row = starting_row + len(strategy_dict) * index
+
+    for i,s in enumerate(strategy_dict):
+        if "CEGAR" in engine_data and s in strategy_list_symex:
+            sheet[get_column_letter((engine_data_index) * 3 + 2) + str(i + s_row)].value = ""
+            sheet[get_column_letter((engine_data_index) * 3 + 3) + str(i + s_row)].value = ""
+            sheet[get_column_letter((engine_data_index) * 3 + 4) + str(i + s_row)].value = ""
+        else:
+            sheet[get_column_letter((engine_data_index) * 3 + 2) + str(i + s_row)].value = s
+            sheet[get_column_letter((engine_data_index)*3+3) + str(i + s_row)].value = strategy_dict[s][0][0]
+            sheet[get_column_letter((engine_data_index)*3+4) +str(i+s_row)].value = strategy_dict[s][0][1]
+        if max(max_percentage_value_list)==percentage_to_float(strategy_dict[s][0][1]):
+            sheet[get_column_letter((engine_data_index)*3+4) + str(i + s_row)].fill = green_fill
+
+
 
 def write_one_block_summary_best_strategy(workbook,ce_types,measurement_row_map,measurement,measurement_index,engine_data,column_index):
     ce_number=3
