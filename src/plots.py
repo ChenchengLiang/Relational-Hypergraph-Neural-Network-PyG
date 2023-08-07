@@ -245,9 +245,10 @@ def draw_cactus_plot_multiple_plotly(summary_folder,plot_name,scale,datasets, la
         line = dict(dash='dash') if "CEGAR" in label else dict(dash='solid')
         fig.add_trace(go.Scatter(x=x_values, y=y_values, mode='lines+markers', name=label,marker=marker,line=line))
 
-    fig.update_layout(title='Cactus Plot',
+    fig.update_layout(
+        #title='Cactus Plot',
                       xaxis_title='Number of Problems Solved',
-                      yaxis_title='Time Limit (in second)',
+                      yaxis_title='Time Limit in second '+"("+scale+" scale)",
                       xaxis=dict(range=[0, x_axis_right_limit]),
                       legend=dict(x=0, y=1),
                       #margin=dict(l=50, r=50, b=100, t=100, pad=4),
