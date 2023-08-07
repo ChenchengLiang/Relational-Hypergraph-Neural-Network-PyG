@@ -108,7 +108,7 @@ def main():
 
     # linear
     for engine in ["CEGAR","symex"]:
-        for CEOption in ["union-linear-model","union-mixed-model"]:  #"minimal-linear-model","minimal-mixed-model","common-linear-model","common-mixed-model"
+        for CEOption in ["minimal-linear-model","minimal-mixed-model","common-linear-model","common-mixed-model"]:  #"union-linear-model","union-mixed-model"
             if engine == "CEGAR":
                 for po in ["rank", "score", "SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
                     comparison_pairs.append(
@@ -123,7 +123,7 @@ def main():
 
     # non-linear
     for engine in ["CEGAR", "symex"]:
-        for CEOption in ["union-non-linear-model","union-mixed-model"]: #"minimal-non-linear-model","minimal-mixed-model","common-non-linear-model","common-mixed-model"
+        for CEOption in ["minimal-non-linear-model","minimal-mixed-model","common-non-linear-model","common-mixed-model"]: #"union-non-linear-model","union-mixed-model"
             if engine=="CEGAR":
                 for po in ["rank","score","SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
                     comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",
@@ -203,13 +203,12 @@ def main():
 
         # draw solving time scatter plots
         excel_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/statistics_split_clauses_1.xlsx"
-        draw_solving_time_scatter(excel_file, compare_benchmark_name)
+        save_file_name=draw_solving_time_scatter(excel_file, compare_benchmark_name)
 
         # rename (collect) results
         copy(excel_file, os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".xlsx")
-        scatter_plot_path = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/scatter_plots/All-solving-time" + "<br>" + compare_benchmark_name + "-Original-vs-Prioritizing_score"
-        copy(scatter_plot_path + ".png", os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".png")
-        copy(scatter_plot_path + ".html", os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".html")
+        copy(save_file_name + ".png", os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".png")
+        copy(save_file_name + ".html", os.path.dirname(excel_file) + "/" + compare_benchmark_name + ".html")
 
 
 def category_summary_for_solvability_dict(solvability_dict, solver_variation_folders_dict):

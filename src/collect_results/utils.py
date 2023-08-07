@@ -6,7 +6,7 @@ import glob
 from shutil import copy
 from tqdm import tqdm
 import pandas as pd
-from src.plots import scatter_plot
+from src.plots import scatter_plot,draw_cactus_plot_multiple_plotly
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import PatternFill
@@ -448,9 +448,50 @@ def summarize_excel_files():
                                                   strategy_list, measurement, index, engine_data,
                                                   engine_data_index,strategy_list_symex)
 
-
+    #todo: cactus plots
+    for dataset in ["linear","non-linear"]:
+        draw_cactus_plot_for_selected_configurations(dataset)
 
     workbook.save(summary_file)
+
+def draw_cactus_plot_for_selected_configurations(dataset):
+    summary_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary"
+    #linear cactus plot, union
+    comparison_options_CEGAR=["REHPlus","REHMinus","SEHPlus","SEHMinus"]
+    comparison_options_symex = comparison_options_CEGAR+["twoQueue08"]
+    ledgends=[]
+    lines=[]
+    for engine in ["CEGAR","symex"]:
+        # original+random
+        excel_file=os.path.join(summary_folder,"uppmax-"+engine+"-"+dataset+"-fixed-heuristic-random.xlsx")
+        workbook = load_workbook(excel_file)
+        sheet = workbook["data"]
+        ledgends.append(engine+"-"+"fixed")
+        lines.append([cell.value for cell in sheet["S"]][1:])
+        ledgends.append(engine+"-"+"random")
+        lines.append([cell.value for cell in sheet["U"]][1:])
+        # priority function options
+        if engine =="CEGAR":
+            for option in comparison_options_CEGAR:
+                excel_file= os.path.join(summary_folder,"uppmax-"+engine+"-"+dataset+"-union-"+dataset+"-model-"+option+".xlsx")
+                workbook = load_workbook(excel_file)
+                sheet = workbook["data"]
+                ledgends.append(engine + "-" + option)
+                lines.append([cell.value for cell in sheet["U"]][1:])
+        else:
+            for option in comparison_options_symex:
+                excel_file = os.path.join(summary_folder,"uppmax-" + engine + "-"+dataset+"-union-"+dataset+"-model-" + option + ".xlsx")
+                workbook = load_workbook(excel_file)
+                sheet = workbook["data"]
+                ledgends.append(engine + "-" + option)
+                lines.append([cell.value for cell in sheet["U"]][1:])
+
+    plot_name="1-cactus-"+dataset+"-union"
+    scale="log"
+
+    x_axis_right_limit=240 if dataset=="linear" else 450
+
+    draw_cactus_plot_multiple_plotly(summary_folder,plot_name,scale,lines, ledgends,x_axis_right_limit)
 
 def write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_number,starting_row,strategy_list,measurement,index,engine_data,engine_data_index,strategy_list_symex):
     strategy_dict={}
@@ -697,13 +738,13 @@ def draw_solving_time_scatter(excel_file, compare_benchmark_name):
                         # ["eldarica_CEGAR_original", "vb_eldarica_CEGAR_prioritize"],
                         ] + [apptainer_data_pair]
 
-    axis_name_map = {"eldarica_abstract_off": "Original",
-                     "vb_eldarica_abstract_off_prioritizing_SEH": "prioritizing score+",
-                     "vb_eldarica_abstract_off_prioritizing_rank": "Prioritizing score",
-                     "vb_eldarica_abstract_off_pruning_rank": "Pruning rank",
-                     "vb_eldarica_abstract_off_pruning_score": "Pruning score",
-                     "eldarica_symex_original": "Original", "vb_eldarica_symex_prioritize": "Prioritizing_score",
-                     "eldarica_CEGAR_original": "Original", "vb_eldarica_CEGAR_prioritize": "Prioritizing_score"
+    axis_name_map = {"eldarica_abstract_off": "Fixed",
+                     "vb_eldarica_abstract_off_prioritizing_SEH": "prioritizing_score+",
+                     "vb_eldarica_abstract_off_prioritizing_rank": "Prioritizing_score",
+                     "vb_eldarica_abstract_off_pruning_rank": "Pruning_rank",
+                     "vb_eldarica_abstract_off_pruning_score": "Pruning_score",
+                     "eldarica_symex_original": "Fixed_priority_function", "vb_eldarica_symex_prioritize": "MUS-guided_priority_function",
+                     "eldarica_CEGAR_original": "Fixed_priority_function", "vb_eldarica_CEGAR_prioritize": "MUS-guided_priority_function"
                      }
     for pair in comparison_pairs:
         if "symex" in pair[0]:
@@ -744,16 +785,57 @@ def draw_solving_time_scatter(excel_file, compare_benchmark_name):
                     original_solving_time_list_common.append(original_st)
                     strategy_solving_time_list_common.append(strategy_st)
 
-        scatter_plot(x_data=original_solving_time_list_common, y_data=strategy_solving_time_list_common,
+        engine = "CEGAR" if "CEGAR" in compare_benchmark_name else "Symex"
+
+        if "union" in compare_benchmark_name:
+            MUS_dataset= "union"
+        elif "common" in compare_benchmark_name:
+            MUS_dataset = "intersection"
+        else:
+            MUS_dataset = "single"
+
+        if "REHPlus" in compare_benchmark_name:
+            priority_function = "REHPlus"
+        elif "REHMinus" in compare_benchmark_name:
+            priority_function = "REHMinus"
+        elif "SEHPlus" in compare_benchmark_name:
+            priority_function = "SEHPlus"
+        elif "SEHMinus" in compare_benchmark_name:
+            priority_function = "SEHMinus"
+        elif "score" in compare_benchmark_name:
+            priority_function = "score"
+        elif "rank" in compare_benchmark_name:
+            priority_function = "rank"
+        elif "twoQueue02" in compare_benchmark_name:
+            priority_function = "twoQueue02"
+        elif "twoQueue05" in compare_benchmark_name:
+            priority_function = "twoQueue05"
+        elif "twoQueue08" in compare_benchmark_name:
+            priority_function = "twoQueue08"
+        elif "schedule10" in compare_benchmark_name:
+            priority_function = "schedule10"
+        elif "schedule100" in compare_benchmark_name:
+            priority_function = "schedule100"
+        elif "schedule1000" in compare_benchmark_name:
+            priority_function = "schedule1000"
+        else:
+            priority_function = "random"
+
+        title_text="Algorithm:"+engine+", MUS dataset:"+MUS_dataset+", Priority function:"+priority_function
+
+        all_solving_time_name="Solving time for all problems" + "<br>" + title_text
+        common_solving_time_name="Solving time for commonly solved problems" + "<br>" + title_text
+        save_file_name=scatter_plot(x_data=original_solving_time_list_common, y_data=strategy_solving_time_list_common,
                      z_data=satisfiability_list_common,
                      x_axis=axis_name_map[pair[0]], y_axis=axis_name_map[pair[1]], folder=scatter_folder,
                      data_text=file_name_list_common,
-                     name="Common-solving-time" + "<br>" + compare_benchmark_name, scale="log")
-        scatter_plot(x_data=original_solving_time_list_all, y_data=strategy_solving_time_list_all,
+                     name=common_solving_time_name, scale="log",compare_benchmark_name=compare_benchmark_name)
+        save_file_name=scatter_plot(x_data=original_solving_time_list_all, y_data=strategy_solving_time_list_all,
                      z_data=satisfiability_list_all,
                      x_axis=axis_name_map[pair[0]], y_axis=axis_name_map[pair[1]], folder=scatter_folder,
                      data_text=file_name_list_all,
-                     name="All-solving-time" + "<br>" + compare_benchmark_name, scale="log")
+                     name=all_solving_time_name, scale="log",compare_benchmark_name=compare_benchmark_name)
+    return save_file_name
 
 
 def read_solvability_dict(excel_file, sheet_name="data"):

@@ -17,7 +17,7 @@ import statistics
 plt.style.use("ggplot")
 
 
-def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name, scale="linear"):
+def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name, scale="linear",compare_benchmark_name=""):
     fig = go.Figure()
     if len(z_data) != 0:
         x_data_1, y_data_1, text_data_1, x_data_2, y_data_2, text_data_2, x_data_3, y_data_3, text_data_3 = [], [], [], [], [], [], [], [], []
@@ -105,10 +105,12 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
         go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal", line=dict(color="gray")))
 
     fig.update_layout(
-        title=name + "<br>Number of common files:" + str(len(x_data)) + "<br>above/under/on diagonal:" + str(
-            above_diagonal) + "/" + str(under_diagonal) + "/" + str(on_diagonal) + "<br>gain/lose:" +str(gain) + "/" + str(lose)
-        +"<br>average_x/average_y:" + "{:.1f}".format(average_x)+"/"+"{:.1f}".format(average_y)
-        +"<br>average/percent/total solving time gain:"+"{:.1f}".format(average_solving_time_gain)+"/"+"{:.3f}".format(average_solving_time_gain_percentage)+"/"+"{:.1f}".format(total_solving_time_gain),
+        title=name + "<br>Number of commonly solved problems:" + str(len(x_data))
+              + "<br>above/under/on diagonal:" + str(above_diagonal) + "/" + str(under_diagonal) + "/" + str(on_diagonal)
+        #+ "<br>gain/lose:" +str(gain) + "/" + str(lose)
+        #+"<br>average_x/average_y:" + "{:.1f}".format(average_x)+"/"+"{:.1f}".format(average_y)
+        #+"<br>average/percent/total solving time gain:"+"{:.1f}".format(average_solving_time_gain)+"/"+"{:.3f}".format(average_solving_time_gain_percentage)+"/"+"{:.1f}".format(total_solving_time_gain)
+        ,
         title_x=0.5,
         xaxis_title=x_axis,
         yaxis_title=y_axis)
@@ -120,13 +122,14 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
     fig.update_layout(
         yaxis_tickvals=[0.1, 1, 10, 100, 1200],
         yaxis_ticktext=["0.1", "1", "10", "100", "1200"])
-    plot_file_name = name + "-" + x_axis + "-vs-" + y_axis
+    plot_file_name = compare_benchmark_name + "-" + x_axis + "-vs-" + y_axis
     save_file_name = os.path.join(folder, plot_file_name)
     # fig.update_yaxes(type="linear")
     fig.write_html(save_file_name + ".html")
     img_width = 1200
     img_height = img_width*0.6
     fig.write_image(save_file_name + ".png",width=img_width, height=img_height)
+    return save_file_name
 
 def distance_to_diagnal(x, y):
     return abs(x - y) / math.sqrt(2)
@@ -218,6 +221,44 @@ def plot_cactus(summary_folder, solvability_summary, plot_name=""):
     # draw_one_cactus(summary_folder, cactus, "")
     draw_one_cactus_plotly(summary_folder, cactus, key_word="", scale="linear", plot_name=plot_name)
     draw_one_cactus_plotly(summary_folder, cactus, key_word="", scale="log", plot_name=plot_name)
+
+
+def draw_cactus_plot_multiple_plotly(summary_folder,plot_name,scale,datasets, labels,x_axis_right_limit):
+    # Example times for problems (in seconds) for multiple algorithms or datasets
+    # times_1 = [5, 3, 12, 7, 8, 20, 15, 4, 10, 2]
+    # times_2 = [6, 4, 11, 8, 9, 19, 14, 5, 9, 3]
+    # times_3 = [4, 2, 13, 6, 7, 18, 16, 3, 11, 1]
+    # draw_cactus_plot_multiple_plotly(summary_folder,plot_name,scale,[times_1, times_2, times_3], ['Algorithm A', 'Algorithm B', 'Algorithm C'])
+
+    fig = go.Figure()
+
+    for times, label in zip(datasets, labels):
+        # Sort times to get a cumulative view
+        sorted_times = sorted(times)
+
+        # X values: number of problems solved
+        x_values = list(range(1, len(sorted_times) + 1))
+
+        # Y values: time taken to solve each problem
+        y_values = sorted_times
+        marker= dict(symbol="diamond") if "CEGAR" in label else dict(symbol="circle")
+        line = dict(dash='dash') if "CEGAR" in label else dict(dash='solid')
+        fig.add_trace(go.Scatter(x=x_values, y=y_values, mode='lines+markers', name=label,marker=marker,line=line))
+
+    fig.update_layout(title='Cactus Plot',
+                      xaxis_title='Number of Problems Solved',
+                      yaxis_title='Time Limit (in second)',
+                      xaxis=dict(range=[0, x_axis_right_limit]),
+                      legend=dict(x=0, y=1),
+                      #margin=dict(l=50, r=50, b=100, t=100, pad=4),
+                      )
+
+    fig.update_yaxes(type=scale)
+    fig.write_html(summary_folder + "/" + plot_name  + "-" + scale + "-cactus.html")
+    # img_width = 1200
+    # img_height = img_width * 0.6
+    fig.update_layout(height=800, width=800, autosize=True)
+    fig.write_image(summary_folder + "/" + plot_name + "-" + scale + "-cactus.png")
 
 
 def draw_one_cactus_plotly(summary_folder, cactus, key_word, scale="", plot_name=""):
