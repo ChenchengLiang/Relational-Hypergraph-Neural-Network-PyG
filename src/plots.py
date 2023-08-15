@@ -34,10 +34,10 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
                 x_data_3.append(x)
                 y_data_3.append(y)
                 text_data_3.append(t)
-        fig.add_trace(go.Scatter(x=x_data_1, y=y_data_1, text=text_data_1, marker=dict(color='green'), mode='markers',
+        dot_size = 15
+        fig.add_trace(go.Scatter(x=x_data_1, y=y_data_1, text=text_data_1, marker=dict(color='green',symbol="circle",size=dot_size), mode='markers',
                                  name='sat'))
-        fig.add_trace(go.Scatter(x=x_data_2, y=y_data_2, text=text_data_2, marker=dict(color='blue', symbol="diamond"),
-                                 mode='markers',
+        fig.add_trace(go.Scatter(x=x_data_2, y=y_data_2, text=text_data_2, marker=dict(color='blue', symbol="diamond",size=dot_size),mode='markers',
                                  name='unsat'))  # size=10
         fig.add_trace(
             go.Scatter(x=x_data_3, y=y_data_3, text=text_data_3, marker=dict(color='red', symbol="x"), mode='markers',
@@ -104,16 +104,21 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
     fig.add_trace(
         go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal", line=dict(color="gray")))
 
-    fig.update_layout(
-        title=name + "<br>Number of commonly solved problems:" + str(len(x_data))
-              + "<br>above/under/on diagonal:" + str(above_diagonal) + "/" + str(under_diagonal) + "/" + str(on_diagonal)
+    font_size=60
+    title_text=("Number of commonly solved problems:" + str(len(x_data))+ "<br>above/under:" + str(above_diagonal) + "/" + str(under_diagonal))
+        #name
         #+ "<br>gain/lose:" +str(gain) + "/" + str(lose)
         #+"<br>average_x/average_y:" + "{:.1f}".format(average_x)+"/"+"{:.1f}".format(average_y)
         #+"<br>average/percent/total solving time gain:"+"{:.1f}".format(average_solving_time_gain)+"/"+"{:.3f}".format(average_solving_time_gain_percentage)+"/"+"{:.1f}".format(total_solving_time_gain)
-        ,
+    fig.update_layout(
+        title=title_text,
+        title_font=dict(size=font_size*1.3),
         title_x=0.5,
-        xaxis_title=x_axis,
-        yaxis_title=y_axis)
+        title_y=0.925,
+        xaxis=dict(title_text=x_axis,tickfont=dict(size=font_size),title_font=dict(size=font_size)),
+        yaxis=dict(title_text=y_axis,tickfont=dict(size=font_size),title_font=dict(size=font_size)),
+        legend = dict(x=0, y=1, font=dict(size=font_size))
+        )
     fig.update_xaxes(type=scale)
     fig.update_yaxes(type=scale)
     fig.update_layout(
@@ -240,17 +245,24 @@ def draw_cactus_plot_multiple_plotly(summary_folder,plot_name,scale,datasets, la
         x_values = list(range(1, len(sorted_times) + 1))
 
         # Y values: time taken to solve each problem
+        line_width=10
         y_values = sorted_times
         marker= dict(symbol="diamond") if "CEGAR" in label else dict(symbol="circle")
-        line = dict(dash='dash') if "CEGAR" in label else dict(dash='solid')
+        line = dict(dash='dash',width=line_width) if "CEGAR" in label else dict(dash='solid',width=line_width)
         fig.add_trace(go.Scatter(x=x_values, y=y_values, mode='lines+markers', name=label,marker=marker,line=line))
-
+    font_size=35
     fig.update_layout(
         #title='Cactus Plot',
-                      xaxis_title='Number of Problems Solved',
-                      yaxis_title='Time Limit in second '+"("+scale+" scale)",
-                      xaxis=dict(range=[0, x_axis_right_limit]),
-                      legend=dict(x=0, y=1),
+        xaxis=dict(
+            title_text='Number of Problems Solved',
+            range=[0, x_axis_right_limit],
+            tickfont=dict(size=font_size),
+            title_font=dict(size=font_size)),
+        yaxis=dict(
+            title_text='Time Limit in second '+"("+scale+" scale)",
+            title_font=dict(size=font_size),
+            tickfont=dict(size=font_size)),
+                      legend=dict(x=0, y=1,font=dict(size=font_size)),
                       #margin=dict(l=50, r=50, b=100, t=100, pad=4),
                       )
 

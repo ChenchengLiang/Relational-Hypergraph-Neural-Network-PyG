@@ -108,7 +108,7 @@ def main():
 
     # linear
     for engine in ["CEGAR","symex"]:
-        for CEOption in ["minimal-linear-model","minimal-mixed-model","common-linear-model","common-mixed-model"]:  #"union-linear-model","union-mixed-model"
+        for CEOption in ["union-linear-model","union-mixed-model","minimal-linear-model","minimal-mixed-model","common-linear-model","common-mixed-model"]:  #
             if engine == "CEGAR":
                 for po in ["rank", "score", "SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
                     comparison_pairs.append(
@@ -123,7 +123,7 @@ def main():
 
     # non-linear
     for engine in ["CEGAR", "symex"]:
-        for CEOption in ["minimal-non-linear-model","minimal-mixed-model","common-non-linear-model","common-mixed-model"]: #"union-non-linear-model","union-mixed-model"
+        for CEOption in ["union-non-linear-model","union-mixed-model","minimal-non-linear-model","minimal-mixed-model","common-non-linear-model","common-mixed-model"]: #
             if engine=="CEGAR":
                 for po in ["rank","score","SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]:
                     comparison_pairs.append([holdout_non_linear_folder + "uppmax-"+engine+"-non-linear-fixed-heuristic-constant/train_data",

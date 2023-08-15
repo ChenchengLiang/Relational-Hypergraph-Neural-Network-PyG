@@ -270,189 +270,319 @@ def summarize_excel_files():
     # excel_files = ["uppmax-synex-non-linear-train+valid-union-random-1797","uppmax-symex-non-linear-train+valid-union-label-1797"]  # symex train+valid
 
     summary_file = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/summary.xlsx"
+    #write summary excel
+    # with pd.ExcelWriter(summary_file) as writer:
+    #     pd.DataFrame(pd.DataFrame({})).to_excel(writer, sheet_name="summary")
+    #
+    #     for k in excel_files_dict:
+    #         excel_files = excel_files_dict[k]
+    #         columns = ["category"] + ["total","original_solved","original_safe", "original_unsafe", "original_avg_t","original_avg_t_s","original_avg_t_cs","original_avg_t_ocs","original_avg_t_safe","original_avg_t_unsafe"] + manual_flatten(
+    #             [[f + "_solved",f + "_safe", f + "_unsafe", f + "_avg_t",f + "_avg_t_s",f + "_avg_t_cs",f+"_avg_t_ocs",f+"_avg_t_safe",f+"_avg_t_unsafe"] for f in excel_files])
+    #         output_dict = {x: [] for x in columns}
+    #         engine = "symex" if "symex" in excel_files[0] else "CEGAR"
+    #
+    #         # get original safe and unsafe
+    #         solvability_dict = read_solvability_dict(
+    #             "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" +
+    #             excel_files[0] + ".xlsx",
+    #             sheet_name="category_summary")
+    #
+    #         output_dict["total"] = ["total"] + solvability_dict["number_predicted"]
+    #
+    #         output_dict["original_solved"] = ["solved"] + [a + b for a, b in
+    #                                                      zip(solvability_dict["eldarica_" + engine + "_original_safe"],
+    #                                                          solvability_dict[
+    #                                                              "eldarica_" + engine + "_original_unsafe"])]
+    #         output_dict["original_safe"] = ["safe"] + solvability_dict["eldarica_" + engine + "_original_safe"]
+    #         output_dict["original_unsafe"] = ["unsafe"] + solvability_dict["eldarica_" + engine + "_original_unsafe"]
+    #         solving_time_list=solvability_dict["eldarica_" + engine + "_original_solving_time"]
+    #         common_solving_time_list = solvability_dict["eldarica_" + engine + "_original_common_solving_time"]
+    #         common_original_solving_time_list = solvability_dict["eldarica_" + engine + "_original_common_original_solving_time"]
+    #         common_solving_count_list = solvability_dict["eldarica_" + engine + "_original_common_solving_count"]
+    #         sat_solving_time_list=solvability_dict["eldarica_" + engine + "_original_sat_solving_time"]
+    #         sat_solving_count_list=solvability_dict["eldarica_" + engine + "_original_safe"]
+    #         unsat_solving_time_list=solvability_dict["eldarica_" + engine + "_original_unsat_solving_time"]
+    #         unsat_solving_count_list=solvability_dict["eldarica_" + engine + "_original_unsafe"]
+    #         average_solving_time_list,average_solving_time_solved_list,average_solving_common_solving_time_list,average_solving_common_original_solving_time_list,average_safe_solving_time_list,average_unsafe_solving_time_list = compute_average_solving_time(
+    #             output_dict["total"],output_dict["original_solved"] ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list,sat_solving_time_list,sat_solving_count_list,unsat_solving_time_list,unsat_solving_count_list)
+    #         output_dict["original_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_list]
+    #         output_dict["original_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_solved_list]
+    #         output_dict["original_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_solving_time_list]
+    #         output_dict["original_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_original_solving_time_list]
+    #         output_dict["original_avg_t_safe"] = ["avg_t_safe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_safe_solving_time_list]
+    #         output_dict["original_avg_t_unsafe"] = ["avg_t_unsafe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_unsafe_solving_time_list]
+    #         output_dict["category"] = [" "] + solvability_dict["category"]
+    #
+    #
+    #         # get safe and unsafe from other excels
+    #         for f in excel_files:
+    #             solvability_dict = read_solvability_dict(
+    #                 "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".xlsx",
+    #                 sheet_name="category_summary")
+    #             output_dict[f + "_solved"] = ["solved"] + [a + b for a, b in zip(
+    #                 solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"],
+    #                 solvability_dict["vb_eldarica_" + engine + "_prioritize_unsafe"])]
+    #             output_dict[f + "_safe"] = ["safe"] + solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"]
+    #             output_dict[f + "_unsafe"] = ["unsafe"] + solvability_dict[
+    #                 "vb_eldarica_" + engine + "_prioritize_unsafe"]
+    #             solving_time_list=solvability_dict["vb_eldarica_" + engine + "_prioritize_solving_time"]
+    #             common_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_solving_time"]
+    #             common_original_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_original_solving_time"]
+    #             common_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_solving_count"]
+    #             sat_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_sat_solving_time"]
+    #             sat_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"]
+    #             unsat_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_unsat_solving_time"]
+    #             unsat_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_unsafe"]
+    #             average_solving_time_list,average_solving_time_solved_list,average_solving_common_solving_time_list,average_solving_common_original_solving_time_list,average_safe_solving_time_list,average_unsafe_solving_time_list = compute_average_solving_time(output_dict["total"],output_dict[f + "_solved"]
+    #             ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list,sat_solving_time_list,sat_solving_count_list,unsat_solving_time_list,unsat_solving_count_list)
+    #             output_dict[f + "_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_list]
+    #             output_dict[f + "_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_solved_list]
+    #             output_dict[f + "_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_solving_time_list]
+    #             output_dict[f + "_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_original_solving_time_list]
+    #             output_dict[f + "_avg_t_safe"] = ["avg_t_safe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_safe_solving_time_list]
+    #             output_dict[f + "_avg_t_unsafe"] = ["avg_t_unsafe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_unsafe_solving_time_list]
+    #
+    #         # for x in output_dict:
+    #         #     print(x,len(output_dict[x]))
+    #         pd.DataFrame(pd.DataFrame(output_dict)).to_excel(writer, sheet_name=k)
+    #
+    #
+    # # merge some cells
+    # for e_k in excel_files_dict:
+    #     excel_files = excel_files_dict[e_k]
+    #     # Load the Excel file
+    #     workbook = load_workbook(summary_file)
+    #     # Select the desired sheet
+    #     sheet = workbook[e_k]
+    #
+    #     # Merge cells
+    #     sheet.merge_cells('D1:L1')  # Merge cells in the range
+    #     sheet["D1"].value = "Original"
+    #
+    #     merge_dict = {f: [] for f in excel_files}
+    #     last_column_letter = sheet.dimensions.split(':')[1].strip('1234567890')
+    #     for f in excel_files:
+    #         for row in sheet["E1:" + last_column_letter + "1"]:
+    #             for cell in row:
+    #                 if (f + "_solved" == cell.value or f + "_safe" == cell.value or f + "_unsafe" == cell.value or f + "_avg_t" == cell.value or
+    #                         f + "_avg_t_s" == cell.value or f + "_avg_t_cs" == cell.value or f + "_avg_t_ocs" == cell.value or f + "_avg_t_safe" == cell.value or f + "_avg_t_unsafe" == cell.value):
+    #                     merge_dict[f].append(cell.coordinate)
+    #     for k in merge_dict:
+    #         sheet.merge_cells(merge_dict[k][0] + ":" + merge_dict[k][-1])
+    #         sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "").replace("uppmax-", "")
+    #
+    #     # add scatter plot inside
+    #     count = 20 #row number
+    #     for f in excel_files:
+    #         img = Image(
+    #             "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".png")
+    #         sheet["A" + str(count)] = ''
+    #         sheet["A" + str(count)].comment = None
+    #         sheet.add_image(img, 'A' + str(count))
+    #         count += 35 #row number
+    #
+    #     #compute improve percentage for solving time
+    #     total_row = 13 if "non-linear" in e_k else 15
+    #     column_number = 9
+    #     sheet["B" + str(total_row + 2)].value = "improve percentage"
+    #
+    #     oirginal_column_number = 4  # solved
+    #     compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
+    #     oirginal_column_number = 5  # safe
+    #     compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
+    #     oirginal_column_number = 6  # unsafe
+    #     compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
+    #     oirginal_st_column_number=7 #avg_t
+    #     compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
+    #     oirginal_st_column_number=8 #avg_t_s
+    #     compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
+    #     oirginal_st_column_number=9 #avg_t_cs
+    #     compute_improved_percentage_for_common_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
+    #     oirginal_st_column_number = 11  # avg_t_safe
+    #     compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
+    #     oirginal_st_column_number = 12  # avg_t_unsafe
+    #     compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
+    #
+    #     summary_max_for_each_sheet(sheet, total_row, column_number)
+    #
+    #     # Save the modified workbook
+    #     workbook.save(summary_file)
+    #
+    # #write final summary, best strategy
+    # workbook = load_workbook(summary_file)
+    # sheet = workbook["summary"]
+    # sheet.delete_rows(1, sheet.max_row) #clear the sheet
+    # measurement_row_map = {"solved": 23,"safe":24,"unsafe":25,"avt_t":26,"avg_t_s":27,"avg_t_cs":28,"avg_t_safe":29,"avg_t_unsafe":30}
+    # ce_types=["union", "minimal", "common"]
+    # engine_data_list=[]
+    # for e in ["CEGAR","symex"]:
+    #     for d in ["linear","non-linear"]:
+    #         engine_data_list.append(e + "-" + d)
+    #
+    # for engine_data_index,engine_data in enumerate(engine_data_list):
+    #     for i,measurement in enumerate(measurement_row_map):
+    #         write_one_block_summary_best_strategy(workbook, ce_types, measurement_row_map, measurement,i,engine_data,engine_data_index)
+    #
+    # # write final summary, best data set
+    # column_number = 9
+    # starting_row = 32
+    # measurement_column_map = {"solved": 0, "safe": 1, "unsafe": 2, "avt_t": 3, "avg_t_s": 4, "avg_t_cs": 5,
+    #                        "avg_t_safe": 7, "avg_t_unsafe": 8}
+    # strategy_list_symex=["twoQueue02","twoQueue05","twoQueue08","schedule10","schedule100","schedule1000"]
+    # strategy_list=["random","rank","score","SEHPlus","SEHMinus","REHPlus","REHMinus"]+strategy_list_symex
+    #
+    # #write measurement column
+    # for index,measurement in enumerate(measurement_column_map):
+    #     sheet = workbook["summary"]
+    #     s_row = starting_row + len(strategy_list) * index
+    #     e_row = starting_row + len(strategy_list) * (index+1) - 1
+    #     sheet["A"+ str(s_row)].value = measurement
+    #     sheet.merge_cells("A"+ str(s_row) + ':'+"A"+ str(e_row))
+    # #write content
+    # for engine_data_index, engine_data in enumerate(engine_data_list):
+    #     total_row = 13 if "non-linear" in engine_data else 15
+    #     for measurement in measurement_column_map:
+    #         index = measurement_column_map[measurement]
+    #         write_one_block_summary_best_data_set(workbook, ce_types, total_row, column_number, starting_row,
+    #                                               strategy_list, measurement, index, engine_data,
+    #                                               engine_data_index,strategy_list_symex,summary_column_number=5)
+    #
+    # workbook.save(summary_file)
+    #
+    # #cactus plots
+    # for dataset in ["linear","non-linear"]:
+    #     draw_cactus_plot_for_selected_configurations(dataset)
 
-    # write summary excel
-    with pd.ExcelWriter(summary_file) as writer:
-        pd.DataFrame(pd.DataFrame({})).to_excel(writer, sheet_name="summary")
-
-        for k in excel_files_dict:
-            excel_files = excel_files_dict[k]
-            columns = ["category"] + ["total","original_solved","original_safe", "original_unsafe", "original_avg_t","original_avg_t_s","original_avg_t_cs","original_avg_t_ocs","original_avg_t_safe","original_avg_t_unsafe"] + manual_flatten(
-                [[f + "_solved",f + "_safe", f + "_unsafe", f + "_avg_t",f + "_avg_t_s",f + "_avg_t_cs",f+"_avg_t_ocs",f+"_avg_t_safe",f+"_avg_t_unsafe"] for f in excel_files])
-            output_dict = {x: [] for x in columns}
-            engine = "symex" if "symex" in excel_files[0] else "CEGAR"
-
-            # get original safe and unsafe
-            solvability_dict = read_solvability_dict(
-                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" +
-                excel_files[0] + ".xlsx",
-                sheet_name="category_summary")
-
-            output_dict["total"] = ["total"] + solvability_dict["number_predicted"]
-
-            output_dict["original_solved"] = ["solved"] + [a + b for a, b in
-                                                         zip(solvability_dict["eldarica_" + engine + "_original_safe"],
-                                                             solvability_dict[
-                                                                 "eldarica_" + engine + "_original_unsafe"])]
-            output_dict["original_safe"] = ["safe"] + solvability_dict["eldarica_" + engine + "_original_safe"]
-            output_dict["original_unsafe"] = ["unsafe"] + solvability_dict["eldarica_" + engine + "_original_unsafe"]
-            solving_time_list=solvability_dict["eldarica_" + engine + "_original_solving_time"]
-            common_solving_time_list = solvability_dict["eldarica_" + engine + "_original_common_solving_time"]
-            common_original_solving_time_list = solvability_dict["eldarica_" + engine + "_original_common_original_solving_time"]
-            common_solving_count_list = solvability_dict["eldarica_" + engine + "_original_common_solving_count"]
-            sat_solving_time_list=solvability_dict["eldarica_" + engine + "_original_sat_solving_time"]
-            sat_solving_count_list=solvability_dict["eldarica_" + engine + "_original_safe"]
-            unsat_solving_time_list=solvability_dict["eldarica_" + engine + "_original_unsat_solving_time"]
-            unsat_solving_count_list=solvability_dict["eldarica_" + engine + "_original_unsafe"]
-            average_solving_time_list,average_solving_time_solved_list,average_solving_common_solving_time_list,average_solving_common_original_solving_time_list,average_safe_solving_time_list,average_unsafe_solving_time_list = compute_average_solving_time(
-                output_dict["total"],output_dict["original_solved"] ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list,sat_solving_time_list,sat_solving_count_list,unsat_solving_time_list,unsat_solving_count_list)
-            output_dict["original_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_list]
-            output_dict["original_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_solved_list]
-            output_dict["original_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_solving_time_list]
-            output_dict["original_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_original_solving_time_list]
-            output_dict["original_avg_t_safe"] = ["avg_t_safe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_safe_solving_time_list]
-            output_dict["original_avg_t_unsafe"] = ["avg_t_unsafe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_unsafe_solving_time_list]
-            output_dict["category"] = [" "] + solvability_dict["category"]
+    # todo: write profolio
+    for ce_type in ["union","minimal","common"]:
+        collect_profolio(summary_file,ce_type)
 
 
-            # get safe and unsafe from other excels
-            for f in excel_files:
-                solvability_dict = read_solvability_dict(
-                    "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".xlsx",
-                    sheet_name="category_summary")
-                output_dict[f + "_solved"] = ["solved"] + [a + b for a, b in zip(
-                    solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"],
-                    solvability_dict["vb_eldarica_" + engine + "_prioritize_unsafe"])]
-                output_dict[f + "_safe"] = ["safe"] + solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"]
-                output_dict[f + "_unsafe"] = ["unsafe"] + solvability_dict[
-                    "vb_eldarica_" + engine + "_prioritize_unsafe"]
-                solving_time_list=solvability_dict["vb_eldarica_" + engine + "_prioritize_solving_time"]
-                common_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_solving_time"]
-                common_original_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_original_solving_time"]
-                common_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_common_solving_count"]
-                sat_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_sat_solving_time"]
-                sat_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_safe"]
-                unsat_solving_time_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_unsat_solving_time"]
-                unsat_solving_count_list = solvability_dict["vb_eldarica_" + engine + "_prioritize_unsafe"]
-                average_solving_time_list,average_solving_time_solved_list,average_solving_common_solving_time_list,average_solving_common_original_solving_time_list,average_safe_solving_time_list,average_unsafe_solving_time_list = compute_average_solving_time(output_dict["total"],output_dict[f + "_solved"]
-                ,solving_time_list,common_solving_time_list,common_solving_count_list,common_original_solving_time_list,sat_solving_time_list,sat_solving_count_list,unsat_solving_time_list,unsat_solving_count_list)
-                output_dict[f + "_avg_t"] = ["avg_t"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_list]
-                output_dict[f + "_avg_t_s"] = ["avg_t_s"] + [x if isinstance(x,str) else format(x,".2f") for x in average_solving_time_solved_list]
-                output_dict[f + "_avg_t_cs"] = ["avg_t_cs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_solving_time_list]
-                output_dict[f + "_avg_t_ocs"] = ["avg_t_ocs"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_solving_common_original_solving_time_list]
-                output_dict[f + "_avg_t_safe"] = ["avg_t_safe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_safe_solving_time_list]
-                output_dict[f + "_avg_t_unsafe"] = ["avg_t_unsafe"] + [x if isinstance(x, str) else format(x, ".2f") for x in average_unsafe_solving_time_list]
-
-            # for x in output_dict:
-            #     print(x,len(output_dict[x]))
-            pd.DataFrame(pd.DataFrame(output_dict)).to_excel(writer, sheet_name=k)
 
 
-    # merge some cells
-    for e_k in excel_files_dict:
-        excel_files = excel_files_dict[e_k]
-        # Load the Excel file
-        workbook = load_workbook(summary_file)
-        # Select the desired sheet
-        sheet = workbook[e_k]
+def collect_profolio(summary_file,ce_type):
+    folder="/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/"
+    strategy_list = ["rank", "score", "SEHPlus", "SEHMinus", "REHPlus", "REHMinus"]
+    strategy_list_symex=strategy_list+["twoQueue02","twoQueue05","twoQueue08"]
+    #read each block
+    all_data_list=[]
+    original_data_list=[]
+    for engine in ["CEGAR","symex"]:
+        for dataset in ["linear","non-linear"]:
+            if engine=="CEGAR":
+                strategies=strategy_list
+            else:
+                strategies=strategy_list_symex
+            one_block_data_list=[]
+            for strategy in strategies:
+                one_configuration_file=folder+"uppmax-"+engine+"-"+dataset+"-"+ce_type+"-"+dataset+"-model-"+strategy+".xlsx"
+                workbook = load_workbook(one_configuration_file)
+                sheet = workbook["data"]
+                one_block_data_list.append([[cell.value for cell in sheet["B"]][1:],[cell.value for cell in sheet["T"]][1:],[cell.value for cell in sheet["U"]][1:]])
+            all_data_list.append(one_block_data_list)
 
-        # Merge cells
-        sheet.merge_cells('D1:L1')  # Merge cells in the range
-        sheet["D1"].value = "Original"
+            #read original for each block
+            one_configuration_file = folder + "uppmax-"+engine+"-"+dataset+"-fixed-heuristic-random" + ".xlsx"
+            workbook = load_workbook(one_configuration_file)
+            sheet = workbook["data"]
+            one_block_original_data_list=[]
+            for n,sa,t in zip([cell.value for cell in sheet["B"]][1:], [cell.value for cell in sheet["R"]][1:],[cell.value for cell in sheet["S"]][1:]):
+                one_block_original_data_list.append([n,sa,t])
+            original_data_list.append(one_block_original_data_list)
 
-        merge_dict = {f: [] for f in excel_files}
-        last_column_letter = sheet.dimensions.split(':')[1].strip('1234567890')
-        for f in excel_files:
-            for row in sheet["E1:" + last_column_letter + "1"]:
-                for cell in row:
-                    if (f + "_solved" == cell.value or f + "_safe" == cell.value or f + "_unsafe" == cell.value or f + "_avg_t" == cell.value or
-                            f + "_avg_t_s" == cell.value or f + "_avg_t_cs" == cell.value or f + "_avg_t_ocs" == cell.value or f + "_avg_t_safe" == cell.value or f + "_avg_t_unsafe" == cell.value):
-                        merge_dict[f].append(cell.coordinate)
-        for k in merge_dict:
-            sheet.merge_cells(merge_dict[k][0] + ":" + merge_dict[k][-1])
-            sheet[merge_dict[k][0]].value = k.replace(e_k + "-", "").replace("uppmax-", "")
 
-        # add scatter plot inside
-        count = 20 #row number
-        for f in excel_files:
-            img = Image(
-                "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary/" + f + ".png")
-            sheet["A" + str(count)] = ''
-            sheet["A" + str(count)].comment = None
-            sheet.add_image(img, 'A' + str(count))
-            count += 35 #row number
-
-        #compute improve percentage for solving time
-        total_row = 13 if "non-linear" in e_k else 15
-        column_number = 9
-        sheet["B" + str(total_row + 2)].value = "improve percentage"
-
-        oirginal_column_number = 4  # solved
-        compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
-        oirginal_column_number = 5  # safe
-        compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
-        oirginal_column_number = 6  # unsafe
-        compute_improved_percentage(sheet, oirginal_column_number, total_row, column_number)
-        oirginal_st_column_number=7 #avg_t
-        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
-        oirginal_st_column_number=8 #avg_t_s
-        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
-        oirginal_st_column_number=9 #avg_t_cs
-        compute_improved_percentage_for_common_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
-        oirginal_st_column_number = 11  # avg_t_safe
-        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
-        oirginal_st_column_number = 12  # avg_t_unsafe
-        compute_improved_percentage_solving_time(sheet, oirginal_st_column_number, total_row, column_number)
-
-        summary_max_for_each_sheet(sheet, total_row, column_number)
-
-        # Save the modified workbook
-        workbook.save(summary_file)
-
-    #write final summary, best strategy
+    #compute profolio for each block
     workbook = load_workbook(summary_file)
     sheet = workbook["summary"]
-    sheet.delete_rows(1, sheet.max_row) #clear the sheet
-    measurement_row_map = {"solved": 23,"safe":24,"unsafe":25,"avt_t":26,"avg_t_s":27,"avg_t_cs":28,"avg_t_safe":29,"avg_t_unsafe":30}
-    ce_types=["union", "minimal", "common"]
-    engine_data_list=[]
-    for e in ["CEGAR","symex"]:
-        for d in ["linear","non-linear"]:
-            engine_data_list.append(e + "-" + d)
+    summary_column = 5
+    for block_index,(one_block,one_block_original) in enumerate(zip(all_data_list,original_data_list)):
 
-    for engine_data_index,engine_data in enumerate(engine_data_list):
-        for i,measurement in enumerate(measurement_row_map):
-            write_one_block_summary_best_strategy(workbook, ce_types, measurement_row_map, measurement,i,engine_data,engine_data_index)
+        one_block_profolio=[]
+        for i, x in enumerate(one_block[0][0]):
+            one_row_best_solving_time=100000
+            one_row_best_satisfiability="None"
+            one_row_best_name="None"
+            for s in one_block:
+                if s[2][i]<one_row_best_solving_time:
+                    one_row_best_solving_time=s[2][i]
+                    one_row_best_satisfiability=s[1][i]
+                    one_row_best_name=s[0][i]
+            one_block_profolio.append([one_row_best_name, one_row_best_satisfiability, one_row_best_solving_time])
 
-    # write final summary, best data set
-    column_number = 9
-    starting_row = 32
-    measurement_column_map = {"solved": 0, "safe": 1, "unsafe": 2, "avt_t": 3, "avg_t_s": 4, "avg_t_cs": 5,
-                           "avg_t_safe": 7, "avg_t_unsafe": 8}
-    strategy_list_symex=["twoQueue02","twoQueue05","twoQueue08","schedule10","schedule100","schedule1000"]
-    strategy_list=["random","rank","score","SEHPlus","SEHMinus","REHPlus","REHMinus"]+strategy_list_symex
+        #compute columns
+        safe_solving_time_list=[]
+        unsafe_solving_time_list=[]
+        unknown_list=[]
+        original_safe_solving_time_list=[]
+        original_unsafe_solving_time_list=[]
+        original_unknown_list=[]
+        common_solving_time_profolio_list=[]
+        common_solving_time_original_list = []
+        for row,row_original in zip(one_block_profolio,one_block_original):
+            if row[1]=="safe":
+                safe_solving_time_list.append(row[2])
+            elif row[1]=="unsafe":
+                unsafe_solving_time_list.append(row[2])
+            else:
+                unknown_list.append(row[2])
+            if row_original[1]=="safe":
+                original_safe_solving_time_list.append(row_original[2])
+            elif row_original[1]=="unsafe":
+                original_unsafe_solving_time_list.append(row_original[2])
+            else:
+                original_unknown_list.append(row_original[2])
+            #compute common solved time
+            if row[1]==row_original[1] and float(row[2])<benchmark_timeout:
+                common_solving_time_profolio_list.append(row[2])
+                common_solving_time_original_list.append(row_original[2])
 
-    #write measurement column
-    for index,measurement in enumerate(measurement_column_map):
-        sheet = workbook["summary"]
-        s_row = starting_row + len(strategy_list) * index
-        e_row = starting_row + len(strategy_list) * (index+1) - 1
-        sheet["A"+ str(s_row)].value = measurement
-        sheet.merge_cells("A"+ str(s_row) + ':'+"A"+ str(e_row))
-    #write content
-    for engine_data_index, engine_data in enumerate(engine_data_list):
-        total_row = 13 if "non-linear" in engine_data else 15
-        for measurement in measurement_column_map:
-            index = measurement_column_map[measurement]
-            write_one_block_summary_best_data_set(workbook, ce_types, total_row, column_number, starting_row,
-                                                  strategy_list, measurement, index, engine_data,
-                                                  engine_data_index,strategy_list_symex)
 
-    #todo: cactus plots
-    for dataset in ["linear","non-linear"]:
-        draw_cactus_plot_for_selected_configurations(dataset)
+        safe_count=len(safe_solving_time_list)
+        unsafe_count=len(unsafe_solving_time_list)
+        total_solved=safe_count+unsafe_count
+        average_safe_solving_time=sum(safe_solving_time_list)/len(safe_solving_time_list)
+        average_unsafe_solving_time=sum(unsafe_solving_time_list)/len(unsafe_solving_time_list)
+        average_solving_time=sum(safe_solving_time_list+unsafe_solving_time_list+unknown_list)/len(safe_solving_time_list+unsafe_solving_time_list+unknown_list)
+        average_common_solving_time=sum(common_solving_time_profolio_list)/len(common_solving_time_profolio_list)
+
+        original_safe_count = len(original_safe_solving_time_list)
+        original_unsafe_count = len(original_unsafe_solving_time_list)
+        original_total_solved = original_safe_count + original_unsafe_count
+        original_average_safe_solving_time = sum(original_safe_solving_time_list) / len(original_safe_solving_time_list)
+        original_average_unsafe_solving_time = sum(original_unsafe_solving_time_list) / len(original_unsafe_solving_time_list)
+        original_average_solving_time = sum(original_safe_solving_time_list + original_unsafe_solving_time_list + original_unknown_list) / len(original_safe_solving_time_list + original_unsafe_solving_time_list + original_unknown_list)
+        average_common_solving_time_original = sum(common_solving_time_original_list) / len(common_solving_time_original_list)
+
+        improved_percentage_safe_count=float_to_percentage((safe_count-original_safe_count)/original_safe_count)
+        improved_percentage_unsafe_count=float_to_percentage((unsafe_count-original_unsafe_count)/original_unsafe_count)
+        improved_percentage_total_solved=float_to_percentage((total_solved-original_total_solved)/original_total_solved)
+        improved_percentage_average_safe_solving_time=float_to_percentage((original_average_safe_solving_time-average_safe_solving_time)/original_average_safe_solving_time)
+        improved_percentage_average_unsafe_solving_time=float_to_percentage((original_average_unsafe_solving_time-average_unsafe_solving_time)/original_average_unsafe_solving_time)
+        improved_percentage_average_solving_time=float_to_percentage((original_average_solving_time-average_solving_time)/original_average_solving_time)
+        improved_percentage_average_common_solving_time=float_to_percentage(100*(average_common_solving_time_original-average_common_solving_time)/average_common_solving_time_original)
+
+        dataset_row_start_dict={"union":3,"minimal":4,"common":5}
+        dataset_row_start=dataset_row_start_dict[ce_type]
+        #write back to excel
+        strategy_row_content_dict={"solved":[dataset_row_start,total_solved,improved_percentage_total_solved],"safe":[dataset_row_start+3,safe_count,improved_percentage_safe_count],
+                                   "unsafe":[dataset_row_start+6,unsafe_count,improved_percentage_unsafe_count],"avt_t":[dataset_row_start+9,average_solving_time,improved_percentage_average_solving_time],
+                                   "avg_t_cs":[dataset_row_start+15,average_common_solving_time,improved_percentage_average_common_solving_time],
+                                   "avg_t_safe":[dataset_row_start+18,average_safe_solving_time,improved_percentage_average_safe_solving_time],
+                                   "avg_t_unsafe":[dataset_row_start+21,average_unsafe_solving_time,improved_percentage_average_unsafe_solving_time]}
+        sheet[get_column_letter(summary_column*(block_index+1)  )+"2"].value="pf"
+        sheet[get_column_letter(summary_column * (block_index + 1) + 1) + "2"].value = "pf_ip"
+        for c in strategy_row_content_dict:
+            sheet[get_column_letter(summary_column*(block_index+1))+str(strategy_row_content_dict[c][0])].value=strategy_row_content_dict[c][1]
+            sheet[get_column_letter(summary_column * (block_index + 1)+1) + str(strategy_row_content_dict[c][0])].value =strategy_row_content_dict[c][2]
+
 
     workbook.save(summary_file)
+
+
+
+
+
+
 
 def draw_cactus_plot_for_selected_configurations(dataset):
     summary_folder = "/home/cheli243/PycharmProjects/HintsLearning/benchmarks/final-linear-evaluation/data_summary"
@@ -488,12 +618,11 @@ def draw_cactus_plot_for_selected_configurations(dataset):
 
     plot_name="1-cactus-"+dataset+"-union"
     scale="log"
-
     x_axis_right_limit=240 if dataset=="linear" else 450
-
     draw_cactus_plot_multiple_plotly(summary_folder,plot_name,scale,lines, ledgends,x_axis_right_limit)
 
-def write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_number,starting_row,strategy_list,measurement,index,engine_data,engine_data_index,strategy_list_symex):
+def write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_number,starting_row,strategy_list,measurement,
+                                          index,engine_data,engine_data_index,strategy_list_symex,summary_column_number):
     strategy_dict={}
     strategy_list=assign_dict_key_empty_list(strategy_dict,strategy_list)
     improved_percentage_row=total_row+2
@@ -528,21 +657,21 @@ def write_one_block_summary_best_data_set(workbook,ce_types,total_row,column_num
 
     for i,s in enumerate(strategy_dict):
         if "CEGAR" in engine_data and s in strategy_list_symex:
-            sheet[get_column_letter((engine_data_index) * 3 + 2) + str(i + s_row)].value = ""
-            sheet[get_column_letter((engine_data_index) * 3 + 3) + str(i + s_row)].value = ""
-            sheet[get_column_letter((engine_data_index) * 3 + 4) + str(i + s_row)].value = ""
+            sheet[get_column_letter((engine_data_index) * summary_column_number + 2) + str(i + s_row)].value = ""
+            sheet[get_column_letter((engine_data_index) * summary_column_number + 3) + str(i + s_row)].value = ""
+            sheet[get_column_letter((engine_data_index) * summary_column_number + 4) + str(i + s_row)].value = ""
         else:
-            sheet[get_column_letter((engine_data_index) * 3 + 2) + str(i + s_row)].value = s
-            sheet[get_column_letter((engine_data_index)*3+3) + str(i + s_row)].value = strategy_dict[s][0][0]
-            sheet[get_column_letter((engine_data_index)*3+4) +str(i+s_row)].value = strategy_dict[s][0][1]
+            sheet[get_column_letter((engine_data_index) * summary_column_number + 2) + str(i + s_row)].value = s
+            sheet[get_column_letter((engine_data_index)*summary_column_number+3) + str(i + s_row)].value = strategy_dict[s][0][0]
+            sheet[get_column_letter((engine_data_index)*summary_column_number+4) +str(i+s_row)].value = strategy_dict[s][0][1]
         if max(max_percentage_value_list)==percentage_to_float(strategy_dict[s][0][1]):
-            sheet[get_column_letter((engine_data_index)*3+4) + str(i + s_row)].fill = green_fill
+            sheet[get_column_letter((engine_data_index)*summary_column_number+4) + str(i + s_row)].fill = green_fill
 
 
 
 def write_one_block_summary_best_strategy(workbook,ce_types,measurement_row_map,measurement,measurement_index,engine_data,column_index):
     ce_number=3
-    column_number=3
+    column_number=5
     strategy_list = []
     percentage_list = []
     for ce_type in ce_types:
@@ -555,19 +684,19 @@ def write_one_block_summary_best_strategy(workbook,ce_types,measurement_row_map,
     #write to summary sheet
     sheet = workbook["summary"]
     #merge rows
-    sheet["A"+str(measurement_index*column_number+2)].value = measurement
-    sheet.merge_cells('A'+str(measurement_index*column_number+2)+':A'+str(measurement_index*column_number+4))
+    sheet["A"+str(measurement_index*ce_number+3)].value = measurement #solved, safe, unsafe, average time ...
+    sheet.merge_cells('A'+str(measurement_index*ce_number+3)+':A'+str(measurement_index*ce_number+5))
     #merge columns
-    sheet[get_column_letter(column_index*ce_number+2)+"1"].value = engine_data
-    sheet.merge_cells(str(get_column_letter(column_index*ce_number+2))+'1:'+str(get_column_letter(column_index*ce_number+4))+'1')
+    sheet[get_column_letter(column_index*column_number+2)+"1"].value = engine_data #CEGAR-linear, CEGAR-non-linear, symex-linear...
+    sheet.merge_cells(str(get_column_letter(column_index*column_number+2))+'1:'+str(get_column_letter(column_index*column_number+column_number+1))+'1')
     for i, (s, p, ce) in enumerate(zip(strategy_list, percentage_list, ce_types)):
-        sheet[str(get_column_letter(column_index*column_number+2)) + str(i+measurement_index*column_number + 2)].value = ce
+        sheet[str(get_column_letter(column_index*column_number+2)) + str(i+1+measurement_index*ce_number + 2)].value = ce
         if "random" in s:
             s="random"
-        sheet[str(get_column_letter(column_index*column_number+3)) + str(i+measurement_index*column_number + 2)].value = s
-        sheet[str(get_column_letter(column_index*column_number+4)) + str(i+measurement_index*column_number + 2)].value = p
+        sheet[str(get_column_letter(column_index*column_number+3)) + str(i+1+measurement_index*ce_number + 2)].value = s
+        sheet[str(get_column_letter(column_index*column_number+4)) + str(i+1+measurement_index*ce_number + 2)].value = p
         if p == max(percentage_list):
-            sheet[str(get_column_letter(column_index * column_number + 4)) + str(i + measurement_index * column_number + 2)].fill=green_fill
+            sheet[str(get_column_letter(column_index * column_number + 4)) + str(i+1 + measurement_index * ce_number + 2)].fill=green_fill
 
 def summary_max_for_each_sheet(sheet,total_row,column_number):
     # color max value for improve percentage
