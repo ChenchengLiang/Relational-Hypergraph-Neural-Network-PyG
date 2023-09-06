@@ -115,7 +115,8 @@ apptainer exec eldarica_image.sif eld <path_to_smt2_file> -getSolvability -hornG
 ```
 where the option constant in prioritizeClauses:constant can be replaced by label, random, score, rank, SEHPlus, SEHMinus, REHPlus, or REHMinus to apply the predicted probability in different priority functions; The CDHG in -hornGraphType:CDHG can be replaced by CG to read the predictions from the CG. In the container folder, we can build CEGAR and SyMex Eldarica images (eldarica_image.sif) by "eldarica-compile-CEGAR-recipe.def" and "eldarica-compile-CEGAR-recipe.def", respectively.
 
-This command reads the predicted probability from ".hyperEdgeGraph.JSON" or ".monoDirectionLayerGraph.JSON" depending on the option -hornGraphType:CDHG/CG, then use the probability in a priority function decided by the option -prioritizeClause. The solving results (i.e., SAT, UNSAT, or timeout and corresponding time consumption) are written in a .solvability.JSON file.
+This command reads the predicted probability from ".hyperEdgeGraph.JSON" or ".monoDirectionLayerGraph.JSON" depending on the option -hornGraphType:CDHG/CG, then uses the probability in a priority function decided by the option -prioritizeClause. The solving results (i.e., SAT, UNSAT, or timeout and corresponding time consumption) are written in a .solvability.JSON file. In the file .solvability.JSON, the solving time is stored in the field "solvingTime-CDHG-0.0" when using the graph CDHG. If we use CG, then the field should be "solvingTime-CG-0.0". Similarly, the satisfiability of the .smt2 file is stored in the field "satisfiability-CDHG-0.0" where "1" and "0" represent SAT and UNSAT, respectively.
+The file .solvability.JSON includes much redundant information for different options, statistics, and debugging. We suggest the users to write their own scripts to capture the solving results and corresponding time. 
 
 
 
