@@ -109,6 +109,16 @@ In "one-example-demo-unsatcore-CDHG/test_data/predicted", you can see the predic
 Try to replace the relative paths by absolute paths 
 if there are some problems caused by the path (e.g., didn't read data in list).
 
+#### 4. Use predicted results to guide CEGAR and SyMex [Eldarica]
+```
+apptainer exec eldarica_image.sif eld <path_to_smt2_file> -getSolvability -hornGraphLabelType:unsatCore -unsatCoreThreshold:0.0 -hornGraphType:CDHG -abstract:off -prioritizeClauses:constant
+```
+where the option constant in prioritizeClauses:constant can be replaced by label, random, score, rank, SEHPlus, SEHMinus, REHPlus, or REHMinus to apply the predicted probability in different priority functions; The CDHG in -hornGraphType:CDHG can be replaced by CG to read the predictions from the CG. In the container folder, we can build CEGAR and SyMex Eldarica images (eldarica_image.sif) by "eldarica-compile-CEGAR-recipe.def" and "eldarica-compile-CEGAR-recipe.def", respectively.
+
+This command reads the predicted probability from ".hyperEdgeGraph.JSON" or ".monoDirectionLayerGraph.JSON" depending on the option -hornGraphType:CDHG/CG, then use the probability in a priority function decided by the option -prioritizeClause. The solving results (i.e., SAT, UNSAT, or timeout and corresponding time consumption) are written in a .solvability.JSON file.
+
+
+
 
 ## Citation
 [Exploring Representation of Horn Clauses using GNNs (Extended Technical Report)](https://arxiv.org/abs/2206.06986)
