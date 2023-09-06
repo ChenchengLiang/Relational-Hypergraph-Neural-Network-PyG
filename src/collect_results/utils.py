@@ -559,7 +559,7 @@ def collect_profolio(summary_file,ce_type):
         improved_percentage_average_safe_solving_time=float_to_percentage((original_average_safe_solving_time-average_safe_solving_time)/original_average_safe_solving_time)
         improved_percentage_average_unsafe_solving_time=float_to_percentage((original_average_unsafe_solving_time-average_unsafe_solving_time)/original_average_unsafe_solving_time)
         improved_percentage_average_solving_time=float_to_percentage((original_average_solving_time-average_solving_time)/original_average_solving_time)
-        improved_percentage_average_common_solving_time=float_to_percentage(100*(average_common_solving_time_original-average_common_solving_time)/average_common_solving_time_original)
+        improved_percentage_average_common_solving_time=float_to_percentage((average_common_solving_time_original-average_common_solving_time)/average_common_solving_time_original)
 
         dataset_row_start_dict={"union":3,"minimal":4,"common":5}
         dataset_row_start=dataset_row_start_dict[ce_type]

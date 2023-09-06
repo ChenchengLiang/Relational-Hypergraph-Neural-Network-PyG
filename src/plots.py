@@ -105,7 +105,7 @@ def scatter_plot(x_data, y_data, z_data, x_axis, y_axis, folder, data_text, name
         go.Scatter(x=[0, max_value], y=[0, max_value], mode="lines", name="diagonal", line=dict(color="gray")))
 
     font_size=60
-    title_text=("Number of commonly solved problems:" + str(len(x_data))+ "<br>above/under:" + str(above_diagonal) + "/" + str(under_diagonal))
+    title_text=("Number of commonly solved problems:" + str(len(x_data))+ "<br>above/under diagonal:" + str(above_diagonal) + "/" + str(under_diagonal))
         #name
         #+ "<br>gain/lose:" +str(gain) + "/" + str(lose)
         #+"<br>average_x/average_y:" + "{:.1f}".format(average_x)+"/"+"{:.1f}".format(average_y)
