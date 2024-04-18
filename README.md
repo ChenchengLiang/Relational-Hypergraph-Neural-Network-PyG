@@ -11,9 +11,9 @@ If you don't use containers, you can also follow the commands in .def files ment
 #### 1. Eldarica container
 In the folder container of this repository, build an Eldarica image by:
 ```
-apptainer build eldarica_image.sif eldarica-compile-unsatcore-recipe.def
+apptainer build eldarica_image.sif eldarica-compile-CEGAR-recipe.def
 ```
-This command builds an image named eldarica_image.sif, and the recipe file is eldarica-compile-unsatcore-recipe.def.
+This command builds an image named eldarica_image.sif, and the recipe file is eldarica-compile-CEGAR-recipe.def.
 eldarica_image.sif contains Eldarica and its dependencies.
 
 Run this image by:
