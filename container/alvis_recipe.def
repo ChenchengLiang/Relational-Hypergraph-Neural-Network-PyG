@@ -6,8 +6,8 @@ From: ubuntu:20.04
     mkdir ${APPTAINER_ROOTFS}/requirement
 
 %files
-    /home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/src .
-    /home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/requirements.txt requirement
+    ../src .
+    ../requirements.txt requirement
 
 %environment
     export LISTEN_PORT=12345
