@@ -5,7 +5,7 @@ From: continuumio/miniconda3
     mkdir ${APPTAINER_ROOTFS}/requirement
 
 %files
-    /home/cheli243/PycharmProjects/Relational-Hypergraph-Neural-Network-PyG/requirements.txt requirement
+    ../requirements.txt requirement
 
 %environment
     export LISTEN_PORT=12345
