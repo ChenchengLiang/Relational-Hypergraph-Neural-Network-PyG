@@ -1,25 +1,13 @@
 cff-version: 1.2.0
 message: "If you use this repository, please cite the following work."
 authors:
-  - family-names: "Abdulla"
-    given-names: "Parosh Aziz"
   - family-names: "Liang"
     given-names: "Chencheng"
   - family-names: "Rümmer"
     given-names: "Philipp"
-editors:
-  - family-names: "Dimitrova"
-    given-names: "Rayna"
-  - family-names: "Lahav"
-    given-names: "Ori"
-  - family-names: "Wolff"
-    given-names: "Sebastian"
-title: "Boosting Constrained Horn Solving by Unsat Core Learning"
-conference: "Verification, Model Checking, and Abstract Interpretation"
-year: 2024
-publisher: "Springer Nature Switzerland"
-address: "Cham"
-pages: "280--302"
-doi: "10.1007/978-3-031-50524-9_13"
-isbn: "978-3-031-50524-9"
-abstract: "The Relational Hyper-Graph Neural Network (R-HyGNN) was introduced in [1] to learn domain-specific knowledge from program verification problems encoded in Constrained Horn Clauses (CHCs). It exhibits high accuracy in predicting the occurrence of CHCs in counterexamples. In this research, we present an R-HyGNN-based framework called MUSHyperNet. The goal is to predict the Minimal Unsatisfiable Subsets (MUSes) (i.e., unsat core) of a set of CHCs to guide an abstract symbolic model checking algorithm. In MUSHyperNet, we can predict the MUSes once and use them in different instances of the abstract symbolic model checking algorithm. We demonstrate the efficacy of MUSHyperNet using two instances of the abstract symbolic model-checking algorithm: Counter-Example Guided Abstraction Refinement (CEGAR) and symbolic model-checking-based (SymEx) algorithms. Our framework enhances performance on a uniform selection of benchmarks across all categories from CHC-COMP, solving more problems (6.1% increase for SymEx, 4.1% for CEGAR) and reducing average solving time (13.3% for SymEx, 7.1% for CEGAR)."
+  - family-names: "Brockschmidt"
+    given-names: "Marc"
+title: "Exploring Representation of Horn Clauses using GNNs (Extended Technical Report)"
+year: 2022
+type: article
+arxiv: "2206.06986"
